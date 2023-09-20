@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./principal.css" />
+    <link rel="stylesheet" href="../ui/style/planillas.css" />
+    <link
+      rel="stylesheet"
+      href="../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../node_modules/@fortawesome/fontawesome-free/css/solid.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../node_modules/@fortawesome/fontawesome-free/css/brands.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../node_modules/select2/dist/css/select2.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../node_modules/select2/dist/css/select2.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
+
+    <title>Planilla-w</title>
+  </head>
+  <body class="vh-100 overflow-hidden body" style="width: 100%">
+    <!-- Navbar -->
+    <header class="header">
+      <nav class="navbar navbar-expand-lg navbar-dark fixed-top header">
+        <div class="container-fluid">
+          <!-- Logo -->
+          <a class="navbar-brand fs-1" href="#">SCAP </a>
+
+          <!-- <img src="../assets/fonts/logo.png" alt="logo not-found">
+        <a class="navbar-brand fs-4" href="#">SCAP STDO </a> -->
+          <!-- Toggle button -->
+          <button
+            class="navbar-toggler shadow-none border-0"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <!-- SideBar -->
+          <div
+            class="sidebar offcanvas offcanvas-start"
+            tabindex="-1"
+            id="offcanvasNavbar"
+            aria-labelledby="offcanvasNavbarLabel"
+          >
+            <!-- Sidebar Header -->
+            <div class="offcanvas-header text-white border-bottom">
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white shadow-none"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+              ></button>
+            </div>
+            <!-- Sidebar Body -->
+            <div class="offcanvas-body d-flex flex-column p-4 flex-lg-row">
+              <ul
+                class="navbar-nav justify-content-center fs-5 flex-grow-1 pe-3 align-items-center"
+              >
+                <li class="nav-item">
+                  <a
+                    class="nav-link active"
+                    aria-current="page"
+                    onclick="abrirInicio()"
+                    >Inicio</a
+                  >
+                </li>
+
+                <li class="nav-item mx-2">
+                  <div class="dropdown">
+                    <button
+                      class="nav-link btn btn-outline dropdown-toggle"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      Registros
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li class="nav-item mx-2">
+                        <a class="dropdown-item" onclick="abrirSocios()"
+                          >Socios</a
+                        >
+                      </li>
+                      <li><hr class="dropdown-divider" /></li>
+                      <li class="nav-item mx-2">
+                        <a class="dropdown-item" onclick="abrirUsuarios()"
+                          >Usuarios</a
+                        >
+                      </li>
+                      <li><hr class="dropdown-divider" /></li>
+                      <li class="nav-item mx-2">
+                        <a class="dropdown-item" onclick="abrirImplementos()"
+                          >Inventario</a
+                        >
+                      </li>
+                      <li><hr class="dropdown-divider" /></li>
+                      <li class="nav-item mx-2">
+                        <a class="dropdown-item" onclick="abrirParametros()"
+                          >Configuraciones</a
+                        >
+                      </li>
+                      <!-- <li>
+                        <a class="dropdown-item" href="#"
+                          >Something else here</a
+                        >
+                      </li> -->
+                    </ul>
+                  </div>
+                </li>
+
+                <li class="nav-item mx-2">
+                  <a class="nav-link" onclick="abrirPagos()">Pagos</a>
+                </li>
+
+                <li class="nav-item mx-2">
+                  <a class="nav-link" onclick="abrirPlanillas()">Planillas</a>
+                </li>
+                <li class="nav-item mx-2">
+                  <a class="nav-link" onclick="abrirContratos()">Contratos</a>
+                </li>
+              </ul>
+              <!-- Login/Sign up -->
+              <div
+                class="d-flex justify-content-center align-items-center gap-3 flex-column flex-lg-row"
+              >
+                <!-- <button
+                  onclick="mostrarLogin()"
+                  class="text-white px-3 py-1 rounded-1 btn bg-primary"
+                >
+                  Iniciar sesion
+                </button> -->
+                <button class="text-black px-3 py-1 rounded-1 btn bg-white">
+                  Salir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <div class="row container-fluid" style="height: 100%">
+      <section
+        class="container-fluid active"
+        style="padding-top: 120px"
+        id="seccion1"
+      >
+        <div class="col-12 d-flex justify-content-end">
+          <button class="btn btn-success mx-2" id="btnSeccion1">
+            Administrar Planillas
+          </button>
+          <!-- <button class="btn btn-success " onclick="generarPlanillas()" id="btnGenerarPlanillas"> -->
+          <button class="btn btn-success" onclick="generarPlanilla()">
+            Generar Planillas
+          </button>
+        </div>
+        <!-- <div class="col-12">
+        <p class="text-white fs-5">Inicio/Registros/Planillas</p>
+      </div> -->
+        <div class="col-lg-12 col-md-12 col-sm-12" style="height: 60vh">
+          <div class="row">
+            <div class="col-6 " style="height: 60vh; padding: 1rem">
+              <p style="padding: 0; margin: 0; border-bottom: solid 2px">
+                Listado de planillas
+              </p>
+              <div class="row my-3  encabezado-planillas">
+                <div class="col-6">
+                  <label for="criterio">Buscar por...</label>
+                  <div class="row">
+                    <div class="col-6">
+                      <select
+                        id="criterio"
+                        class="form-select"
+                        aria-label="Default select example"
+                      >
+                        <option value="todas" selected>Todas</option>
+                        <option value="cedula">Cédula del socio</option>
+                        <option value="apellidos">Apellidos del socio</option>
+                        <option value="código">Código</option>
+                      </select>
+                    </div>
+                    <div class="col-6">
+                      <div class="input-group">
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Buscar..."
+                          id="cedula"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <label for="cedula">Fecha de Emisión</label>
+                  <div class="input-group">
+                    <div class="col-12">
+                      <div class="row">
+                        <div class="col-6">
+                          <select
+                            id="anio"
+                            class="form-select"
+                            aria-label="Default select example"
+                          >
+                            <option value="todas" selected>Todas</option>
+                          </select>
+                        </div>
+                        <div class="col-6">
+                          <select id="mes" class="form-select">
+                            <option value="all">Todos los meses</option>
+                            <option value="01">Enero</option>
+                            <option value="02">Febrero</option>
+                            <option value="03">Marzo</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Mayo</option>
+                            <option value="06">Junio</option>
+                            <option value="07">Julio</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 d-flex justify-content-end mt-1">
+                  <div class="col-12">
+                    <div class="row d-flex justify-content-end">
+                      <div class="col-3">
+                        <label for="criterio">Estado</label>
+                        <select
+                          id="estado"
+                          class="form-select"
+                          aria-label="Default select example"
+                        >
+                          <option value="all" selected>Todos</option>
+                          <option value="Cancelado">Cancelado</option>
+                          <option value="Por cobrar">Sin cancelar</option>
+                        </select>
+                      </div>
+                      <div class="col-3">
+                        <label class="text-white" for="criterio">Buscar</label>
+                        <button
+                          type="button"
+                          class="btn-buscar"
+                          style="width: 100%"
+                        >
+                          Buscar<i class="fa fa-search mx-1"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="text-center"  style="border-top: solid 2px #85c1e9;margin-right: 3%;"></p>
+              <div
+                class="row"
+                id="planillas"
+                style="overflow-y: auto; height: 100%"
+              >
+                <div class="col-6 mx-1 card mb-3 border-primary card-planilla">
+                  <div
+                    class="card-header row d-flex"
+                    style="background-color: #85c1e9"
+                  >
+                    <div class="d-flex col-6 titulo-detalles header-planilla">
+                      <p>Contrato:</p>
+                      CN203
+                    </div>
+                    <div
+                      class="d-flex col-6 titulo-detalles header-planilla positive justify-content-end"
+                    >
+                      <p>Cancelado:</p>
+                      Si
+                    </div>
+                  </div>
+                  <div class="card-body cuerpo">
+                    <div class="card-title d-flex titulo-socio">
+                      <h5>Socio:</h5>
+                      <p>Juan Jose Lopez</p>
+                    </div>
+                    <div class="d-flex">
+                      <p>Fecha emisión:</p>
+                      06-09-2023
+                    </div>
+                    <div class="row">
+                      <p class="text-center titulo-servicios-positive">
+                        Agua Potable
+                      </p>
+                      <div class="col-4 d-flex titulo-detalles">
+                        <p>Consumo:</p>
+                        23m
+                      </div>
+                      <div class="col-4 d-flex titulo-detalles">
+                        <p>Tarifa:</p>
+                        0.35
+                      </div>
+                      <div class="col-4 d-flex titulo-detalles">
+                        <p>Valor:</p>
+                        $8.50
+                      </div>
+                    </div>
+
+                    <p class="text-center titulo-servicios-positive">
+                      Servicios
+                    </p>
+                    <div class="lista-servicios">
+                      <ul class="list-group list-group-flush">
+                        <li class="titulo-detalles d-flex detalles">
+                          <p>Alcantarillado:</p>
+                          2.00
+                        </li>
+                        <li class="titulo-detalles d-flex detalles">
+                          <p>Recoleccion de desechos:</p>
+                          1.50
+                        </li>
+                        <li class="titulo-detalles d-flex detalles">
+                          <p>Riego Agrícola:</p>
+                          1.25
+                        </li>
+                        <li class="titulo-detalles d-flex detalles">
+                          <p>Bomberos:</p>
+                          0.75
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="card-footer row d-flex">
+                    <div class="col-6 titulo-detalles d-flex">
+                      <p>Total:</p>
+                      18.50
+                    </div>
+
+                    <button class="btn-planilla-positive col-6">
+                      <i class="fa-solid fa-file-pen"></i>
+                    </button>
+                    <!-- <button>Editar</button> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6" style="height: 65vh; padding: 1rem">
+              <p style="border-bottom: solid 2px; margin: 0">
+                Detalles de la planilla
+              </p>
+              <div class="row my-3">
+                <div class="col-12 d-flex justify-content-center">
+                  <div class="row encabezado-planilla">
+                    <div class="col-3">
+                      <label for="cedula">Fecha deEmisión</label>
+                      <p class="text-white" id="planillaEmision">10-09-2023</p>
+                    </div>
+                    <div class="col-3">
+                      <label for="cedula">Código del contrato</label>
+                      <p class="text-white" id="contratoCodigo">CN203</p>
+                    </div>
+                    <div class="col-3">
+                      <label for="cedula">Código de la planilla</label>
+                      <p class="text-white" id="planillaCodigo">CN203</p>
+                    </div>
+                    <div class="col-3">
+                      <label for="cedula">Estado de la planilla</label>
+                      <p class="text-white" id="planillaEstado">Por cancelar</p>
+                    </div>
+                    <div class="col-6">
+                      <label for="cedula">Socio</label>
+                      <!-- <input
+                        readonly
+                        type="text"
+                        class="form-control"
+                        placeholder="Nombres y apellidos del socio"
+                        id="nombresSocio"
+                      /> -->
+                      <p class="text-white" id="socioNombres">
+                        Sofia Mercy Ruíz Paéz
+                      </p>
+                    </div>
+                    <div class="col-3">
+                      <label for="cedula">Cédula del socio</label>
+                      <p class="text-white" id="socioCedula">1728674523</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <form id="planillaForm">
+                    <p class="text-center">Servicio de agua potable</p>
+                    <div class="row">
+                      <div class="col-3">
+                        <label for="cedula">Lectura Anterior</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Lectura Anterior"
+                          id="lecturaAnterior"
+                        />
+                      </div>
+                      <div class="col-3">
+                        <label for="lecturaActual">Lectura Actual</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Lectura Actual"
+                          id="lecturaActual"
+                        />
+                      </div>
+                      <div class="col-3">
+                        <label for="lecturaActual">Tarifa de consumo</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Tarifa de consumo"
+                          id="tarifaConsumo"
+                        />
+                      </div>
+                      <div class="col-3">
+                        <label for="lecturaActual">Valor consumo</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="$0.0"
+                          id="valorConsumo"
+                        />
+                      </div>
+                      <div class="col-12 d-flex justify-content-center mt-2">
+                        <button
+                          type="button"
+                          class="btn btn-warning"
+                          id="calcularConsumo"
+                          onclick="recalcularConsumo()"
+                        >
+                          Calcular
+                        </button>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6">
+                        <p class="text-center mt-2 mb-2">Servicios Fijos</p>
+                        <div
+                          id="serviciosFijos"
+                          class="row container-card-servicios"
+                        >
+                          <div
+                            class="col-12 card border-info mb-2"
+                            style="
+                              max-width: 100%;
+                              max-height: fit-content;
+                              padding: 0;
+                            "
+                          >
+                            <div
+                              class="card-header titulo-detalles"
+                              style="
+                                margin: 0;
+                                padding: 0.5%;
+                                background-color: #85c1e9;
+                              "
+                            >
+                              <p>Alcantarillado</p>
+                            </div>
+                            <div class="card-body card-cuerpo card-s-cuerpo">
+                              <!-- <h5 class="card-title">Recoleccion de desechos</h5> -->
+                              <div class="col-12">
+                                <div class="row">
+                                  <div class="col-3 card-cuerpo">
+                                    <p class="">Valor:</p>
+                                    <p class="">$2.50</p>
+                                  </div>
+                                  <div class="col-3">
+                                    <p>Descuento:</p>
+                                    <p>Tercera Edad</p>
+                                  </div>
+                                  <div class="col-3">
+                                    <p>Valor desc:</p>
+                                    <p>$0.50</p>
+                                  </div>
+                                  <div class="col-3">
+                                    <p>Total:</p>
+                                    <p>2.50</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <p class="text-center mt-2 mb-2">
+                          Servicios Ocacionales
+                        </p>
+                        <div
+                          id="otrosServicios"
+                          class="row container-card-servicios"
+                        >
+                          <div
+                            class="col-12 card border-info mb-2"
+                            style="
+                              max-width: 100%;
+                              max-height: fit-content;
+                              padding: 0;
+                            "
+                          >
+                            <div
+                              class="card-header titulo-detalles"
+                              style="
+                                margin: 0;
+                                padding: 0.5%;
+                                background-color: #aed6f1;
+                              "
+                            >
+                              <p>Vacunas</p>
+                            </div>
+                            <div
+                              class="card-body card-cuerpo"
+                              style="padding: 1em"
+                            >
+                              <!-- <h5 class="card-title">Recoleccion de desechos</h5> -->
+                              <div class="col-12">
+                                <div class="row">
+                                  <div class="col-3 card-cuerpo">
+                                    <p class="">Valor:</p>
+                                    <p class="">$2.50</p>
+                                  </div>
+                                  <div class="col-3">
+                                    <p>Descuento:</p>
+                                    <p>Tercera Edad</p>
+                                  </div>
+                                  <div class="col-3">
+                                    <p>Valor desc:</p>
+                                    <p>$0.50</p>
+                                  </div>
+                                  <div class="col-3">
+                                    <p>Total:</p>
+                                    <p>2.50</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="row d-flex justify-content-end">
+                        <div class="col-3">
+                          <label for="lecturaActual">Subtotal</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            placeholder="$0.0"
+                            id="valorSubtotal"
+                          />
+                        </div>
+                        <div class="col-3">
+                          <label for="lecturaActual">Total descuento</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            placeholder="$0.0"
+                            id="valorTotalDescuento"
+                          />
+                        </div>
+                        <div class="col-3">
+                          <label for="lecturaActual">Total a pagar</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            placeholder="$0.0"
+                            id="valorTotalPagar"
+                          />
+                        </div>
+                        <div class="col-12 d-flex justify-content-end mt-2">
+                          <button class="btn btn-danger" type="reset">
+                            Cancelar
+                          </button>
+                          <button class="btn btn-success" type="submit">
+                            Guardar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="container-fluid" style="padding-top: 150px" id="seccion2">
+        <div class="col-12 d-flex justify-content-end">
+          <button class="btn btn-success" id="btnSeccion2">
+            Lista de Planillas
+          </button>
+        </div>
+      </section>
+    </div>
+    <dialog
+      id="formServicios"
+      style="
+        background-color: white;
+        border: #00000000;
+        padding: 0;
+        backdrop-filter: blur(10px);
+      "
+      class="vw-100 vh-100"
+    >
+      <section
+        style="
+          width: 100%;
+          height: 100%;
+
+          margin: 0 auto;
+        "
+        class="text-white container-fluid"
+      >
+        <div class="row container-fluid" style="height: 50%">
+          <div class="col-12">
+            <p class="text-white fs-5">Inicio/Registros/Servicios</p>
+          </div>
+          <div
+            class="col-lg-8 col-md-8 col-sm-12"
+            style="
+              height: 50vh;
+
+              padding: 10px;
+            "
+          >
+            <!-- Tabla de listado de usuarios -->
+            <div style="width: 100%; height: 100%">
+              <table class="table">
+                <thead class="table-dark">
+                  <tr>
+                    <th colspan="9" class="text-center fs-4">
+                      Listado de Servicios
+                      <i class="fa-solid fa-user-tie"></i>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>Id</th>
+                    <th>Fecha</th>
+                    <th>Servicio</th>
+                    <th>Descripcion</th>
+                    <th>Valor</th>
+
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="socios">
+                  <tr>
+                    <td>1</td>
+                    <td>2023-07-07</td>
+                    <td>Reparacion de medidor</td>
+                    <td>Reparacion dela llave de paso del medidor</td>
+                    <td>50$</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-12" style="padding-top: 10px">
+            <form class="form-horizontal" id="socioForm">
+              <div class="col-12 text-white text-center fs-4">
+                Datos del Servicio
+              </div>
+              <input type="text" class="form-control my-2" placeholder="Id" />
+              <input
+                type="text"
+                class="form-control my-2"
+                placeholder="Servicio"
+                id="servicio"
+              />
+              <input
+                type="text"
+                class="form-control my-2"
+                placeholder="Fecha de Aplicacion"
+                id="fecha"
+              />
+              <input
+                type="number"
+                class="form-control my-2"
+                placeholder="Descripcion"
+                id="descripcion"
+              />
+              <input
+                type="date"
+                class="form-control my-2"
+                placeholder="Valor"
+                id="valor"
+              />
+
+              <div class="col-12 d-flex justify-content-end">
+                <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
+                <button class="btn btn-danger rounded-2">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Acciones y formulario de los implementos para cada servicio -->
+        <div class="row container-fluid" style="height: 50%">
+          <div class="col-12">
+            <p class="text-white fs-5">Inicio/Registros/Implementos</p>
+          </div>
+          <div
+            class="col-lg-8 col-md-8 col-sm-12"
+            style="
+              height: 60vh;
+
+              padding: 10px;
+            "
+          >
+            <!-- Tabla de listado de usuarios -->
+            <div style="width: 100%; height: 100%">
+              <table class="table">
+                <thead class="table-dark">
+                  <tr>
+                    <th colspan="9" class="text-center fs-4">
+                      Implementos que fuero requeridos
+                      <i class="fa-solid fa-user-tie"></i>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>Id</th>
+                    <th>Codigo</th>
+                    <th>Implemento</th>
+                    <th>Descripcion</th>
+                    <th>Marca</th>
+                    <th>Cantidad</th>
+                    <th>Valor unitario</th>
+                    <th>Total</th>
+
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="socios">
+                  <tr>
+                    <td>1</td>
+                    <td>100200300</td>
+                    <td>Llave de agua</td>
+                    <td>Llave de agua tipo pesada</td>
+                    <td>FV</td>
+                    <td>1</td>
+                    <td>7.00</td>
+                    <td>7.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-12" style="padding-top: 10px">
+            <form class="form-horizontal" id="socioForm">
+              <div class="col-12 text-white text-center fs-4">
+                Datos del implemento
+              </div>
+
+              <div class="col-12 my-2">
+                <!-- <div class="form-group">
+                      <label>Multiple</label> -->
+                <select
+                  class="form-control select2 select2-hidden-accessible"
+                  data-placeholder="Select a State"
+                  style="width: 100%"
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  <option selected>Codigo</option>
+                  <option>Alaska</option>
+                  <option>California</option>
+                  <option>Delaware</option>
+                  <option>Tennessee</option>
+                  <option>Texas</option>
+                  <option>Washington</option>
+                </select>
+                <!-- </div> -->
+              </div>
+              <div class="col-12 mt-2 mb-1">
+                <select
+                  class="form-control select2 select2-hidden-accessible"
+                  data-placeholder="Select a State"
+                  style="width: 100%"
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  <option selected>Implemento</option>
+                  <option>Alaska</option>
+                  <option>California</option>
+                  <option>Delaware</option>
+                  <option>Tennessee</option>
+                  <option>Texas</option>
+                  <option>Washington</option>
+                </select>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <input
+                    type="text"
+                    class="form-control my-1"
+                    placeholder="Descripcion"
+                    id="fecha"
+                  />
+                </div>
+                <div class="col-6">
+                  <input
+                    type="number"
+                    class="form-control my-1"
+                    placeholder="Marca"
+                    id="descripcion"
+                  />
+                </div>
+                <div class="col-6">
+                  <input
+                    type="number"
+                    step="any"
+                    class="form-control my-1"
+                    placeholder="Valor unitario"
+                    id="valor"
+                  />
+                </div>
+                <div class="col-6">
+                  <input
+                    type="number"
+                    step="any"
+                    class="form-control my-1"
+                    placeholder="Cantidad"
+                    id="valor"
+                  />
+                </div>
+                <div class="col-6">
+                  <input
+                    type="number"
+                    step="any"
+                    class="form-control my-1"
+                    placeholder="Valor total"
+                    id="valortotal"
+                  />
+                </div>
+              </div>
+              <div class="col-12 d-flex justify-content-end">
+                <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
+                <button class="btn btn-danger rounded-2">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </dialog>
+  </body>
+  <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="../../node_modules/select2/dist/js/select2.min.js"></script>
+  <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="../../node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
+  <script src="./bootstrap/js/bootstrap.min.js"></script>
+
+  <script src="./planillas.js" defer></script>
+
+  <script>
+    function mostrarFormServicios() {
+      console.log("MostrarFormServicios");
+      const dialog = document.getElementById("formServicios");
+      dialog.showModal();
+    }
+  </script>
+</html>
