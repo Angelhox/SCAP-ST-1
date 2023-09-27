@@ -337,7 +337,8 @@
               <input
                 type="text"
                 class="form-control my-2"
-                placeholder="Descripcuion del cargo"
+                placeholder="Descripción del cargo"
+                readonly
                 id="descripcioncargo"
                 value="Seleccione un cargo"
               />
@@ -407,13 +408,16 @@
 
             <div class="col-6">
               <label for="nombre">Acceso</label>
-              <input
-                type="text"
-                class="form-control my-2"
-                placeholder="Acceso"
-                id="acceso"
-                disabled
-              />
+              <select class="form-select my-2" id="accesos" disabled>
+                <option
+                  data-values="Seleccione un cargo"
+                  value="0"
+                  id="0"
+                  selected
+                >
+                  Acceso...
+                </option>
+              </select>
             </div>
             <div class="col-12">
               <label for="nombre">Descripción del acceso</label>
@@ -422,6 +426,8 @@
                 class="form-control my-2"
                 placeholder="Descripción"
                 id="descripcionacceso"
+                readonly
+                value="Seleccione un acceso"
                 disabled
               />
             </div>

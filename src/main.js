@@ -283,7 +283,7 @@ function createWindow() {
       contextIsolation: false,
     },
   });
-  window.loadFile("src/ui/login.html");
+  window.loadFile("src/ui/principal.html");
 }
 ipcMain.on("abrirInterface", (event, interfaceName) => {
   try {
@@ -303,6 +303,15 @@ ipcMain.handle("getCargos", async () => {
   return results;
 });
 // ----------------------------------------------------------------
+// Funciones de los accesos
+// ----------------------------------------------------------------
+ipcMain.handle("getAccesos", async () => {
+  const conn = await getConnection();
+  const results = conn.query("SELECT * FROM roles");
+  console.log(results);
+  return results;
+});
+// ----------------------------------------------------------------
 // Funciones de los usuarios
 // ----------------------------------------------------------------
 ipcMain.handle("getUsuarios", async () => {
@@ -313,10 +322,12 @@ ipcMain.handle("getUsuarios", async () => {
       "empleados.segundoApellido,empleados.telefono,empleados.correo," +
       "cargosempleados.cargo," +
       "cargosempleados.cargoDescripcion," +
-      " usuarios.id as usuariosId,usuarios.rol,usuarios.rolDescripcion," +
-      " usuarios.usuario,usuarios.clave,usuarios.fechaModificacion " +
+      " usuarios.id as usuariosId," +
+      " usuarios.usuario,usuarios.clave,usuarios.fechaModificacion, " +
+      " roles.id as rolesId, roles.rol,roles.rolDescripcion " +
       "from empleados join usuarios on empleados.id=usuarios.empleadosId join " +
-      "cargosempleados on cargosempleados.id=empleados.cargosId where empleados.usuariosn='Si';"
+      "cargosempleados on cargosempleados.id=empleados.cargosId join roles on " +
+      "roles.id=usuarios.rolesId where empleados.usuariosn='Si';"
   );
   console.log(results);
   return results;
@@ -338,16 +349,16 @@ ipcMain.handle("getEmpleados", async () => {
   console.log(results);
   return results;
 });
-ipcMain.handle("createUsuario", async (event, empleado, cargo, usuario) => {
+ipcMain.handle("createUsuario", async (event, empleado, usuario) => {
   try {
     const conn = await getConnection();
     console.log("Recibido: ", usuario);
     //   product.price = parseFloat(product.price);
-    const resultCargo = await conn.query(
-      "Insert into cargosempleados set ? ;",
-      cargo
-    );
-    empleado.cargosId = resultCargo.insertId;
+    // const resultCargo = await conn.query(
+    //   "Insert into cargosempleados set ? ;",
+    //   cargo
+    // );
+    //empleado.cargosId = resultCargo.insertId;
     const resultEmpleado = await conn.query(
       "Insert into empleados set ? ;",
       empleado
@@ -358,13 +369,19 @@ ipcMain.handle("createUsuario", async (event, empleado, cargo, usuario) => {
       usuario
     );
     console.log(resultUsuario);
-    new Notification({
-      title: "Regístro guardado",
-      body: "Se registró un nuevo usuario con éxito",
-    }).show();
-    usuario.id = result.insertId;
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Guardado!",
+      message: "Se ha guardado el nuevo registro.",
+    });
+    usuario.id = resultUsuario.insertId;
     return usuario;
   } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al guardar el registro.",
+    });
     console.log(error);
   }
 });
@@ -382,17 +399,21 @@ ipcMain.handle("createEmpleado", async (event, empleado) => {
       "Insert into empleados set ? ;",
       empleado
     );
-
     console.log(resultEmpleado);
-    new Notification({
-      title: "Regístro guardado",
-      body: "Se registró un nuevo colaborador con éxito",
-    }).show();
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Guardado!",
+      message: "Se ha guardado el nuevo registro.",
+    });
     empleado.id = resultEmpleado.insertId;
     return empleado;
   } catch (error) {
-    console.error("Ha ocurrido un error");
-    console.log(error);
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al guardar el registro.",
+    });
+    console.error("Ha ocurrido un error: ", error);
   }
 });
 // ----------------------------------------------------------------
@@ -405,12 +426,13 @@ ipcMain.handle("getUsuarioById", async (event, id) => {
     "select empleados.id,empleados.cedula," +
       "empleados.primerNombre,empleados.segundoNombre,empleados.primerApellido," +
       "empleados.segundoApellido,empleados.telefono,empleados.correo," +
-      "cargosempleados.cargo," +
+      "cargosempleados.id as cargosId,cargosempleados.cargo," +
       "cargosempleados.cargoDescripcion," +
-      " usuarios.id as usuariosId,usuarios.rol,usuarios.rolDescripcion," +
+      " usuarios.id as usuariosId,roles.id as rolesId,roles.rol,roles.rolDescripcion," +
       " usuarios.usuario,usuarios.clave,usuarios.fechaModificacion " +
       "from empleados join usuarios on empleados.id=usuarios.empleadosId join " +
-      "cargosempleados on cargosempleados.id=empleados.cargosId where empleados.id=?;",
+      "cargosempleados on cargosempleados.id=empleados.cargosId " +
+      "join roles on roles.id=usuarios.rolesId where empleados.id=?;",
     id
   );
   console.log(result);
@@ -425,7 +447,7 @@ ipcMain.handle("getEmpleadoById", async (event, id) => {
     "select empleados.id,empleados.cedula," +
       "empleados.primerNombre,empleados.segundoNombre,empleados.primerApellido," +
       "empleados.segundoApellido,empleados.telefono,empleados.correo," +
-      "cargosempleados.cargo," +
+      "cargosempleados.id as cargosId,cargosempleados.cargo," +
       "cargosempleados.cargoDescripcion " +
       "from empleados join " +
       "cargosempleados on cargosempleados.id=empleados.cargosId where empleados.id=? ;",
@@ -436,90 +458,93 @@ ipcMain.handle("getEmpleadoById", async (event, id) => {
 });
 ipcMain.handle("updateUsuario", async (event, id, empleado, usuario) => {
   const conn = await getConnection();
-  const usuarioExist = await conn.query(
-    "SELECT * FROM usuarios WHERE usuarios.empleadosId=? order by usuarios.id desc limit 1;",
-    id
-  );
-  if (usuarioExist.length > 0) {
-    if (usuarioExist[0].id !== null) {
-      console.log("existe el usuario: " + usuarioExist[0].id);
-      //empleado.usuariosn = "Si";
-      const resultEmpleado = await conn.query(
-        "UPDATE empleados set ? where id = ?",
-        [empleado, id]
-      );
-      console.log(resultEmpleado);
-    }
-  } else {
-    //empleado.usuariosn = "No";
+  try {
     const resultEmpleado = await conn.query(
       "UPDATE empleados set ? where id = ?",
       [empleado, id]
     );
     console.log(resultEmpleado);
-  }
-
-  if (
-    usuario.usuario !== null &&
-    usuario.usuario !== " " &&
-    usuario.clave !== null &&
-    usuario.clave !== " " &&
-    usuario.rol !== null &&
-    usuario.rol !== " " &&
-    usuario.rolDescripcion !== null &&
-    usuario.rolDescripcion !== " "
-  ) {
-    if (usuarioExist.length > 0) {
-      if (usuarioExist[0].id !== null) {
+    if (
+      usuario.usuario !== null &&
+      usuario.usuario !== " " &&
+      usuario.clave !== null &&
+      usuario.clave !== " " &&
+      usuario.rol !== null &&
+      usuario.rol !== " " &&
+      usuario.rolDescripcion !== null &&
+      usuario.rolDescripcion !== " "
+    ) {
+      const usuarioExist = await conn.query(
+        "SELECT * FROM usuarios WHERE usuarios.empleadosId=? order by usuarios.id desc limit 1;",
+        id
+      );
+      if (usuarioExist.length > 0 && usuarioExist[0].id !== null) {
         console.log("existe el usuario: " + usuarioExist[0].id);
         const resultUsuario = await conn.query(
           "UPDATE usuarios set ? where empleadosId = ?;",
           [usuario, id]
         );
         console.log("Se actualizó el usuario", resultUsuario);
-        return resultUsuario;
+      } else {
+        usuario.empleadosId = id;
+        const resultUsuario = await conn.query(
+          "INSERT INTO usuarios SET ?",
+          usuario
+        );
+        console.log("Se creó el usuario", resultUsuario);
       }
-    } else {
-      usuario.empleadosId = id;
-      const resultUsuario = await conn.query(
-        "INSERT INTO usuarios SET ?",
-        usuario
-      );
-      console.log("Se creó el usuario", resultUsuario);
-      return resultUsuario;
     }
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Actualizado!",
+      message: "Se ha actualizado el registro.",
+    });
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al actualizar el registro.",
+    });
   }
 });
 // ----------------------------------------------------------------
 // ----------------------------------------------------------------
 ipcMain.handle("updateEmpleado", async (event, id, empleado) => {
   const conn = await getConnection();
-  const usuarioExist = await conn.query(
-    "SELECT * FROM usuarios WHERE usuarios.empleadosId=? order by usuarios.id desc limit 1;",
-    id
-  );
+  let resultEmpleado = null;
   try {
-    if (usuarioExist.length > 0) {
-      if (usuarioExist[0].id !== null) {
-        console.log("existe el usuario: " + usuarioExist[0].id);
-        empleado.usuariosn = "Si";
-        const resultEmpleado = await conn.query(
-          "UPDATE empleados set ? where id = ?",
-          [empleado, id]
-        );
-        console.log(resultEmpleado);
-        return resultEmpleado;
-      }
+    const usuarioExist = await conn.query(
+      "SELECT * FROM usuarios WHERE usuarios.empleadosId=? order by usuarios.id desc limit 1;",
+      id
+    );
+    if (usuarioExist.length > 0 && usuarioExist[0].id !== null) {
+      console.log("existe el usuario: " + usuarioExist[0].id);
+      empleado.usuariosn = "Si";
+      resultEmpleado = await conn.query("UPDATE empleados set ? where id = ?", [
+        empleado,
+        id,
+      ]);
+      console.log(resultEmpleado);
     } else {
       empleado.usuariosn = "No";
-      const resultEmpleado = await conn.query(
-        "UPDATE empleados set ? where id = ?",
-        [empleado, id]
-      );
+      resultEmpleado = await conn.query("UPDATE empleados set ? where id = ?", [
+        empleado,
+        id,
+      ]);
       console.log(resultEmpleado);
-      return resultEmpleado;
     }
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Actualizado!",
+      message: "Se ha actualizado el registro.",
+    });
+    return resultEmpleado;
   } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al actualizar el registro.",
+    });
     console.log(error);
   }
 });
@@ -529,16 +554,30 @@ ipcMain.handle("updateEmpleado", async (event, id, empleado) => {
 ipcMain.handle("deleteUsuario", async (event, id) => {
   console.log("id from main.js: ", id);
   const conn = await getConnection();
-  const resultUsuario = await conn.query(
-    "DELETE FROM usuarios WHERE  empleadosId=?",
-    id
-  );
-  const resultEmpleado = await conn.query(
-    "UPDATE empleados SET usuariosn='No' WHERE id =?;",
-    id
-  );
-  console.log(resultEmpleado);
-  return resultEmpleado;
+  try {
+    const resultUsuario = await conn.query(
+      "DELETE FROM usuarios WHERE  empleadosId=?",
+      id
+    );
+    const resultEmpleado = await conn.query(
+      "UPDATE empleados SET usuariosn='No' WHERE id =?;",
+      id
+    );
+    console.log(resultEmpleado);
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Usuario eliminado!",
+      message: "Se ha actualizado el registro.",
+    });
+    return resultEmpleado;
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al actualizar el registro.",
+    });
+    console.log(error);
+  }
 });
 // ----------------------------------------------------------------
 // Eliminar un empleado
@@ -546,35 +585,73 @@ ipcMain.handle("deleteUsuario", async (event, id) => {
 ipcMain.handle("deleteEmpleado", async (event, id) => {
   console.log("id from main.js: ", id);
   const conn = await getConnection();
-  const resultEmpleado = await conn.query(
-    "DELETE FROM empleados WHERE id =?;",
-    id
-  );
-  console.log(resultEmpleado);
-  return resultEmpleado;
+  try {
+    const resultEmpleado = await conn.query(
+      "DELETE FROM empleados WHERE id =?;",
+      id
+    );
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Borrado!",
+      message: "Se ha eliminado el usuario.",
+    });
+    console.log(resultEmpleado);
+    return resultEmpleado;
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al elimiar el registro.",
+    });
+  }
 });
 
 // Funciones de los socios
-ipcMain.handle("getSocios", async () => {
+ipcMain.handle("getSocios", async (event, criterio, criterioContent) => {
   const conn = await getConnection();
-  const results = conn.query("SELECT * FROM socios;");
-  console.log(results);
-  return results;
+  try {
+    if (criterio === "all") {
+      const results = conn.query("SELECT * FROM viewSocios;");
+      console.log(results);
+      return results;
+    } else {
+      const results = conn.query(
+        "SELECT * FROM viewSocios where " +
+          criterio +
+          " like '%" +
+          criterioContent +
+          "%';"
+      );
+      console.log(results);
+      return results;
+    }
+  } catch (error) {
+    console.log(error);
+  }
 });
 ipcMain.handle("createSocio", async (event, socio) => {
   try {
     const conn = await getConnection();
     console.log("Recibido: ", socio);
-    //   product.price = parseFloat(product.price);
     const result = await conn.query("INSERT INTO socios SET ?", socio);
     console.log(result);
-    new Notification({
-      title: "Regístro guardado",
-      body: "Se registró al nuevo socio con exito!",
-    }).show();
+    // new Notification({
+    //   title: "Regístro guardado",
+    //   body: "Se registró al nuevo socio con exito!",
+    // }).show();serviserviciosId
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Guardado!",
+      message: "Se ha guardado el registro.",
+    });
     socio.id = result.insertId;
     return socio;
   } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al guardar el registro.",
+    });
     console.log(error);
   }
 });
@@ -595,19 +672,47 @@ ipcMain.handle("getContratanteByCedula", async (event, cedula) => {
 });
 ipcMain.handle("updateSocio", async (event, id, socio) => {
   const conn = await getConnection();
-  const result = await conn.query("UPDATE socios SET ? WHERE id = ?", [
-    socio,
-    id,
-  ]);
-  console.log(result);
-  return result;
+  try {
+    const result = await conn.query("UPDATE socios SET ? WHERE id = ?", [
+      socio,
+      id,
+    ]);
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Actualizado!",
+      message: "Se ha actualizado el registro.",
+    });
+    console.log(result);
+    return result;
+  } catch (error) {
+    console.log(error);
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al actualizar el registro.",
+    });
+  }
 });
 ipcMain.handle("deleteSocio", async (event, id) => {
   console.log("id from main.js: ", id);
   const conn = await getConnection();
-  const result = await conn.query("DELETE FROM socios WHERE id = ?", id);
-  console.log(result);
-  return result;
+  try {
+    const result = await conn.query("DELETE FROM socios WHERE id = ?", id);
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Borrado!",
+      message: "Se ha eliminado el usuario.",
+    });
+    console.log(result);
+    return result;
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al elimiar el registro.",
+    });
+    console.log(error);
+  }
 });
 // ----------------------------------------------------------------
 // Funciones de los implementos
@@ -709,8 +814,9 @@ ipcMain.handle("deleteImplemento", async (event, id) => {
     console.log(error);
   }
 });
+
 // ----------------------------------------------------------------
-// Funciones de los servicios
+// Funciones de los servicios fijos
 // ----------------------------------------------------------------
 // Cambiamos de serviciosFIjos a servicios
 // ipcMain.handle("getServiciosFijos", async () => {
@@ -721,72 +827,6 @@ ipcMain.handle("deleteImplemento", async (event, id) => {
 //   console.log(results);
 //   return results;
 // });
-ipcMain.handle("getServiciosFijos", async () => {
-  const conn = await getConnection();
-  const results = conn.query(
-    "SELECT * FROM viewServicios where tipo='Servicio fijo'order by id asc;"
-  );
-  console.log(results);
-  return results;
-});
-// Cambio de serviciosFijos a servicios
-// ipcMain.handle("createServiciosFijos", async (event, servicio) => {
-//   try {
-//     const conn = await getConnection();
-//     console.log("Recibido: ", servicio);
-//     //   product.price = parseFloat(product.price);
-//     const resultServicio = await conn.query(
-//       "INSERT INTO serviciosFijos set ?;",
-//       servicio
-//     );
-
-//     new Notification({
-//       title: "SCAP Santo Domingo No.1",
-//       body: servicio.nombre + " se há registrado :)",
-//     }).show();
-//     servicio.id = servicio.insertId;
-//     console.log(resultServicio);
-//     return resultServicio;
-//   } catch (error) {
-//     new Notification({
-//       title: "SCAP Santo Domingo No.1",
-//       body: "Ha ocurrido un error al insertar el registro :(",
-//     }).show();
-//     console.log(error);
-//   }
-// });
-ipcMain.handle("createServiciosFijos", async (event, servicio) => {
-  try {
-    const conn = await getConnection();
-    console.log("Recibido: ", servicio);
-    //   product.price = parseFloat(product.price);
-    const resultServicio = await conn.query(
-      "INSERT INTO servicios set ?;",
-      servicio
-    );
-
-    new Notification({
-      title: "SCAP Santo Domingo No.1",
-      body: servicio.nombre + " se há registrado :)",
-    }).show();
-    servicio.id = servicio.insertId;
-    console.log(resultServicio);
-    return resultServicio;
-  } catch (error) {
-    new Notification({
-      title: "SCAP Santo Domingo No.1",
-      body: "Ha ocurrido un error al insertar el registro :(",
-    }).show();
-    console.log(error);
-  }
-});
-// Cambio de serviciosFijos a servicios
-// ipcMain.handle("getServiciosFijosById", async (event, id) => {
-//   const conn = await getConnection();
-//   const result = await conn.query(
-//     "SELECT * FROM viewServiciosFijos where id = ?",
-//     id
-//   );
 ipcMain.handle("getServiciosFijosById", async (event, id) => {
   const conn = await getConnection();
   const result = await conn.query(
@@ -868,6 +908,68 @@ ipcMain.handle("getServiciosContratadosById", async (event, id) => {
 
   console.log("Resultado", result);
   return result;
+});
+ipcMain.handle("getServiciosFijos", async () => {
+  const conn = await getConnection();
+  const results = conn.query(
+    "SELECT * FROM viewServicios where tipo='Servicio fijo'order by id asc;"
+  );
+  console.log(results);
+  return results;
+});
+ipcMain.handle("getContratos", async () => {
+  const conn = await getConnection();
+  const result = await conn.query("SELECT * FROM viewContratos ;");
+
+  console.log("Resultado: ", result);
+  return result;
+});
+ipcMain.handle("getContratadosById", async (event, servicioId) => {
+  const conn = await getConnection();
+  const result = await conn.query(
+    "SELECT contratosId FROM serviciosContratados WHERE NOT estado='Innactivo' and " +
+      "serviciosId=? ;",
+    servicioId
+  );
+
+  console.log("Resultado: ", result);
+  return result;
+});
+// ----------------------------------------------------------------
+// Funciones de las cuotas
+// ----------------------------------------------------------------
+ipcMain.handle("getCuotas", async () => {
+  const conn = await getConnection();
+  const results = conn.query(
+    "SELECT * FROM viewServicios where tipo='Cuota'order by id asc;"
+  );
+  console.log(results);
+  return results;
+});
+ipcMain.handle("createCuotas", async (event, cuota) => {
+  try {
+    const conn = await getConnection();
+    console.log("Recibido: ", cuota);
+    const resultServicio = await conn.query(
+      "INSERT INTO servicios set ?;",
+      cuota
+    );
+    cuota.id = resultServicio.insertId;
+    console.log(resultServicio);
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Guardado!",
+      message: "Se ha guardado una nueva cuota.",
+    });
+    return resultServicio;
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al guardar la cuota.",
+    });
+    console.log(error);
+  }
 });
 // ----------------------------------------------------------------
 //   funciones de los Medidores
@@ -1043,7 +1145,7 @@ ipcMain.handle("getContratosConMedidor", async () => {
   try {
     const conn = await getConnection();
     contratosConMedidor = conn.query(
-      "SELECT * from viewContratos where medidorSn='Si' order by id desc;"
+      "SELECT * from viewContratos where medidorSn='Si' order by contratosId desc;"
     );
   } catch (e) {
     Console.log(e);
@@ -1056,7 +1158,7 @@ ipcMain.handle("getContratosSinMedidor", async () => {
   try {
     const conn = await getConnection();
     contratosSinMedidor = conn.query(
-      "SELECT * from viewContratos where medidorSn='No' order by id desc;"
+      "SELECT * from viewContratos where medidorSn='No' order by contratosId desc;"
     );
   } catch (e) {
     console.log(e);

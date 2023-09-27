@@ -1,5 +1,6 @@
 const { ipcRenderer } = require("electron");
 const validator = require("validator");
+const Swal = require("sweetalert2");
 // const abrirInterface = async()=> {
 //    const result=  ipcRenderer.send('abrirInterface',"src/ui/index.html");
 //   }
@@ -35,6 +36,7 @@ loginForm.addEventListener("submit", async (e) => {
 
   usuarioUsuario.focus();
 });
+
 // ----------------------------------------------------------------
 // Funcion de recepcion de respuesta al intentar logearse
 // ----------------------------------------------------------------
@@ -56,10 +58,6 @@ ipcRenderer.on("loginResponse", async (event, response) => {
     }
   }
 });
-
-// ipcRenderer.on("showAlert", (event, message) => {
-//   alert(message);
-// });
 // ----------------------------------------------------------------
 // Funcion para mostrar el formulario de Login
 // ----------------------------------------------------------------
@@ -80,6 +78,23 @@ function cancelar() {
 function salir() {
   ipcRenderer.send("salir");
 }
+document.getElementById("outButton").addEventListener("click", function () {
+  Swal.fire({
+    title: "¿Quieres salir de la aplicación?",
+    icon: "question",
+    iconColor: "#f8c471",
+    showCancelButton: true,
+    confirmButtonColor: "#2874A6",
+    cancelButtonColor: "#EC7063 ",
+    confirmButtonText: "Sí, continuar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+      ipcRenderer.send("salir");
+    }
+  });
+});
 // loginForm.addEventListener("submit", async (e) => {
 //   e.preventDefault();
 //   const url = "src/ui/usuarios.html";

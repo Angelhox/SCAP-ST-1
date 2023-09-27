@@ -1,5 +1,6 @@
 const { ipcRenderer } = require("electron");
 const validator = require("validator");
+const Swal = require("sweetalert2");
 const mensajeError = document.getElementById("mensajeError");
 const usuarioPrimerNombre = document.getElementById("primernombre");
 const usuarioSegundoNombre = document.getElementById("segundonombre");
@@ -13,7 +14,7 @@ const usuarioCorreo = document.getElementById("correo");
 const usuarioUsuario = document.getElementById("usuario");
 const usuarioClave = document.getElementById("clave");
 const usuarioModificacion = document.getElementById("fechamodificacion");
-const usuarioAcceso = document.getElementById("acceso");
+const usuarioAcceso = document.getElementById("accesos");
 const usuarioDescripcionAcceso = document.getElementById("descripcionacceso");
 const usuariosList = document.getElementById("usuarios");
 const empleadosList = document.getElementById("empleados");
@@ -23,6 +24,7 @@ let usuarios = [];
 let empleados = [];
 let editingStatus = false;
 let editUsuarioId = "";
+let usuarioProceso = "";
 usuarioForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   var segundoNombreUsuariodf = "NA";
@@ -46,21 +48,35 @@ usuarioForm.addEventListener("submit", async (e) => {
   } else if (validator.isEmpty(usuarioPrimerApellido.value)) {
     mensajeError.textContent = "El primer apellido es obligatorio.";
     usuarioPrimerApellido.focus();
-  } else if (validator.isEmpty(usuarioCedula.value)) {
-    mensajeError.textContent = "La cedula es obligatoria.";
-    socioCedula.focus();
-  } else if (validator.isEmpty(usuarioTelefono.value)) {
-    mensajeError.textContent = "el teléfono es obligatorio.";
-    usuarioTelefono.focus();
-  } else if (validator.isEmpty(usuarioCorreo.value)) {
-    mensajeError.textContent = "El correo es obligatorio.";
-    usuarioCorreo.focus();
+  } else if (
+    validator.isEmpty(usuarioCedula.value) ||
+    !validator.isLength(usuarioCedula.value, { max: 10, min: 10 })
+  ) {
+    mensajeError.textContent = "Ingresa un número de cédula válido.";
+
+    usuarioCedula.focus();
   } else if (usuarioCargo.value === "0") {
-    mensajeError.textContent = "El cargo es obligatorio.";
+    mensajeError.textContent = "Selecciona un cargo válido.";
     usuarioCargo.focus();
-  } else if (usuarioDescripcionCargo.value === "Seleccione un cargo") {
-    mensajeError.textContent = "La descripción del cargo es obligatoria.";
+  } else if (
+    validator.isEmpty(usuarioDescripcionCargo.value) ||
+    usuarioDescripcionCargo.value === "Seleccione un cargo" ||
+    !validator.isLength(usuarioDescripcionCargo.value, { max: 45 })
+  ) {
+    mensajeError.textContent = "Ingresa una descripción válida.";
     usuarioDescripcionCargo.focus();
+  } else if (
+    validator.isEmpty(usuarioTelefono.value) ||
+    !validator.isLength(usuarioTelefono.value, { min: 10, max: 10 })
+  ) {
+    mensajeError.textContent = "Ingresa un número de télefono válido.";
+    usuarioTelefono.focus();
+  } else if (
+    validator.isEmpty(usuarioCorreo.value) ||
+    !validator.isEmail(usuarioCorreo.value)
+  ) {
+    mensajeError.textContent = "Ingresa un correo electrónico válido.";
+    usuarioCorreo.focus();
   } else {
     if (
       usuarioaccesosn.checked &&
@@ -73,17 +89,33 @@ usuarioForm.addEventListener("submit", async (e) => {
       usuarioDescripcionAcceso !== null &&
       usuarioDescripcionAcceso !== " "
     ) {
-      if (validator.isEmpty(usuarioUsuario.value)) {
-        mensajeError.textContent = "El usuario es obligatorio.";
+      if (
+        validator.isEmpty(usuarioUsuario.value) ||
+        !validator.isLength(usuarioUsuario.value, { min: 10, max: 20 })
+      ) {
+        mensajeError.textContent =
+          "Ingresa un nombre de usuario de 10 a 20 caracteres.";
         usuarioUsuario.focus();
       } else if (validator.isEmpty(usuarioClave.value)) {
         mensajeError.textContent = "La Contraseña es es obligatoria.";
         usuarioClave.focus();
-      } else if (validator.isEmpty(usuarioAcceso.value)) {
-        mensajeError.textContent = "El Acceso es obligatorio.";
+      } else if (!validator.isLength(usuarioClave.value, { min: 10 })) {
+        mensajeError.textContent =
+          "La contraseña debe tener un mínimo de 10 caracteres";
+        usuarioClave.focus();
+      } else if (!validator.isLength(usuarioClave.value, { max: 20 })) {
+        mensajeError.textContent =
+          "La contraseña debe tener un máximo de 20 caracteres";
+        usuarioClave.focus();
+      } else if (usuarioAcceso.value === "0") {
+        mensajeError.textContent = "Selecciona un nivel de acceso válido.";
         usuarioAcceso.focus();
-      } else if (validator.isEmpty(usuarioDescripcionAcceso.value)) {
-        mensajeError.textContent = "La descripcion del acceso es obligatoria.";
+      } else if (
+        validator.isEmpty(usuarioDescripcionAcceso.value) ||
+        usuarioDescripcionAcceso.value === "Seleccione un cargo" ||
+        !validator.isLength(usuarioDescripcionAcceso.value, { max: 45 })
+      ) {
+        mensajeError.textContent = "Ingresa una descripción de acceso válida.";
         usuarioDescripcionAcceso.focus();
       } else {
         const newEmpleado = {
@@ -104,8 +136,7 @@ usuarioForm.addEventListener("submit", async (e) => {
         const newUsuario = {
           usuario: usuarioUsuario.value,
           clave: usuarioClave.value,
-          rol: usuarioAcceso.value,
-          rolDescripcion: usuarioDescripcionAcceso.value,
+          rolesId: usuarioAcceso.value,
           fechaModificacion: usuarioModificacion.value,
         };
         if (!editingStatus) {
@@ -117,22 +148,33 @@ usuarioForm.addEventListener("submit", async (e) => {
           );
           console.log(result);
         } else {
-          console.log("Editing usuario with electron");
-          const result = await ipcRenderer.invoke(
-            "updateUsuario",
-            editUsuarioId,
-            newEmpleado,
-            newUsuario
-            // newCargo
-          );
-          editingStatus = false;
-          editUsuarioId = "";
-          console.log(result);
+          Swal.fire({
+            title: "¿Quieres guardar los cambios?",
+            text: "No podrás deshacer esta acción.",
+            icon: "question",
+            iconColor: "#f8c471",
+            showCancelButton: true,
+            confirmButtonColor: "#2874A6",
+            cancelButtonColor: "#EC7063 ",
+            confirmButtonText: "Sí, continuar",
+            cancelButtonText: "Cancelar",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+              console.log("Editing usuario with electron");
+              const result = await ipcRenderer.invoke(
+                "updateUsuario",
+                editUsuarioId,
+                newEmpleado,
+                newUsuario
+                // newCargo
+              );
+              editingStatus = false;
+              editUsuarioId = "";
+              console.log(result);
+            }
+          });
         }
-        getUsuarios();
-        getEmpleados();
-        resetForm();
-        usuarioPrimerNombre.focus();
       }
     } else {
       console.log("Creando un empleado");
@@ -165,22 +207,31 @@ usuarioForm.addEventListener("submit", async (e) => {
         console.log(result);
       } else {
         console.log("Editing empleado with electron");
-        const result = await ipcRenderer.invoke(
-          "updateEmpleado",
-          editUsuarioId,
-          newEmpleado
-          // newCargo
-        );
-        editingStatus = false;
-        editUsuarioId = "";
-        console.log(result);
+        Swal.fire({
+          title: "¿Quieres guardar los cambios?",
+          text: "No podrás deshacer esta acción.",
+          icon: "question",
+          iconColor: "#f8c471",
+          showCancelButton: true,
+          confirmButtonColor: "#2874A6",
+          cancelButtonColor: "#EC7063 ",
+          confirmButtonText: "Sí, continuar",
+          cancelButtonText: "Cancelar",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+            const result = await ipcRenderer.invoke(
+              "updateEmpleado",
+              editUsuarioId,
+              newEmpleado
+              // newCargo
+            );
+            editingStatus = false;
+            editUsuarioId = "";
+            console.log(result);
+          }
+        });
       }
-      getUsuarios();
-      getEmpleados();
-      getCargos();
-
-      resetForm();
-      usuarioPrimerNombre.focus();
     }
   }
 });
@@ -229,12 +280,16 @@ function renderEmpleados(empleados) {
       <td>${empleado.cargo}</td>
       <td>${empleado.cargoDescripcion}</td>
       <td>
-      <button onclick="deleteEmpleado('${empleado.id}')" class="btn "> 
+      <button onclick="deleteEmpleado('${empleado.id}','${
+      empleado.primerNombre + " " + empleado.primerApellido
+    }')" class="btn "> 
       <i class="fa-solid fa-user-minus"></i>
       </button>
       </td>
       <td>
-      <button onclick="editEmpleado('${empleado.id}')" class="btn ">
+      <button onclick="editEmpleado('${empleado.id}','${
+      empleado.primerNombre + " " + empleado.primerApellido
+    }')" class="btn ">
       <i class="fa-solid fa-user-pen"></i>
       </button>
       </td>
@@ -264,11 +319,12 @@ const editUsuario = async (id) => {
   usuarioCorreo.value = usuario[0].correo;
   usuarioUsuario.value = usuario[0].usuario;
   usuarioClave.value = usuario[0].clave;
-  usuarioCargo.value = usuario[0].cargo;
+  usuarioCargo.selectedIndex = usuario[0].cargosId;
   usuarioDescripcionCargo.value = usuario[0].cargoDescripcion;
-  usuarioAcceso.value = usuario[0].rol;
+  usuarioAcceso.selectedIndex = usuario[0].rolesId;
   usuarioDescripcionAcceso.value = usuario[0].rolDescripcion;
   usuarioModificacion.value = formatearFecha(usuario[0].fechaModificacion);
+  usuarioProceso = usuario[0].primerNombre + " " + usuario[0].primerApellido;
   editingStatus = true;
   editUsuarioId = usuario[0].id;
   console.log(usuario[0]);
@@ -279,6 +335,7 @@ const editUsuario = async (id) => {
 const editEmpleado = async (id) => {
   resetForm();
   const usuario = await ipcRenderer.invoke("getEmpleadoById", id);
+  console.log("Id del cargo: ", usuario[0].cargosId);
   usuarioPrimerNombre.value = usuario[0].primerNombre;
   usuarioSegundoNombre.value = usuario[0].segundoNombre;
   usuarioPrimerApellido.value = usuario[0].primerApellido;
@@ -286,7 +343,7 @@ const editEmpleado = async (id) => {
   usuarioCedula.value = usuario[0].cedula;
   usuarioTelefono.value = usuario[0].telefono;
   usuarioCorreo.value = usuario[0].correo;
-  usuarioCargo.value = usuario[0].cargo;
+  usuarioCargo.selectedIndex = usuario[0].cargosId;
   usuarioDescripcionCargo.value = usuario[0].cargoDescripcion;
   editingStatus = true;
   editUsuarioId = usuario[0].id;
@@ -295,19 +352,26 @@ const editEmpleado = async (id) => {
 // ----------------------------------------------------------------
 // Eliminar un usuario del sistema
 // ----------------------------------------------------------------
-const deleteUsuario = async (id) => {
-  const response = confirm(
-    "Estas seguro de eliminar este usuario de forma permanente?"
-  );
-  if (response) {
-    console.log("id from usuarios.js");
-    const result = await ipcRenderer.invoke("deleteUsuario", id);
-    console.log("Resultado usuarios.js", result);
-    getUsuarios();
-    getEmpleados();
-    getCargos();
-    resetForm();
-  }
+const deleteUsuario = async (id, usuarioNombre) => {
+  console.log("Recibido: " + id, usuarioNombre);
+  Swal.fire({
+    title: "¿Quieres borrar el registro de " + usuarioNombre + " ?",
+    text: "No podrás deshacer esta acción.",
+    icon: "question",
+    iconColor: "#f8c471",
+    showCancelButton: true,
+    confirmButtonColor: "#2874A6",
+    cancelButtonColor: "#EC7063 ",
+    confirmButtonText: "Sí, continuar",
+    cancelButtonText: "Cancelar",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+      console.log("id from usuarios.js");
+      const result = await ipcRenderer.invoke("deleteUsuario", id);
+      console.log("Resultado usuarios.js", result);
+    }
+  });
 };
 // ----------------------------------------------------------------
 // Dar baja un usuario del sistema
@@ -315,36 +379,53 @@ const deleteUsuario = async (id) => {
 const bajaUsuario = async () => {
   if (editingStatus) {
     if (editUsuarioId !== null) {
-      const response = confirm(
-        "Estas seguro en dar de baja a este usuario de forma permanente?"
-      );
-      if (response) {
-        console.log("id from usuarios.js");
-        const result = await ipcRenderer.invoke("deleteUsuario", editUsuarioId);
-        console.log("Resultado usuarios.js", result);
-        getUsuarios();
-        getEmpleados();
-        getCargos();
-        resetForm();
-      }
+      Swal.fire({
+        title: "¿Quieres dar de baja el usuario de " + usuarioProceso + " ?",
+        text: "No podrás deshacer esta acción.",
+        icon: "question",
+        iconColor: "#f8c471",
+        showCancelButton: true,
+        confirmButtonColor: "#2874A6",
+        cancelButtonColor: "#EC7063 ",
+        confirmButtonText: "Sí, continuar",
+        cancelButtonText: "Cancelar",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+          console.log("id from usuarios.js");
+          const result = await ipcRenderer.invoke(
+            "deleteUsuario",
+            editUsuarioId
+          );
+          console.log("Resultado usuarios.js", result);
+        }
+      });
     }
   }
 };
 // ----------------------------------------------------------------
 // Eliminar un empleado del sistema
 // ----------------------------------------------------------------
-const deleteEmpleado = async (id) => {
-  const response = confirm(
-    "Estas seguro de eliminar un empleado de forma permanente?"
-  );
-  if (response) {
-    console.log("id from usuarios.js");
-    const result = await ipcRenderer.invoke("deleteEmpleado", id);
-    console.log("Resultado usuarios.js", result);
-    getUsuarios();
-    getEmpleados();
-    resetForm();
-  }
+const deleteEmpleado = async (id, usuarioNombre) => {
+  console.log("Recibido: " + id, usuarioNombre);
+  Swal.fire({
+    title: "¿Quieres borrar el registro de " + usuarioNombre + " ?",
+    text: "No podrás deshacer esta acción.",
+    icon: "question",
+    iconColor: "#f8c471",
+    showCancelButton: true,
+    confirmButtonColor: "#2874A6",
+    cancelButtonColor: "#EC7063 ",
+    confirmButtonText: "Sí, continuar",
+    cancelButtonText: "Cancelar",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+      console.log("id from usuarios.js");
+      const result = await ipcRenderer.invoke("deleteEmpleado", id);
+      console.log("Resultado usuarios.js", result);
+    }
+  });
 };
 // ----------------------------------------------------------------
 // Obtenemos los usuarios del sistema
@@ -375,9 +456,21 @@ const getCargos = async () => {
     option.textContent = cargo.cargo;
     option.setAttribute("data-values", cargo.cargoDescripcion);
     usuarioCargo.appendChild(option);
-    document.getElementById(cargo.id).addEventListener("select", (event) => {
-      alert("Has hecho clic en la Opción 3");
-    });
+  });
+};
+// ----------------------------------------------------------------
+// Obtenemos los cargos disponibles desde la base de datos
+// ----------------------------------------------------------------
+const getAccesos = async () => {
+  roles = await ipcRenderer.invoke("getAccesos");
+  console.log(roles);
+  roles.forEach((rol) => {
+    const option = document.createElement("option");
+    option.id = rol.id;
+    option.value = rol.id;
+    option.textContent = rol.rol;
+    option.setAttribute("data-values", rol.rolDescripcion);
+    usuarioAcceso.appendChild(option);
   });
 };
 usuarioCargo.addEventListener("change", (event) => {
@@ -387,11 +480,19 @@ usuarioCargo.addEventListener("change", (event) => {
   usuarioDescripcionCargo.value = dataValues;
   console.log("Seleccionado: ", selected, dataValues);
 });
+usuarioAcceso.addEventListener("change", (event) => {
+  let seleccionado = usuarioAcceso.options[usuarioAcceso.selectedIndex];
+  let dataValues = seleccionado.getAttribute("data-values");
+  let selected = usuarioAcceso.value;
+  usuarioDescripcionAcceso.value = dataValues;
+  console.log("Seleccionado: ", selected, dataValues);
+});
 async function init() {
   usuarioModificacion.value = formatearFecha(new Date());
   await getUsuarios();
   await getEmpleados();
   await getCargos();
+  await getAccesos();
 }
 function formatearFecha(fecha) {
   const fechaOriginal = new Date(fecha);
@@ -401,6 +502,33 @@ function formatearFecha(fecha) {
   const fechaFormateada = `${year}-${month}-${day}`;
   return fechaFormateada;
 }
+ipcRenderer.on("Notificar", (event, response) => {
+  if (response.title === "Borrado!") {
+    resetFormAfterSave();
+  } else if (response.title === "Actualizado!") {
+    resetFormAfterUpdate();
+  } else if (response.title === "Guardado!") {
+    resetFormAfterSave();
+  } else if (response.title === "Usuario eliminado!") {
+    resetFormAfterSave();
+  }
+  console.log("Response: " + response);
+  if (response.success) {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "success",
+      confirmButtonColor: "#f8c471",
+    });
+  } else {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "error",
+      confirmButtonColor: "#f8c471",
+    });
+  }
+});
 function habilitarUsuario() {
   console.log("Habilitar Usuario");
   if (usuarioaccesosn.checked) {
@@ -418,6 +546,30 @@ function habilitarUsuario() {
   }
 }
 // ----------------------------------------------------------------
+// Resetear el formulario despues de actualizar
+function resetFormAfterUpdate() {
+  getUsuarios();
+  getEmpleados();
+  mensajeError.textContent = "";
+}
+// ----------------------------------------------------------------
+// Resetear el formulario despues de guardar o eliminar
+function resetFormAfterSave() {
+  getUsuarios();
+  getEmpleados();
+  editingStatus = false;
+  editUsuarioId = "";
+  usuarioDarBaja.disabled = true;
+  usuarioForm.reset();
+  usuarioUsuario.disabled = true;
+  usuarioClave.disabled = true;
+  usuarioDescripcionAcceso.disabled = true;
+  usuarioAcceso.disabled = true;
+  usuarioAcceso.selectedIndex = 0;
+  mensajeError.textContent = "";
+  usuarioModificacion.value = formatearFecha(new Date());
+}
+// ----------------------------------------------------------------
 // Resetear el formulario
 function resetForm() {
   editingStatus = false;
@@ -428,6 +580,7 @@ function resetForm() {
   usuarioClave.disabled = true;
   usuarioDescripcionAcceso.disabled = true;
   usuarioAcceso.disabled = true;
+  usuarioAcceso.selectedIndex = 0;
   mensajeError.textContent = "";
   usuarioModificacion.value = formatearFecha(new Date());
 }

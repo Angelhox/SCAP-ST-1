@@ -96,3 +96,7 @@ const abrirServicios = async () => {
   const url = "src/ui/servicios.html";
   await ipcRenderer.send("abrirInterface", url);
 };
+const abrirCuotas = async () => {
+  const url = "src/ui/cuotas.html";
+  await ipcRenderer.send("abrirInterface", url);
+};

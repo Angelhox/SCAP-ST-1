@@ -573,7 +573,7 @@ function renderServiciosDisponibles(serviciosDisponibles) {
 
     const label = document.createElement("label");
     label.style.width = "40%";
-    label.classList.add("btn", "btn-outline-success");
+    label.classList.add("btn", "btn-outline-warning");
     label.setAttribute("for", serviciosDisponibles[i].id);
     label.textContent = "Adquirido";
 

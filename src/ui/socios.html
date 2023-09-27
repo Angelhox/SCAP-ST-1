@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="./principal.css" />
+    <link rel="stylesheet" href="../ui/style/socios.css" />
     <link
       rel="stylesheet"
       href="../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css"
@@ -129,12 +130,6 @@
               <div
                 class="d-flex justify-content-center align-items-center gap-3 flex-column flex-lg-row"
               >
-                <button
-                  onclick="mostrarLogin()"
-                  class="text-white px-3 py-1 rounded-1 btn bg-primary"
-                >
-                  Iniciar sesion
-                </button>
                 <button class="text-black px-3 py-1 rounded-1 btn bg-white">
                   Salir
                 </button>
@@ -145,24 +140,66 @@
       </nav>
     </header>
 
-    <div class="row container-fluid" style="padding-top: 120px">
-      <div class="col-12" >
-        <p class="fs-4">Administra los registros de los socios</p>
-      </div>
-      <div
-        class="col-lg-8 col-md-8 col-sm-12"
-        style="height: 60vh; overflow-y: auto; overflow-x: auto; padding: 10px"
-      >
+    <div class="row container-fluid" style="padding-top: 7em">
+      <div class="col-lg-8 col-md-8 col-sm-12" style="height: 68vh; padding: 0">
+        <div class="col-12 encabezado-socios">
+          <div
+            class="col-12 mp-0 d-flex flex-column align-items-start justify-content-end"
+          >
+            <p class="fs-1 mp-0">
+              Socios
+              <i class="fs-1 fa-regular fa-handshake mx-2 my-2"></i>
+            </p>
+          </div>
+          <div class="col-12">
+            <label for="criterio">Buscar por...</label>
+            <div class="row">
+              <div class="col-3">
+                <select
+                  id="criterio"
+                  class="form-select btn-rd"
+                  aria-label="Default select example"
+                >
+                  <option value="all" selected>Todas</option>
+                  <option value="cedulaPasaporte">Cédula del socio</option>
+                  <option value="apellidos">Apellidos del socio</option>
+                </select>
+              </div>
+              <div class="col-3">
+                <div class="input-group">
+                  <input
+                    readonly
+                    type="text"
+                    class="form-control btn-rd"
+                    placeholder="Buscar..."
+                    id="criterio-content"
+                  />
+                </div>
+              </div>
+              <div class="col-3">
+                <!-- <label class="text-white" for="criterio">Buscar</label> -->
+                <button
+                  type="button"
+                  class="btn-buscar"
+                  style="width: 100%"
+                  id="buscarSocios"
+                >
+                  Buscar<i class="fa fa-search mx-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- Tabla de listado de usuarios -->
-        <div style="width: 100%; height: 100%">
+        <div style="width: 100%; height: 100%; overflow-y: auto">
           <table class="table">
             <thead class="table-dark">
-              <tr>
+              <!-- <tr>
                 <th colspan="9" class="text-center fs-4">
                   Listado de Socios
                   <i class="fa-solid fa-user-tie"></i>
                 </th>
-              </tr>
+              </tr> -->
               <tr>
                 <th>Nombres</th>
                 <th>Apellidos</th>
@@ -185,14 +222,206 @@
                 <td>juanmacias@gamil.com</td>
                 <td>Pichincha-Cayambe</td>
               </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
+              <tr>
+                <td>Juan Alvaro</td>
+                <td>Macias Proaño</td>
+                <td>1002480697</td>
+                <td>0998476044</td>
+                <td>20 años</td>
+                <td>juanmacias@gamil.com</td>
+                <td>Pichincha-Cayambe</td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
-      <div class="col-lg-4 col-md-4 col-sm-12">
+      <div class="col-lg-4 col-md-4 col-sm-12 encabezado-form">
         <form class="form-horizontal" id="socioForm">
-          <div class="col-12 text-center fs-4">Datos del Socio</div>
-          <div id="mensajeError" style="color:red; font-size: 200; height: 20px;" ></div>
+          <div class="col-12 text-center fs-4 mp-0">Datos del Socio</div>
+          <div
+            id="mensajeError"
+            style="color: red; font-size: 200; height: 20px"
+          ></div>
 
           <div class="row">
             <div class="col-6">
@@ -354,7 +583,20 @@
           <div class="col-12 d-flex justify-content-end">
             <div id="mensajeError" class="fs-6"></div>
             <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
-            <button class="btn btn-danger rounded-2">Cancelar</button>
+            <button
+              type="button"
+              onclick="imprimir()"
+              class="btn btn-primary mx-2 rounded-2"
+            >
+              imprimir
+            </button>
+            <button
+              type="button"
+              onclick="resetForm()"
+              class="btn btn-danger rounded-2"
+            >
+              Cancelar
+            </button>
           </div>
         </form>
       </div>

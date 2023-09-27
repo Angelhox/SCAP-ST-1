@@ -1,5 +1,6 @@
 const { ipcRenderer } = require("electron");
 const validator = require("validator");
+const Swal = require("sweetalert2");
 
 const mensajeError = document.getElementById("mensajeError");
 const socioPrimerNombre = document.getElementById("primernombre");
@@ -20,6 +21,9 @@ const socioSecundaria = document.getElementById("secundaria");
 const socioCasa = document.getElementById("numerocasa");
 const socioReferencia = document.getElementById("referencia");
 const sociosList = document.getElementById("socios");
+const buscarSocios = document.getElementById("buscarSocios");
+const criterio = document.getElementById("criterio");
+const criterioContent = document.getElementById("criterio-content");
 let socios = [];
 let editingStatus = false;
 let editSocioId = "";
@@ -79,21 +83,34 @@ socioForm.addEventListener("submit", async (e) => {
   } else if (validator.isEmpty(socioPrimerApellido.value)) {
     mensajeError.textContent = "El primer apellido es obligatorio.";
     socioPrimerApellido.focus();
-  } else if (validator.isEmpty(socioCedula.value)) {
-    mensajeError.textContent = "La cedula es obligatoria.";
+  } else if (
+    validator.isEmpty(socioCedula.value) ||
+    !validator.isLength(socioCedula.value, { max: 13, min: 10 })
+  ) {
+    mensajeError.textContent = "Ingresa un número de cédula válido.";
     socioCedula.focus();
   } else if (validator.isEmpty(socioNacimiento.value)) {
-    mensajeError.textContent = "La fecha de nacimiento es obligatoria.";
+    mensajeError.textContent = "Ingresa una fecha de nacimiento válida.";
     socioNacimiento.focus();
   } else if (validator.isEmpty(socioProvincia.value)) {
-    mensajeError.textContent = "La provincia es obligatoria.";
+    mensajeError.textContent = "Ingresa una provincia válida";
     socioProvincia.focus();
   } else if (validator.isEmpty(socioCanton.value)) {
-    mensajeError.textContent = "El cantón es obligatorio.";
+    mensajeError.textContent = "Ingresa un canton válido.";
     socioCanton.focus();
-  } else if (validator.isEmpty(socioReferencia.value)) {
-    mensajeError.textContent = "La referencia es obligatoria.";
+  } else if (
+    validator.isEmpty(socioReferencia.value) ||
+    !validator.isLength(socioReferencia.value, { min: 0, max: 45 })
+  ) {
+    mensajeError.textContent =
+      "Ingresa una referencia valida de máximo 45 caracteres.";
     socioReferencia.focus();
+  } else if (!validator.isEmail(socioCorreo.value)) {
+    mensajeError.textContent = "Ingresa un correo válido.";
+    socioCorreo.focus();
+  } else if (!validator.isLength(socioMovil.value, { max: 10, min: 10 })) {
+    mensajeError.textContent = "Ingresa un télefono móvil válido.";
+    socioMovil.focus();
   } else {
     const newSocio = {
       primerNombre: socioPrimerNombre.value,
@@ -119,18 +136,30 @@ socioForm.addEventListener("submit", async (e) => {
       console.log(result);
     } else {
       console.log("Editing socio with electron");
-      const result = await ipcRenderer.invoke(
-        "updateSocio",
-        editSocioId,
-        newSocio
-      );
-      editingStatus = false;
-      editSocioId = "";
-      console.log(result);
+      Swal.fire({
+        title: "¿Quieres guardar los cambios?",
+        text: "No podrás deshacer esta acción.",
+        icon: "question",
+        iconColor: "#f8c471",
+        showCancelButton: true,
+        confirmButtonColor: "#2874A6",
+        cancelButtonColor: "#EC7063 ",
+        confirmButtonText: "Sí, continuar",
+        cancelButtonText: "Cancelar",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+          const result = await ipcRenderer.invoke(
+            "updateSocio",
+            editSocioId,
+            newSocio
+          );
+          editingStatus = false;
+          editSocioId = "";
+          console.log(result);
+        }
+      });
     }
-    getSocios();
-    socioForm.reset();
-    socioPrimerNombre.focus();
   }
 });
 function renderSocios(socios) {
@@ -159,7 +188,13 @@ function renderSocios(socios) {
         socio.barrio
       }</td>
       <td>
-      <button onclick="deleteSocio('${socio.id}')" class="btn "> 
+      <button onclick="deleteSocio('${socio.id}','${
+      socio.primerNombre +
+      " " +
+      socio.primerApellido +
+      " " +
+      socio.segundoApellido
+    }')" class="btn "> 
       <i class="fa-solid fa-user-minus"></i>
       </button>
       </td>
@@ -195,22 +230,57 @@ const editSocio = async (id) => {
   editSocioId = socio.id;
   console.log(socio);
 };
-const deleteSocio = async (id) => {
-  const response = confirm("Estas seguro de eliminar este socio?");
-  if (response) {
-    console.log("id from socios.js");
-    const result = await ipcRenderer.invoke("deleteSocio", id);
-    console.log("Resultado socios.js", result);
-    getSocios();
-  }
+const deleteSocio = async (id, socioNombre) => {
+  Swal.fire({
+    title: "¿Quieres borrar el registro de " + socioNombre + " ?",
+    text: "No podrás deshacer esta acción.",
+    icon: "question",
+    iconColor: "#f8c471",
+    showCancelButton: true,
+    confirmButtonColor: "#2874A6",
+    cancelButtonColor: "#EC7063 ",
+    confirmButtonText: "Sí, continuar",
+    cancelButtonText: "Cancelar",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+      console.log("id from usuarios.js");
+      const result = await ipcRenderer.invoke("deleteSocio", id);
+      console.log("Resultado socios.js", result);
+    }
+  });
 };
-const getSocios = async () => {
-  socios = await ipcRenderer.invoke("getSocios");
+const getSocios = async (criterio, criterioContent) => {
+  socios = await ipcRenderer.invoke("getSocios", criterio, criterioContent);
   console.log(socios);
   renderSocios(socios);
 };
+criterio.onchange = async () => {
+  let criterioSeleccionado = criterio.value;
+  console.log("Seleccionado: ", criterioSeleccionado);
+  if (criterioSeleccionado === "all") {
+    // criterioContent.textContent = "";
+    criterioContent.value = "";
+    criterioContent.readOnly = true;
+    let criterioBuscar = "all";
+    let criterioContentBuscar = "all";
+    await getSocios(criterioBuscar, criterioContentBuscar);
+  }else{
+    criterioContent.readOnly = false;
+  }
+};
+buscarSocios.onclick = async () => {
+  let criterioBuscar = criterio.value;
+  let criterioContentBuscar = criterioContent.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  console;
+  await getSocios(criterioBuscar, criterioContentBuscar);
+};
+
 async function init() {
-  await getSocios();
+  let criterioBuscar = "all";
+  let criterioContentBuscar = "all";
+  await getSocios(criterioBuscar, criterioContentBuscar);
 }
 function calcularEdad(fechaNacimiento) {
   const fechaActual = new Date();
@@ -233,6 +303,50 @@ function calcularEdad(fechaNacimiento) {
 
   return edad;
 }
+ipcRenderer.on("Notificar", (event, response) => {
+  if (response.title === "Borrado!") {
+    resetFormAfterSave();
+  } else if (response.title === "Actualizado!") {
+    resetFormAfterUpdate();
+  } else if (response.title === "Guardado!") {
+    resetFormAfterSave();
+  } else if (response.title === "Usuario eliminado!") {
+    resetFormAfterSave();
+  }
+  console.log("Response: " + response);
+  if (response.success) {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "success",
+      confirmButtonColor: "#f8c471",
+    });
+  } else {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "error",
+      confirmButtonColor: "#f8c471",
+    });
+  }
+});
+function resetFormAfterUpdate() {
+  getSocios();
+  mensajeError.textContent = "";
+}
+function resetFormAfterSave() {
+  getSocios();
+  editingStatus = false;
+  editSocioId = "";
+  socioForm.reset();
+  mensajeError.textContent = "";
+}
+function resetForm() {
+  editingStatus = false;
+  editSocioId = "";
+  socioForm.reset();
+  mensajeError.textContent = "";
+}
 function formatearFecha(fecha) {
   const fechaOriginal = new Date(fecha);
   const year = fechaOriginal.getFullYear();
@@ -240,6 +354,9 @@ function formatearFecha(fecha) {
   const day = String(fechaOriginal.getDate()).padStart(2, "0");
   const fechaFormateada = `${year}-${month}-${day}`;
   return fechaFormateada;
+}
+function imprimir() {
+  window.print();
 }
 // funciones del navbar
 const abrirInicio = async () => {

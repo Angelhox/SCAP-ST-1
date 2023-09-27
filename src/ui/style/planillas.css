@@ -105,8 +105,9 @@ body {
     transition: background-color 0.3s;
     /* Agrega una transición suave al color de fondo */
 }
+
 .btn-buscar {
- padding: .4em;
+    padding: .4em;
     font-size: 16px;
     cursor: pointer;
     border: none;
@@ -141,15 +142,12 @@ body {
 
 .encabezado-planillas {
     padding: 1em 1em 0 1em;
-    
-
     /* padding-bottom: .5em !important;*/
     max-width: 100%;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     border: solid 2px #85C1E9;
     border-bottom: none;
-
 }
 
 .encabezado-planilla div {
@@ -196,4 +194,15 @@ section {
 section.active {
     display: block;
     opacity: 1;
+}
+
+.btn-rd {
+    border-radius: 5px;
+}
+ input {
+    border-radius: 5px;
+ }
+.mp-0 {
+    margin: 0;
+    padding: 0;
 }

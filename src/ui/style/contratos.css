@@ -1,7 +1,8 @@
 .card-fondo {
     height: 18rem;
     width: 100%;
-    background-image: url('../../assets/fonts/servicios.png');
+    /* background-image: url('../../assets/fonts/servicios.png'); */
+    background-image: url('../../assets/fonts/servicios-disponibles.gif');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: top;
@@ -11,7 +12,10 @@
 }
 
 .card-contenido {
-    backdrop-filter: blur(10px);
+    margin: 0;
+    padding: 0;
+    border-radius: 5%;
+    backdrop-filter: blur(20px);
     background-color: rgba(255, 255, 255, 0.5);
 }
 
@@ -111,4 +115,21 @@
     padding: 10px;
     border: 7px solid #ccc;
     
+}
+.btn-custom {
+    padding: 0 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    /* Quita el outline predeterminado */
+    transition: background-color 0.3s;
+    /* Agrega una transición suave al color de fondo */
+}
+
+.btn-custom:hover {
+    background-color: #85C1E9;
+    color: white;
+    /* Cambia el color de fondo al pasar el ratón por encima */
 }
