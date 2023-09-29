@@ -1,5 +1,5 @@
 const { ipcRenderer, electron, remote } = require("electron");
-const Swal= require("sweetalert2");
+const Swal = require("sweetalert2");
 const validator = require("validator");
 
 // const { Notification } = remote;
@@ -302,12 +302,14 @@ function renderContratosConMedidor(datosContratos) {
       <td>${contrato.cedulaPasaporte}</td>
       <td>${contrato.estado}</td>
       <td>
-      <button onclick="detallesContratos('${contrato.id}')" class="btn "> 
+      <button onclick="detallesContratos('${
+        contrato.contratosId
+      }')" class="btn "> 
       <i class="fa-solid fa-circle-info" style="color: #511f1f;"></i>
       </button>
       </td>
       <td>
-      <button onclick="editContrato('${contrato.id}')" class="btn ">
+      <button onclick="editContrato('${contrato.contratosId}')" class="btn ">
       <i class="fa-solid fa-user-pen"></i>
       </button>
       </td>
@@ -594,9 +596,7 @@ function renderServiciosDisponibles(serviciosDisponibles) {
 function marcarServiciosContratados() {
   if (serviciosEditar !== null) {
     for (let i = 0; i < serviciosEditar.length; i++) {
-      document.getElementById(
-        serviciosEditar[i].serviciosId
-      ).checked = true;
+      document.getElementById(serviciosEditar[i].serviciosId).checked = true;
     }
   }
 }
@@ -925,12 +925,12 @@ const verificarContratosAnteriores = async (cedula) => {
 };
 ipcRenderer.on("showAlertMedidoresExistentes", (event, message) => {
   Swal.fire({
-    title: 'Contratos anteriores',
+    title: "Contratos anteriores",
     text: message,
-    icon: 'info', // Puedes usar 'success', 'error', 'warning', 'info', etc.
+    icon: "info", // Puedes usar 'success', 'error', 'warning', 'info', etc.
   });
   //alert(message);
- // window.showErrorBox("Título", "Contenido del mensaje");
+  // window.showErrorBox("Título", "Contenido del mensaje");
 });
 // ----------------------------------------------------------------
 // Habilitar o desabilitar el formulario del
@@ -955,6 +955,45 @@ function inHabilitarFormMedidor() {
   medidorSecundaria.disabled = true;
   medidorReferencia.disabled = true;
   medidorObservacion.disabled = true;
+}
+function generarCodigo() {
+  Swal.fire({
+    title: "Código de contrato.",
+
+    html: `
+        <label for="opciones">Barrio:</label>
+        <select id="sectorNombre" class="form-select">
+        <option value="1N"selcted>Barrio 3 de Noviembre</option>
+            <option value="2C">Barrio Central</option>
+            <option value="3L">Barrio Los Laureles</option>
+            <option value="4B">Barrio El Bosque</option>
+        </select>
+        <br>
+        <label for="texto">Numero de contrato:</label>
+        <input type="text" id="numeroContrato" class="form-control">
+    `,
+    confirmButtonText: "Aceptar",
+    confirmButtonColor: " #f8c471",
+    showCancelButton: true,
+    cancelButtonText: "Cancelar",
+    preConfirm: () => {
+      const sectorNombre = document.getElementById("sectorNombre").value;
+      const numeroContrato = document.getElementById("numeroContrato").value;
+
+      return { sector: sectorNombre, numero: numeroContrato };
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Aquí puedes usar result.value.opcion y result.value.texto
+      const sector = result.value.sector;
+      const numero = result.value.numero;
+
+      // Realiza acciones con los valores obtenidos
+      console.log("Código del contrato:", sector + numero);
+      contratoCodigo.value = sector + numero;
+      // console.log("Texto ingresado:", texto);
+    }
+  });
 }
 // ----------------------------------------------------------------
 // Transicion entre las secciones de la vista

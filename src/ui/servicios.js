@@ -5,12 +5,25 @@ const { ipcRenderer } = require("electron");
 const validator = require("validator");
 const Swal = require("sweetalert2");
 // ----------------------------------------------------------------
+const servicioCreacion = document.getElementById("fechaCreacion");
 const servicioNombre = document.getElementById("nombre");
 const servicioDescripcion = document.getElementById("descripcion");
 // const servicioTipo = document.getElementById("tipo");
 const servicioValor = document.getElementById("valor");
 const serviciosList = document.getElementById("servicios");
 const usuariosList = document.getElementById("usuarios");
+const buscarServicios = document.getElementById("buscarServicios");
+const criterio = document.getElementById("criterio");
+const criterioContent = document.getElementById("criterio-content");
+// ----------------------------------------------------------------
+const servicioCreacionBn = document.getElementById("fechaCreacion-bn");
+const servicioNombreBn = document.getElementById("nombre-bn");
+const servicioDescripcionBn = document.getElementById("descripcion-bn");
+const servicioValorBn = document.getElementById("valor-bn");
+const buscarBeneficiarios = document.getElementById("buscarBeneficiarios");
+const criterioBn = document.getElementById("criterio-bn");
+const criterioContentBn = document.getElementById("criterio-bn-content");
+
 let servicios = [];
 let usuarios = [];
 let contratados = [];
@@ -22,8 +35,10 @@ servicioForm.addEventListener("submit", async (e) => {
   // if (parametroEstado.checked) {
   //   estadoParametro = "Activo";
   // }
-
-  if (validator.isEmpty(servicioNombre.value)) {
+  if (validator.isEmpty(servicioCreacion.value)) {
+    mensajeError.textContent = "Ingresa una fecha de creación válida.";
+    servicioCreacion.focus();
+  } else if (validator.isEmpty(servicioNombre.value)) {
     mensajeError.textContent = "El nombre del servicio es obligatorio.";
     servicioNombre.focus();
   } else if (validator.isEmpty(servicioDescripcion.value)) {
@@ -38,6 +53,7 @@ servicioForm.addEventListener("submit", async (e) => {
     servicioValor.focus();
   } else {
     const newServicio = {
+      fechaCreacion: servicioCreacion.value,
       nombre: servicioNombre.value,
       descripcion: servicioDescripcion.value,
       tipo: "Servicio fijo",
@@ -52,18 +68,31 @@ servicioForm.addEventListener("submit", async (e) => {
       console.log(result);
     } else {
       console.log("Editing parametro with electron");
-      const result = await ipcRenderer.invoke(
-        "updateServiciosFijos",
-        editServicioId,
-        newServicio
-      );
-      editingStatus = false;
-      editServicioId = "";
-      console.log(result);
+
+      Swal.fire({
+        title: "¿Quieres guardar los cambios?",
+        text: "No podrás deshacer esta acción.",
+        icon: "question",
+        iconColor: "#f8c471",
+        showCancelButton: true,
+        confirmButtonColor: "#2874A6",
+        cancelButtonColor: "#EC7063 ",
+        confirmButtonText: "Sí, continuar",
+        cancelButtonText: "Cancelar",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+          const result = await ipcRenderer.invoke(
+            "updateServiciosFijos",
+            editServicioId,
+            newServicio
+          );
+          editingStatus = false;
+          editServicioId = "";
+          console.log(result);
+        }
+      });
     }
-    getServicios();
-    servicioForm.reset();
-    servicioNombre.focus();
   }
 });
 function renderServiciosFijos(serviciosFijos) {
@@ -180,6 +209,10 @@ function renderServiciosFijos(serviciosFijos) {
       mostrarSeccion("seccion2");
     };
     divCol1.appendChild(btnEditServicio);
+    btnEditServicio.onclick = () => {
+      console.log("Detalles del servicio: " + servicioFijo.id);
+      editServicio(servicioFijo.id);
+    };
     divCol1.appendChild(btnDeleteServicio);
     divCol1.appendChild(btnEstadistics);
     // Se puede crear botones con un ciclo forEach pero, no son muy manejables
@@ -204,11 +237,12 @@ function renderServiciosFijos(serviciosFijos) {
   });
 }
 async function renderUsuarios(usuarios, servicioId) {
-  let ct=[];
+  let ct = [];
   const contratadosId = await ipcRenderer.invoke(
     "getContratadosById",
     servicioId
   );
+  console.log("Contratados: " + contratadosId);
   contratadosId.forEach((contratadoId) => {
     ct.push(contratadoId.contratosId);
   });
@@ -366,6 +400,7 @@ async function renderUsuarios(usuarios, servicioId) {
 // }
 const editServicio = async (id) => {
   const servicio = await ipcRenderer.invoke("getServiciosFijosById", id);
+  servicioCreacion.value = formatearFecha(servicio.fechaCreacion);
   servicioNombre.value = servicio.nombre;
   servicioDescripcion.value = servicio.descripcion;
   // if (parametro.estado == "Activo") {
@@ -380,28 +415,106 @@ const editServicio = async (id) => {
   console.log(servicio);
 };
 const deleteServicio = async (id) => {
-  const response = confirm("Estas seguro de eliminar este parametro?");
-  if (response) {
-    console.log("id from parametros.js");
-    const result = await ipcRenderer.invoke("deleteServiciosFijos", id);
-    console.log("Resultado parametros.js", result);
-    getServicios();
-  }
+  Swal.fire({
+    title: "¿Quieres borrar el servicio de " + socioNombre + " ?",
+    text: "No podrás deshacer esta acción.",
+    icon: "question",
+    iconColor: "#f8c471",
+    showCancelButton: true,
+    confirmButtonColor: "#2874A6",
+    cancelButtonColor: "#EC7063 ",
+    confirmButtonText: "Sí, continuar",
+    cancelButtonText: "Cancelar",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+      console.log("id from parametros.js");
+      const result = await ipcRenderer.invoke("deleteServiciosFijos", id);
+      console.log("Resultado servicios.js", result);
+    }
+  });
 };
 // ----------------------------------------------------------------
 // Funcion que muestra las estadisticas de un servicio
 // ----------------------------------------------------------------
 const mostrarEstadisticas = async (servicioId) => {
   // await getContratados(servicioId);
-  usuarios = await ipcRenderer.invoke("getContratos");
-  console.log(usuarios);
+  const servicio = await ipcRenderer.invoke(
+    "getServiciosFijosById",
+    servicioId
+  );
+  servicioCreacionBn.value = formatearFecha(servicio.fechaCreacion);
+  servicioNombreBn.value = servicio.nombre;
+  servicioDescripcionBn.value = servicio.descripcion;
+  servicioValorBn.value = servicio.valor;
+  editingStatus = true;
+  editServicioId = servicio.id;
+  console.log(servicio);
+  let criterioBuscar = "all";
+  let criterioContentBuscar = "all";
+  await getBeneficiarios(criterioBuscar, criterioContentBuscar, servicioId);
+};
+const getBeneficiarios = async (criterio, criterioContent, servicioId) => {
+  usuarios = await ipcRenderer.invoke(
+    "getContratos",
+    criterio,
+    criterioContent
+  );
+  console.log("Beneficiarios: ", usuarios);
   renderUsuarios(usuarios, servicioId);
 };
-
-const getServicios = async () => {
-  servicios = await ipcRenderer.invoke("getServiciosFijos");
+const getServicios = async (criterio, criterioContent) => {
+  servicios = await ipcRenderer.invoke(
+    "getServiciosFijos",
+    criterio,
+    criterioContent
+  );
   console.log(servicios);
   renderServiciosFijos(servicios);
+};
+criterio.onchange = async () => {
+  let criterioSeleccionado = criterio.value;
+  console.log("Seleccionado: ", criterioSeleccionado);
+  if (criterioSeleccionado === "all") {
+    // criterioContent.textContent = "";
+    criterioContent.value = "";
+    criterioContent.readOnly = true;
+    let criterioBuscar = "all";
+    let criterioContentBuscar = "all";
+    await getServicios(criterioBuscar, criterioContentBuscar);
+  } else {
+    criterioContent.readOnly = false;
+  }
+};
+buscarServicios.onclick = async () => {
+  let criterioBuscar = criterio.value;
+  let criterioContentBuscar = criterioContent.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  await getServicios(criterioBuscar, criterioContentBuscar);
+};
+criterioBn.onchange = async () => {
+  let criterioSeleccionado = criterioBn.value;
+  console.log("Seleccionado: ", criterioSeleccionado);
+  if (criterioSeleccionado === "all") {
+    // criterioContent.textContent = "";
+    criterioContentBn.value = "";
+    criterioContentBn.readOnly = true;
+    let criterioBuscar = "all";
+    let criterioContentBuscar = "all";
+    await getBeneficiarios(
+      criterioBuscar,
+      criterioContentBuscar,
+      editServicioId
+    );
+  } else {
+    criterioContentBn.readOnly = false;
+  }
+};
+buscarBeneficiarios.onclick = async () => {
+  let criterioBuscar = criterioBn.value;
+  let criterioContentBuscar = criterioContentBn.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  await getBeneficiarios(criterioBuscar, criterioContentBuscar, editServicioId);
 };
 const getContratados = async (servicioId) => {
   // Buscamos los contratos que hayan contratado el servicio segun el id del servicio
@@ -416,17 +529,20 @@ const getContratados = async (servicioId) => {
   contratados = console.log("Contratados", contratados);
 };
 async function init() {
-  await getServicios();
+  fechaCreacion.value = formatearFecha(new Date());
+  let criterioBuscar = "all";
+  let criterioContentBuscar = "all";
+  await getServicios(criterioBuscar, criterioContentBuscar);
 }
 ipcRenderer.on("Notificar", (event, response) => {
   if (response.title === "Borrado!") {
-    // resetFormAfterSave();
+    resetFormAfterSave();
   } else if (response.title === "Actualizado!") {
-    // resetFormAfterUpdate();
+    resetFormAfterUpdate();
   } else if (response.title === "Guardado!") {
-    // resetFormAfterSave();
+    resetFormAfterSave();
   } else if (response.title === "Usuario eliminado!") {
-    // resetFormAfterSave();
+    resetFormAfterSave();
   }
   console.log("Response: " + response);
   if (response.success) {
@@ -445,6 +561,32 @@ ipcRenderer.on("Notificar", (event, response) => {
     });
   }
 });
+async function resetFormAfterUpdate() {
+  let criterioBuscar = criterio.value;
+  let criterioContentBuscar = criterioContent.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  console;
+  await getServicios(criterioBuscar, criterioContentBuscar);
+  mensajeError.textContent = "";
+}
+async function resetFormAfterSave() {
+  let criterioBuscar = criterio.value;
+  let criterioContentBuscar = criterioContent.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  console;
+  await getServicios(criterioBuscar, criterioContentBuscar);
+  editingStatus = false;
+  editServicioId = "";
+  servicioForm.reset();
+  mensajeError.textContent = "";
+}
+function resetForm() {
+  editingStatus = false;
+  editServicioId = "";
+  servicioForm.reset();
+  mensajeError.textContent = "";
+  servicioCreacion.value = formatearFecha(new Date());
+}
 function formatearFecha(fecha) {
   const fechaOriginal = new Date(fecha);
   const year = fechaOriginal.getFullYear();

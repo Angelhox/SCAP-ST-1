@@ -18,7 +18,7 @@ const socioCedula = document.getElementById("socioCedula");
 // ----------------------------------------------------------------
 // Variables del contrato/medidor
 // ----------------------------------------------------------------
-const contratoCodigo = document.getElementById("contratatoCodigo");
+const contratoCodigo = document.getElementById("contratoCodigo");
 // ----------------------------------------------------------------
 // Variables de los servicios
 // ----------------------------------------------------------------
@@ -46,6 +46,9 @@ const valorTotalPagar = document.getElementById("valorTotalPagar");
 // const medidorObservacion = document.getElementById("observacion");
 
 let planillas = [];
+let datosServicios = [];
+let serviciosFijos = [];
+let otrosServicios = [];
 let editingStatus = false;
 let editPlanillaId = "";
 let editDetalleId = "";
@@ -200,7 +203,7 @@ function renderPlanillas(datosPlanillas) {
     listaUl.className = "list-group list-group-flush";
 
     //Consulta los servicios a cancelar de acuerdo al id del contrato
-    const datosServicios = await ipcRenderer.invoke(
+    datosServicios = await ipcRenderer.invoke(
       "getDatosServiciosByContratoId",
       datosPlanilla.contratosId,
       formatearFecha(datosPlanilla.fechaEmision),
@@ -438,7 +441,7 @@ const editPlanilla = async (planillaId, contratoId, fechaEmision) => {
   console.log(planilla[0]);
   serviciosFijosList.innerHTML = "";
   otrosServiciosList.innerHTML = "";
-  const serviciosFijos = await ipcRenderer.invoke(
+  serviciosFijos = await ipcRenderer.invoke(
     "getDatosServiciosByContratoId",
     contratoId,
     formatearFecha(fechaEmision),
@@ -449,7 +452,7 @@ const editPlanilla = async (planillaId, contratoId, fechaEmision) => {
   } else {
     serviciosFijosList.innerHTML = "";
   }
-  const otrosServicios = await ipcRenderer.invoke(
+  otrosServicios = await ipcRenderer.invoke(
     "getDatosServiciosByContratoId",
     contratoId,
     formatearFecha(fechaEmision),
@@ -578,6 +581,41 @@ async function calcularConsumo() {
   tarifaConsumo.value = tarifaAplicada + "($" + valorTarifa + ")";
 
   console.log("Tarifa: " + tarifaAplicada + "(" + valorTarifa + ")");
+}
+async function vistaFactura() {
+  let socio = socioNombres.textContent;
+  console.log("Encabezado a enviar: " + socio);
+  const datos = {
+    mensaje: "Hola desde pagina1",
+    otroDato: 12345,
+  };
+  const encabezado = {
+    socio: socioNombres.textContent,
+    fecha: formatearFecha(planillaEmision.textContent),
+    cedula: socioCedula.textContent,
+    contrato: contratoCodigo.textContent,
+    planilla: planillaCodigo.textContent,
+  };
+  const datosAgua = {
+    lecturaAnterior: lecturaAnterior.value,
+    lecturaActual: lecturaActual.value,
+    tarifaConsumo: tarifaConsumo.value,
+    valorConsumo: valorConsumo.value,
+  };
+  const datosTotales = {
+    subtotal: valorSubtotal.value,
+    descuento: valorTotalDescuento.value,
+    totalPagar: valorTotalPagar.value,
+  };
+  await ipcRenderer.send(
+    "datos-a-pagina2",
+    datos,
+    encabezado,
+    serviciosFijos,
+    otrosServicios,
+    datosAgua,
+    datosTotales
+  );
 }
 async function recalcularConsumo() {
   await calcularConsumo();

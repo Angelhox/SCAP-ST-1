@@ -1,4 +1,4 @@
-.encabezado-socios {
+.encabezado-usuarios {
     font-weight: 600;
     color: white;
     position: sticky;
@@ -20,8 +20,8 @@
     position: sticky;
     top: 0;
     z-index: 1;
-    margin-top: -5rem;
-    padding: 1em 1em 1em 1em !important;
+    margin-top: -5rem !important;
+    padding: 1em 1em 1em 1em;
     max-width: 100%;
     height: fit-content;
     border-top-left-radius: 10px;
@@ -33,12 +33,9 @@ table {
     border-collapse: collapse;
 }
 
-
-
 td,
 th {
     padding: 8px;
-
     text-align: left;
 }
 
@@ -92,16 +89,6 @@ th {
     border-radius: 5px;
 }
 
-.rno-rd {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.lno-rd {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
 .mp-0 {
     margin: 0;
     padding: 0;
@@ -109,49 +96,4 @@ th {
 
 .form-control {
     border-radius: 5px;
-}
-
-@media print {
-
-    /* Establece la escala de impresión al 50% */
-    body {
-        transform: scale(0.5);
-        transform-origin: top left;
-    }
-
-    .col-12 {
-        width: 100% !important;
-    }
-
-    .col-md-8 {
-        width: 100% !important;
-    }
-    .col-sm-8 {
-        width: 100% !important;
-    }
-
-    .col-6 {
-        width: 100% !important;
-    }
-
-    .col-4 {
-        width: 100% !important;
-    }
-
-    .col-3 {
-        width: 100% !important;
-    }
-
-    .col-2 {
-        width: 100% !important;
-    }
-
-    .row {
-        width: 100% !important;
-    }
-
-
-    #socioForm {
-        display: none;
-    }
 }

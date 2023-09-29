@@ -151,9 +151,7 @@
 }
 
 .encabezado-servicios {
-
     font-weight: 600;
-
     color: white;
     position: sticky;
     top: 0;
@@ -161,7 +159,7 @@
     z-index: 1;
     /* Asegura que esté por encima del contenido de la lista */
     margin-top: -5rem;
-    padding: 1em 1em 0 1em;
+    padding: 1em 1em 1em 1em;
     background-color: #85C1E9;
     /* padding-bottom: .5em !important;*/
     max-width: 100%;
@@ -169,6 +167,49 @@
     border-top-right-radius: 10px;
     border: solid 2px #85C1E9;
     border-bottom: none;
+}
+
+.encabezado-form {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-top: -5rem;
+    padding: 1em 1em 1em 1em;
+    max-width: 100%;
+    height: fit-content;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.btn-buscar {
+    padding: .4em;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    /* Quita el outline predeterminado */
+    transition: background-color 0.3s;
+    /* Agrega una transición suave al color de fondo */
+}
+
+.btn-buscar:hover {
+    background-color: #85C1E9;
+    color: white;
+    /* Cambia el color de fondo al pasar el ratón por encima */
+}
+
+.btn-rd {
+    border-radius: 5px;
+}
+
+.mp-0 {
+    margin: 0;
+    padding: 0;
+}
+
+.form-control {
+    border-radius: 5px;
 }
 
 ::-webkit-scrollbar {
@@ -192,14 +233,15 @@
 }
 
 section {
-    height: 100vh;
+    padding: 0 0 0 1em ;
+    height: 80vh;
     display: none;
     transition: opacity 0.5s ease-in-out;
 }
 
 section.active {
-    
-    height: 100vh;
+
+    height: 80vh;
     width: 100%;
     display: block;
     opacity: 1;

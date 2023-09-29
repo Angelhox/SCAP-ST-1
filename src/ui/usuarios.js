@@ -20,6 +20,9 @@ const usuariosList = document.getElementById("usuarios");
 const empleadosList = document.getElementById("empleados");
 const usuarioaccesosn = document.getElementById("accesosn");
 const usuarioDarBaja = document.getElementById("bajausuario");
+const buscarUsuarios = document.getElementById("buscarUsuarios");
+const criterio = document.getElementById("criterio");
+const criterioContent = document.getElementById("criterio-content");
 let usuarios = [];
 let empleados = [];
 let editingStatus = false;
@@ -430,16 +433,20 @@ const deleteEmpleado = async (id, usuarioNombre) => {
 // ----------------------------------------------------------------
 // Obtenemos los usuarios del sistema
 // ----------------------------------------------------------------
-const getUsuarios = async () => {
-  usuarios = await ipcRenderer.invoke("getUsuarios");
+const getUsuarios = async (criterio, criterioContent) => {
+  usuarios = await ipcRenderer.invoke("getUsuarios", criterio, criterioContent);
   console.log(usuarios);
   renderUsuarios(usuarios);
 };
 // ----------------------------------------------------------------
 // Obtenemos los empleados no usuarios del sistema
 // ----------------------------------------------------------------
-const getEmpleados = async () => {
-  empleados = await ipcRenderer.invoke("getEmpleados");
+const getEmpleados = async (criterio, criterioContent) => {
+  empleados = await ipcRenderer.invoke(
+    "getEmpleados",
+    criterio,
+    criterioContent
+  );
   console.log(empleados);
   renderEmpleados(empleados);
 };
@@ -487,10 +494,36 @@ usuarioAcceso.addEventListener("change", (event) => {
   usuarioDescripcionAcceso.value = dataValues;
   console.log("Seleccionado: ", selected, dataValues);
 });
+criterio.onchange = async () => {
+  let criterioSeleccionado = criterio.value;
+  console.log("Seleccionado: ", criterioSeleccionado);
+  if (criterioSeleccionado === "all") {
+    // criterioContent.textContent = "";
+    criterioContent.value = "";
+    criterioContent.readOnly = true;
+    let criterioBuscar = "all";
+    let criterioContentBuscar = "all";
+    await getEmpleados(criterioBuscar, criterioContentBuscar);
+    await getUsuarios(criterioBuscar, criterioContentBuscar);
+  } else {
+    criterioContent.readOnly = false;
+  }
+};
+buscarUsuarios.onclick = async () => {
+  let criterioBuscar = criterio.value;
+  let criterioContentBuscar = criterioContent.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+
+  await getEmpleados(criterioBuscar, criterioContentBuscar);
+  await getUsuarios(criterioBuscar, criterioContentBuscar);
+};
+
 async function init() {
   usuarioModificacion.value = formatearFecha(new Date());
-  await getUsuarios();
-  await getEmpleados();
+  let criterioBuscar = "all";
+  let criterioContentBuscar = "all";
+  getUsuarios(criterioBuscar, criterioContentBuscar);
+  getEmpleados(criterioBuscar, criterioContentBuscar);
   await getCargos();
   await getAccesos();
 }
@@ -547,16 +580,22 @@ function habilitarUsuario() {
 }
 // ----------------------------------------------------------------
 // Resetear el formulario despues de actualizar
-function resetFormAfterUpdate() {
-  getUsuarios();
-  getEmpleados();
+async function resetFormAfterUpdate() {
+  let criterioBuscar = criterio.value;
+  let criterioContentBuscar = criterioContent.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  await getUsuarios(criterioBuscar, criterioContentBuscar);
+  await getEmpleados(criterioBuscar, criterioContentBuscar);
   mensajeError.textContent = "";
 }
 // ----------------------------------------------------------------
 // Resetear el formulario despues de guardar o eliminar
-function resetFormAfterSave() {
-  getUsuarios();
-  getEmpleados();
+async function resetFormAfterSave() {
+  let criterioBuscar = criterio.value;
+  let criterioContentBuscar = criterioContent.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  await getEmpleados(criterioBuscar, criterioContentBuscar);
+  await getUsuarios(criterioBuscar, criterioContentBuscar);
   editingStatus = false;
   editUsuarioId = "";
   usuarioDarBaja.disabled = true;

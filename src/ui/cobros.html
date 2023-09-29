@@ -31,7 +31,7 @@
       href="../../node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
 
-    <title>Planilla-w</title>
+    <title>Pagos</title>
   </head>
   <body class="vh-100 overflow-hidden body" style="width: 100%">
     <!-- Navbar -->
@@ -171,7 +171,7 @@
           </button>
           <!-- <button class="btn btn-success " onclick="generarPlanillas()" id="btnGenerarPlanillas"> -->
           <button class="btn btn-success" onclick="generarPlanilla()">
-            Actualizar
+            Generar Planillas
           </button>
         </div>
         <!-- <div class="col-12">
@@ -597,10 +597,18 @@
                           />
                         </div>
                         <div class="col-12 d-flex justify-content-end mt-2">
-                          <button class="btn btn-danger" type="reset">
+                          <button
+                            type="button"
+                            class="btn btn-danger mx-1"
+                            type="reset"
+                            onclick="vistaFactura()"
+                          >
+                            Pagar
+                          </button>
+                          <button class="btn btn-danger mx-1" type="reset">
                             Cancelar
                           </button>
-                          <button class="btn btn-success" type="submit">
+                          <button class="btn btn-success mx-1" type="submit">
                             Guardar
                           </button>
                         </div>
@@ -717,6 +725,9 @@
               />
 
               <div class="col-12 d-flex justify-content-end">
+                <button type="button" class="btn btn-primary mx-2 rounded-2">
+                  Cobrar
+                </button>
                 <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
                 <button class="btn btn-danger rounded-2">Cancelar</button>
               </div>
@@ -865,7 +876,10 @@
                 </div>
               </div>
               <div class="col-12 d-flex justify-content-end">
-                <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
+                <button type="button" class="btn btn-primary mx-2 rounded-2">
+                  Cobrar
+                </button>
+                <!-- <button class="btn btn-primary mx-2 rounded-2">Guardar</button> -->
                 <button class="btn btn-danger rounded-2">Cancelar</button>
               </div>
             </form>
@@ -880,7 +894,7 @@
   <script src="../../node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
   <script src="./bootstrap/js/bootstrap.min.js"></script>
 
-  <script src="./planillas.js" defer></script>
+  <script src="./cobros.js" defer></script>
 
   <script>
     function mostrarFormServicios() {

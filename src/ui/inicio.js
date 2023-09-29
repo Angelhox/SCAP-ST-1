@@ -73,7 +73,7 @@ const abrirUsuarios = async () => {
   await ipcRenderer.send("abrirInterface", url);
 };
 const abrirPagos = async () => {
-  const url = "src/ui/planillas.html";
+  const url = "src/ui/cobros.html";
   await ipcRenderer.send("abrirInterface", url);
 };
 const abrirPlanillas = async () => {

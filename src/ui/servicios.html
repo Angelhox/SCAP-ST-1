@@ -150,25 +150,67 @@
       </nav>
     </header>
     <section id="seccion1" class="active">
-      <div class="row container-fluid" style="padding-top: 9em">
+      <div class="row container-fluid" style="padding-top: 7em">
         <div
           class="col-lg-8 col-md-8 col-sm-12"
-          style="
-            height: 80vh;
-            padding: 0 10px 10px 10px;
-            overflow-y: auto;
-            overflow-x: hidden;
-          "
+          style="height: 68vh; padding: 0"
         >
-          <div class="col-12 encabezado-servicios sticky">
-            <p class="fs-5">Servicios fijos</p>
+          <div class="col-12 encabezado-servicios">
+            <div
+              class="col-12 mp-0 d-flex flex-column align-items-start justify-content-end"
+            >
+              <p class="fs-1 mp-0">
+                Servicios
+                <i class="fs-1 fa-solid fa-gears mx-2 my-2"></i>
+              </p>
+            </div>
+            <div class="col-12">
+              <label for="criterio">Buscar por...</label>
+              <div class="row">
+                <div class="col-3">
+                  <select
+                    id="criterio"
+                    class="form-select btn-rd"
+                    aria-label="Default select example"
+                  >
+                    <option value="all" selected>Todas</option>
+                    <option value="nombre">Nombre del servicio</option>
+                    <option value="descripcion">
+                      Descripción del servicio
+                    </option>
+                  </select>
+                </div>
+                <div class="col-3">
+                  <div class="input-group">
+                    <input
+                      readonly
+                      type="text"
+                      class="form-control btn-rd"
+                      placeholder="Buscar..."
+                      id="criterio-content"
+                    />
+                  </div>
+                </div>
+                <div class="col-3">
+                  <!-- <label class="text-white" for="criterio">Buscar</label> -->
+                  <button
+                    type="button"
+                    class="btn-buscar"
+                    style="width: 100%"
+                    id="buscarServicios"
+                  >
+                    Buscar<i class="fa fa-search mx-1"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           <!-- Tabla de listado de usuarios -->
           <!-- <div class="container-servicios"> -->
           <div
-            class="row d-flex justify-content-center container-servicios-list"
+            class="row d-flex justify-content-center container-servicios-list mp-0"
             id="servicios"
-            style="margin-top: 5em"
+            style="overflow-y: auto; height: 100%; max-height: 100%"
           >
             <div class="col-6 card mb-3 card-servicios" style="max-width: 100%">
               <div class="row g-0">
@@ -228,7 +270,10 @@
           </div>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-12">
+        <div
+          class="col-lg-4 col-md-4 col-sm-12 encabezado-form"
+          style="margin: -5em 0 0 0; padding: 0 0 0 1.5em"
+        >
           <form class="form-horizontal" id="servicioForm">
             <div class="col-12 text-center fs-4">Detalles del Servicio</div>
             <div
@@ -236,6 +281,15 @@
               style="color: red; font-size: 200; height: 20px"
             ></div>
             <!-- <input type="text" class="form-control my-2" placeholder="Id" /> -->
+            <label for="sector">Fecha de creación del servicio</label>
+
+            <input
+              type="date"
+              readonly
+              class="form-control my-2"
+              placeholder="fechaCreacion"
+              id="fechaCreacion"
+            />
             <label for="sector">Nombre del servicio</label>
 
             <input
@@ -265,32 +319,80 @@
 
             <div class="col-12 d-flex justify-content-end">
               <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
-              <button class="btn btn-danger rounded-2">Cancelar</button>
+              <button
+                type="button"
+                onclick="resetForm()"
+                class="btn btn-danger rounded-2"
+              >
+                Cancelar
+              </button>
             </div>
           </form>
         </div>
       </div>
     </section>
     <section id="seccion2">
-      <div class="row container-fluid" style="padding-top: 9em">
+      <div class="row container-fluid" style="padding-top: 7em">
         <div
           class="col-lg-8 col-md-8 col-sm-12"
-          style="
-            height: 80vh;
-            padding: 0 10px 10px 10px;
-            overflow-y: auto;
-            overflow-x: hidden;
-          "
+          style="height: 68vh; padding: 0"
         >
-          <div class="col-12 encabezado-servicios sticky">
-            <p class="fs-5">Servicios fijos</p>
+          <div class="col-12 encabezado-servicios">
+            <div
+              class="col-12 mp-0 d-flex flex-column align-items-start justify-content-end"
+            >
+              <p class="fs-1 mp-0">
+                Beneficiarios
+                <i class="fs-1 fa-solid fa-hands-holding-child mx-2 my-2"></i>
+              </p>
+            </div>
+            <div class="col-12">
+              <label for="criterio">Buscar por...</label>
+              <div class="row">
+                <div class="col-3">
+                  <select
+                    id="criterio-bn"
+                    class="form-select btn-rd"
+                    aria-label="Default select example"
+                  >
+                    <option value="all" selected>Todas</option>
+                    <option value="codigo">Contrato</option>
+                    <option value="socio">Socio</option>
+                    <!-- <option value="estado-bn">Beneficiarios</option>
+                    <option value="estado-nbn">No beneficiarios</option> -->
+                  </select>
+                </div>
+                <div class="col-3">
+                  <div class="input-group">
+                    <input
+                      readonly
+                      type="text"
+                      class="form-control btn-rd"
+                      placeholder="Buscar..."
+                      id="criterio-bn-content"
+                    />
+                  </div>
+                </div>
+                <div class="col-3">
+                  <!-- <label class="text-white" for="criterio">Buscar</label> -->
+                  <button
+                    type="button"
+                    class="btn-buscar"
+                    style="width: 100%"
+                    id="buscarBeneficiarios"
+                  >
+                    Buscar<i class="fa fa-search mx-1"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           <!-- Tabla de listado de usuarios -->
           <!-- <div class="container-servicios"> -->
           <div
             class="row d-flex justify-content-center container-servicios-list"
             id="usuarios"
-            style="margin-top: 6em"
+            style="overflow-y: auto; height: 100%; max-height: 100%"
           >
             <div class="col-6 card mb-3" style="max-width: 100%">
               <div class="row g-0">
@@ -345,7 +447,68 @@
           </div>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-12"></div>
+        <div
+          class="col-lg-4 col-md-4 col-sm-12 encabezado-form"
+          style="margin: -5em 0 0 0; padding: 0 0 0 1.5em"
+        >
+          <form class="form-horizontal" id="servicioForm-bn">
+            <div class="col-12 text-center fs-4">Detalles del Servicio</div>
+            <div
+              id="mensajeError"
+              style="color: red; font-size: 200; height: 20px"
+            ></div>
+            <!-- <input type="text" class="form-control my-2" placeholder="Id" /> -->
+            <label for="sector">Fecha de creación del servicio</label>
+
+            <input
+              type="date"
+              readonly
+              class="form-control my-2"
+              placeholder="fechaCreacion"
+              id="fechaCreacion-bn"
+            />
+            <label for="sector">Nombre del servicio</label>
+
+            <input
+              readonly
+              type="text"
+              class="form-control my-2"
+              placeholder="Nombre del servicio"
+              id="nombre-bn"
+            />
+            <label for="sector">Descripción del servicio</label>
+
+            <input
+              readonly
+              type="text"
+              class="form-control my-2"
+              placeholder="Descripcion del servicio"
+              id="descripcion-bn"
+            />
+
+            <label for="sector">Valor del servicio</label>
+
+            <input
+              readonly
+              type="number"
+              step="any"
+              class="form-control my-2"
+              placeholder="Valor"
+              id="valor-bn"
+            />
+
+            <div class="col-12 d-flex justify-content-end">
+              <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
+              <button
+                type="button"
+                onclick="resetForm()"
+                class="btn btn-danger rounded-2"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </section>
   </body>

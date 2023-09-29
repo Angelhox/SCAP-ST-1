@@ -114,8 +114,9 @@
 .fila-md {
     padding: 10px;
     border: 7px solid #ccc;
-    
+
 }
+
 .btn-custom {
     padding: 0 20px;
     font-size: 16px;
@@ -132,4 +133,14 @@
     background-color: #85C1E9;
     color: white;
     /* Cambia el color de fondo al pasar el ratón por encima */
+}
+
+.rno-rd {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.lno-rd {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }

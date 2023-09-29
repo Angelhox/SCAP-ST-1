@@ -273,7 +273,6 @@ buscarSocios.onclick = async () => {
   let criterioBuscar = criterio.value;
   let criterioContentBuscar = criterioContent.value;
   console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
-  console;
   await getSocios(criterioBuscar, criterioContentBuscar);
 };
 
@@ -330,12 +329,20 @@ ipcRenderer.on("Notificar", (event, response) => {
     });
   }
 });
-function resetFormAfterUpdate() {
-  getSocios();
+async function resetFormAfterUpdate() {
+  let criterioBuscar = criterio.value;
+  let criterioContentBuscar = criterioContent.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  console;
+  await getSocios(criterioBuscar, criterioContentBuscar);
   mensajeError.textContent = "";
 }
-function resetFormAfterSave() {
-  getSocios();
+async function resetFormAfterSave() {
+  let criterioBuscar = criterio.value;
+  let criterioContentBuscar = criterioContent.value;
+  console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  console;
+  await getSocios(criterioBuscar, criterioContentBuscar);
   editingStatus = false;
   editSocioId = "";
   socioForm.reset();
