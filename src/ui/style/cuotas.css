@@ -130,6 +130,7 @@
     /* Cambia el color de fondo al pasar el ratón por encima */
 }
 
+
 .btn-servicios-custom {
     margin: .1em;
     height: 30%;
@@ -150,10 +151,9 @@
     /* Cambia el color de fondo al pasar el ratón por encima */
 }
 
+
 .encabezado-servicios {
-    
     font-weight: 600;
-   
     color: white;
     position: sticky;
     top: 0;
@@ -161,7 +161,7 @@
     z-index: 1;
     /* Asegura que esté por encima del contenido de la lista */
     margin-top: -5rem;
-    padding: 1em 1em 0 1em;
+    padding: 1em 1em 1em 1em;
     background-color: #85C1E9;
     /* padding-bottom: .5em !important;*/
     max-width: 100%;
@@ -169,6 +169,86 @@
     border-top-right-radius: 10px;
     border: solid 2px #85C1E9;
     border-bottom: none;
+}
+
+.encabezado-form {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-top: -5rem;
+    padding: 1em 1em 1em 1em;
+    max-width: 100%;
+    height: fit-content;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.btn-buscar {
+    padding: .4em;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    /* Quita el outline predeterminado */
+    transition: background-color 0.3s;
+    /* Agrega una transición suave al color de fondo */
+}
+
+.btn-buscar:hover {
+    background-color: #85C1E9;
+    color: white;
+    /* Cambia el color de fondo al pasar el ratón por encima */
+}
+
+.btn-rd {
+    border-radius: 5px;
+}
+
+.mp-0 {
+    margin: 0;
+    padding: 0;
+}
+
+.form-control {
+    border-radius: 5px;
+}
+
+/* Estilos para el botón */
+.boton-info {
+    background-color: #85C1E9;
+    border: none;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 0 .5em;
+}
+
+/* Estilos para el cuadro de información */
+.informacion {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: .8em;
+
+    z-index: 1;
+    display: none;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+
+}
+
+/* Estilos para el icono dentro del cuadro de información */
+.informacion i {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+/* Estilos para el cuadro de información al pasar el cursor sobre el botón */
+.boton-info:hover .informacion {
+    display: block;
 }
 
 ::-webkit-scrollbar {
@@ -189,4 +269,19 @@
 ::-webkit-scrollbar-thumb:hover {
     background-color: #555;
     /* Cambia el color del "pulgar" al pasar el ratón por encima */
+}
+
+section {
+    padding: 0 0 0 1em;
+    height: 80vh;
+    display: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+section.active {
+
+    height: 80vh;
+    width: 100%;
+    display: block;
+    opacity: 1;
 }

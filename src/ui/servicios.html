@@ -149,7 +149,7 @@
         </div>
       </nav>
     </header>
-    <section id="seccion1" class="active">
+    <section class="active" id="seccion1">
       <div class="row container-fluid" style="padding-top: 7em">
         <div
           class="col-lg-8 col-md-8 col-sm-12"
@@ -316,6 +316,7 @@
               placeholder="Valor"
               id="valor"
             />
+            
 
             <div class="col-12 d-flex justify-content-end">
               <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
@@ -332,19 +333,29 @@
       </div>
     </section>
     <section id="seccion2">
-      <div class="row container-fluid" style="padding-top: 7em">
+      <div
+        class="row container-fluid"
+        style="padding-top: 7em; display: flex; flex-wrap: wrap"
+      >
         <div
-          class="col-lg-8 col-md-8 col-sm-12"
+          class="col-lg-8 col-md-8 col-sm-8"
           style="height: 68vh; padding: 0"
         >
           <div class="col-12 encabezado-servicios">
             <div
-              class="col-12 mp-0 d-flex flex-column align-items-start justify-content-end"
+              class="col-12 mp-0 d-flex align-items-start justify-content-between align-items-end"
             >
               <p class="fs-1 mp-0">
                 Beneficiarios
                 <i class="fs-1 fa-solid fa-hands-holding-child mx-2 my-2"></i>
               </p>
+              <button
+                class="btn btn-outline-light"
+                type="button"
+                id="btn-volver"
+              >
+                Volver
+              </button>
             </div>
             <div class="col-12">
               <label for="criterio">Buscar por...</label>
@@ -357,7 +368,8 @@
                   >
                     <option value="all" selected>Todas</option>
                     <option value="codigo">Contrato</option>
-                    <option value="socio">Socio</option>
+                    <option value="nombres">Nombres del socio</option>
+                    <option value="apellidos">Apellidos del</option>
                     <!-- <option value="estado-bn">Beneficiarios</option>
                     <option value="estado-nbn">No beneficiarios</option> -->
                   </select>
@@ -386,6 +398,21 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div
+            class="col-12 d-flex justify-content-between align-items-center encabezado-bt"
+          >
+            <div class="d-flex align-items-baseline mp-0">
+              <p class="servicio-title mp-0" id="servicio-tit">Agua Potable</p>
+              <p class="trans">-</p>
+
+              <p class="mp-0" id="servicio-desc">
+                (Servicio de agua potable para la comuniad)
+              </p>
+            </div>
+
+            <p class="" id="servicio-det">Servicio fijo | No aplazable</p>
+            <p id="servicio-val">Valor: $2.50</p>
           </div>
           <!-- Tabla de listado de usuarios -->
           <!-- <div class="container-servicios"> -->
@@ -448,66 +475,279 @@
         </div>
 
         <div
-          class="col-lg-4 col-md-4 col-sm-12 encabezado-form"
-          style="margin: -5em 0 0 0; padding: 0 0 0 1.5em"
+          class="col-lg-4 col-md-4 col-sm-4 encabezado-form"
+          style="margin: -5em 0 0 0; padding: 0 0 0 0.5em"
         >
-          <form class="form-horizontal" id="servicioForm-bn">
-            <div class="col-12 text-center fs-4">Detalles del Servicio</div>
-            <div
-              id="mensajeError"
-              style="color: red; font-size: 200; height: 20px"
-            ></div>
-            <!-- <input type="text" class="form-control my-2" placeholder="Id" /> -->
-            <label for="sector">Fecha de creación del servicio</label>
-
-            <input
-              type="date"
-              readonly
-              class="form-control my-2"
-              placeholder="fechaCreacion"
-              id="fechaCreacion-bn"
-            />
-            <label for="sector">Nombre del servicio</label>
-
-            <input
-              readonly
-              type="text"
-              class="form-control my-2"
-              placeholder="Nombre del servicio"
-              id="nombre-bn"
-            />
-            <label for="sector">Descripción del servicio</label>
-
-            <input
-              readonly
-              type="text"
-              class="form-control my-2"
-              placeholder="Descripcion del servicio"
-              id="descripcion-bn"
-            />
-
-            <label for="sector">Valor del servicio</label>
-
-            <input
-              readonly
-              type="number"
-              step="any"
-              class="form-control my-2"
-              placeholder="Valor"
-              id="valor-bn"
-            />
-
-            <div class="col-12 d-flex justify-content-end">
-              <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
+          <div class="row mx-1 encabezado-st">
+            <div class="col-12 text-center fs-4">Recaudaciones</div>
+            <div class="col-6">
+              <label for="criterio-st">Ver por</label>
+              <select id="criterio-st" class="form-select">
+                <option value="actual" selected>Actual</option>
+                <!-- <option value="all">Todos</option> -->
+                <option value="mes">Mes</option>
+                <!-- <option value="periodo">Periodo</option> -->
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="trans" for="criterio">Buscar</label>
               <button
                 type="button"
-                onclick="resetForm()"
-                class="btn btn-danger rounded-2"
+                class="btn-buscar"
+                style="width: 100%"
+                id="buscarRecaudaciones"
               >
-                Cancelar
+                Buscar<i class="fa fa-search mx-1"></i>
               </button>
             </div>
-          </form>
+            <div class="row d-flex justify-content-between my-2">
+              <p class="col-6 mp-0">Fecha de consulta...</p>
+              <p class="col-6 mp-0" style="display: none">Hasta...</p>
+              <p class="col-6 mp-0" style="display: none">Hasta...</p>
+            </div>
+            <div class="col-6">
+              <div class="col-row d-flex mp-0">
+                <div class="col-6 text-center mp-0">
+                  <label for="mes" class="text-center">Mes</label>
+                  <select
+                    disabled
+                    id="mesRecaudacion"
+                    class="form-select"
+                    style="
+                      border-top-right-radius: 0;
+                      border-bottom-right-radius: 0;
+                    "
+                  ></select>
+                </div>
+                <div class="col-6 text-center mp-0">
+                  <label for="anio"> Año</label>
+                  <select
+                    disabled
+                    id="anioRecaudacion"
+                    class="form-select"
+                    aria-label="Default select example"
+                    style="
+                      border-top-left-radius: 0;
+                      border-bottom-left-radius: 0;
+                    "
+                  ></select>
+                </div>
+              </div>
+            </div>
+            <div class="col-6" style="display: none">
+              <div class="col-row d-flex">
+                <div class="col-6 text-center mp-0">
+                  <label for="mesLimite">Mes</label>
+                  <select
+                    id="mesLimite"
+                    class="form-select"
+                    style="
+                      border-top-right-radius: 0;
+                      border-bottom-right-radius: 0;
+                    "
+                  ></select>
+                </div>
+                <div class="col-6 text-center mp-0">
+                  <label for="anio">Año</label>
+                  <select
+                    id="anioLimite"
+                    class="form-select"
+                    aria-label="Default select example"
+                    style="
+                      border-top-left-radius: 0;
+                      border-bottom-left-radius: 0;
+                    "
+                  ></select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row d-flex justify-content-between pt-4">
+              <div class="col-3 d-flex">
+                <p>Recaudado: $</p>
+                <p class="trans">-</p>
+                <p id="valorRecaudado">$253.25</p>
+              </div>
+              <div class="col-3 d-flex">
+                <p>Pendiente: $</p>
+                <p class="trans">-</p>
+                <p id="valorPendiente">$253.25</p>
+              </div>
+              <div class="col-3 d-flex">
+                <p>Total: $</p>
+                <p class="trans">-</p>
+                <p id="valorTotal">$253.25</p>
+              </div>
+            </div>
+            <div class="col-12 table-st-container">
+              <table class="table mp-0" style="width: 100%; margin-bottom: 0">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Contrato</th>
+                    <th>Socio</th>
+                    <th>Estado</th>
+                    <th>Abono</th>
+                    <th>Total</th>
+                    <th>Saldo</th>
+                  </tr>
+                </thead>
+
+                <tbody id="recaudaciones">
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                  <tr>
+                    <td>C001</td>
+                    <td>Juan Jose Lopez</td>
+                    <td>Por cancelar</td>
+                    <td>10.00</td>
+                    <td>5.00</td>
+                    <td>5.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-12 d-flex justify-content-end">
+              <button class="btn-gtc" style="width: 50%">
+                <i class="fs-4 fa-solid fa-print mx-1"></i>Reporte
+              </button>
+            </div>
+          </div>
+          <!-- <div class="col-12 d-flex justify-content-end">
+            <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
+            <button
+              type="button"
+              onclick="resetForm()"
+              class="btn btn-danger rounded-2"
+            >
+              Cancelar
+            </button>
+          </div> -->
         </div>
       </div>
     </section>

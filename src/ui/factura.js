@@ -1,5 +1,6 @@
 // const puppeteer = require("puppeteer");
 const pdf = require("html-pdf");
+const printer = require("pdf-to-printer");
 const { ipcRenderer } = require("electron");
 const socioNombres = document.getElementById("socioNombres");
 const socioCedula = document.getElementById("socioCedula");
@@ -63,28 +64,44 @@ async function imprimirYGuardarPDF() {
   const timestamp = new Date().getTime(); // Obtener el timestamp actual
   const fileName = `documento_${timestamp}.pdf`;
   const filePath = "X:/FacturasSCAP/" + fileName;
-  await pdf.create(content.outerHTML).toFile(filePath, (err, res) => {
+  pdf.create(content.outerHTML).toFile(filePath, async (err, res) => {
     if (err) {
       console.error(err);
       return;
     }
     console.log("Archivo PDF creado: ", res.filename);
     // Enviamos el archivo a la cola de impresion
-    //   printer
-    //     .print(filePath)
-    window
-      .print()
+    printer
+      .print(filePath)
+      // window
+      //   .print()
       .then(() => {
+        printer.print(filePath);
         // Impresión exitosa
         abrirPagos();
         console.log("El PDF se ha enviado a la cola de impresión.");
       })
+      // try {
+      //   await imprime().then(() => {
+      //     window.print();
+      //   });
+      //   abrirPagos();
+      //   console.log("El PDF se ha enviado a la cola de impresión.");
+      // } catch (error) {
+      //   // Error de impresión
+      //   abrirPagos();
+      //   console.error("Error al imprimir el PDF:", error);
+      // }
+
       .catch((error) => {
         // Error de impresión
         abrirPagos();
         console.error("Error al imprimir el PDF:", error);
       });
   });
+}
+async function imprime() {
+  window.print();
 }
 ipcRenderer.on(
   "datos-a-pagina2",

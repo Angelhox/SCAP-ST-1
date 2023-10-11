@@ -24,27 +24,39 @@ const contratoCodigo = document.getElementById("contratoCodigo");
 // ----------------------------------------------------------------
 const serviciosFijosList = document.getElementById("serviciosFijos");
 const otrosServiciosList = document.getElementById("otrosServicios");
+const otrosAplazablesList = document.getElementById("otrosAplazables");
+const mesBusqueda = document.getElementById("mesBusqueda");
+const anioBusqueda = document.getElementById("anioBusqueda");
+const errortextAbono = document.getElementById("errorTextAbono");
+const errContainer = document.getElementById("err-container");
 // ----------------------------------------------------------------
 // Variables del los totales de la planilla
 // ----------------------------------------------------------------
-var totalFinal = 0.0;
-var totalConsumo = 0.0;
-var tarifaAplicada = "Familiar";
-var valorTarifa = 2.0;
+let totalFinal = 0.0;
+let totalConsumo = 0.0;
+let tarifaAplicada = "Familiar";
+let valorTarifa = 2.0;
 const valorSubtotal = document.getElementById("valorSubtotal");
 const valorTotalDescuento = document.getElementById("valorTotalDescuento");
 const valorTotalPagar = document.getElementById("valorTotalPagar");
-
-// const socioNombre = document.getElementById("nombrecompleto");
-// const medidorCodigo = document.getElementById("codigo");
-// const medidorMarca = document.getElementById("marca");
-// const medidorBarrio = document.getElementById("barrio");
-// const medidorPrincipal = document.getElementById("principal");
-// const medidorSecundaria = document.getElementById("secundaria");
-// const medidorNumeroCasa = document.getElementById("numerocasa");
-// const medidorReferencia = document.getElementById("referencia");
-// const medidorObservacion = document.getElementById("observacion");
-
+// Variables del dialogo de los servicios
+const dialogServicios = document.getElementById("formServicios");
+const servicioDg = document.getElementById("title-dg");
+const descripcionDg = document.getElementById("descripcion-dg");
+const detallesDg = document.getElementById("detalles-dg");
+const subtotalDg = document.getElementById("subtotal-dg");
+const descuentoDg = document.getElementById("descuento-dg");
+const totalDg = document.getElementById("total-dg");
+const numPagosDg = document.getElementById("numPagos-dg");
+const canceladosDg = document.getElementById("cancelados-dg");
+const pendientesDg = document.getElementById("pendientes-dg");
+const saldoDg = document.getElementById("saldo-dg");
+const abonadoDg = document.getElementById("abonado-dg");
+const abonarDg = document.getElementById("abonar-dg");
+const guardarDg = document.getElementById("btnGuardar-dg");
+const administrarDg = document.getElementById("btnAdministrar-dg");
+let abonarStatus = false;
+let valorAbonoEdit = 0;
 let planillas = [];
 let datosServicios = [];
 let serviciosFijos = [];
@@ -233,17 +245,32 @@ function renderPlanillas(datosPlanillas) {
         totalPagar += datosServicio.total;
       } else {
         // Crear elementos de la lista de servicios (Alcantarillado, Recolección de desechos, Riego Agrícola, Bomberos)
-        const alcantarilladoLi = document.createElement("li");
-        alcantarilladoLi.className = "titulo-detalles d-flex detalles";
-        const alcantarilladoP = document.createElement("p");
-        alcantarilladoP.textContent = datosServicio.nombre + ": ";
-        const alcantarilladoValor = document.createTextNode(
-          datosServicio.valor
-        );
-        totalPagar += datosServicio.valor;
-        alcantarilladoLi.appendChild(alcantarilladoP);
-        alcantarilladoLi.appendChild(alcantarilladoValor);
-        listaUl.appendChild(alcantarilladoLi);
+
+        if (datosServicio.aplazableSn === "Si") {
+          const alcantarilladoLi = document.createElement("li");
+          alcantarilladoLi.className = "titulo-detalles d-flex detalles";
+          const alcantarilladoP = document.createElement("p");
+          alcantarilladoP.textContent = datosServicio.nombre + ": ";
+          const alcantarilladoValor = document.createTextNode(
+            datosServicio.abono
+          );
+          totalPagar += datosServicio.abono;
+          alcantarilladoLi.appendChild(alcantarilladoP);
+          alcantarilladoLi.appendChild(alcantarilladoValor);
+          listaUl.appendChild(alcantarilladoLi);
+        } else {
+          const alcantarilladoLi = document.createElement("li");
+          alcantarilladoLi.className = "titulo-detalles d-flex detalles";
+          const alcantarilladoP = document.createElement("p");
+          alcantarilladoP.textContent = datosServicio.nombre + ": ";
+          const alcantarilladoValor = document.createTextNode(
+            datosServicio.total
+          );
+          totalPagar += datosServicio.total;
+          alcantarilladoLi.appendChild(alcantarilladoP);
+          alcantarilladoLi.appendChild(alcantarilladoValor);
+          listaUl.appendChild(alcantarilladoLi);
+        }
       }
 
       // Agregar los elementos de servicios al contenedor de servicios
@@ -252,64 +279,12 @@ function renderPlanillas(datosPlanillas) {
       serviciosDiv.appendChild(tarifaDiv);
       serviciosDiv.appendChild(valorDiv);
       serviciosDiv.appendChild(serviciosTituloP);
-      // const recoleccionDesechosLi = document.createElement("li");
-      // recoleccionDesechosLi.className = "titulo-detalles d-flex detalles";
-      // const recoleccionDesechosP = document.createElement("p");
-      // recoleccionDesechosP.textContent = "Recolección de desechos:";
-      // const recoleccionDesechosValor = document.createTextNode("1.50");
-      // recoleccionDesechosLi.appendChild(recoleccionDesechosP);
-      // recoleccionDesechosLi.appendChild(recoleccionDesechosValor);
-
-      // const riegoAgricolaLi = document.createElement("li");
-      // riegoAgricolaLi.className = "titulo-detalles d-flex detalles";
-      // const riegoAgricolaP = document.createElement("p");
-      // riegoAgricolaP.textContent = "Riego Agrícola:";
-      // const riegoAgricolaValor = document.createTextNode("1.25");
-      // riegoAgricolaLi.appendChild(riegoAgricolaP);
-      // riegoAgricolaLi.appendChild(riegoAgricolaValor);
-
-      // const bomberosLi = document.createElement("li");
-      // bomberosLi.className = "titulo-detalles d-flex detalles";
-      // const bomberosP = document.createElement("p");
-      // bomberosP.textContent = "Bomberos:";
-      // const bomberosValor = document.createTextNode("0.75");
-      // bomberosLi.appendChild(bomberosP);
-      // bomberosLi.appendChild(bomberosValor);
-      // Agregar elementos de la lista de servicios a la lista ul
-      // listaUl.appendChild(alcantarilladoLi);
-      // listaUl.appendChild(recoleccionDesechosLi);
-      // listaUl.appendChild(riegoAgricolaLi);
-      // listaUl.appendChild(bomberosLi);
 
       // Agregar la lista ul al contenedor de lista de servicios
       listaServiciosDiv.appendChild(listaUl);
     });
     console.log("valor agua: " + valorAguaPotable);
-    // if (
-    //   valorAguaPotable !== null ||
-    //   valorAguaPotable !== undefined ||
-    //   valorAguaPotable !== "null"
-    // ) {
-    //   const consumoValor = document.createTextNode(valorAguaPotable);
-    //   consumoDiv.appendChild(consumoP);
-    //   consumoDiv.appendChild(consumoValor);
-    //   const tarifaValor = document.createTextNode(valorAguaPotable);
-    //   tarifaDiv.appendChild(tarifaP);
-    //   tarifaDiv.appendChild(tarifaValor);
-    //   const valorValor = document.createTextNode(valorAguaPotable);
-    //   valorDiv.appendChild(valorP);
-    //   valorDiv.appendChild(valorValor);
-    // } else {
-    //   const consumoValor = document.createTextNode("NA");
-    //   consumoDiv.appendChild(consumoP);
-    //   consumoDiv.appendChild(consumoValor);
-    //   const tarifaValor = document.createTextNode("NA");
-    //   tarifaDiv.appendChild(tarifaP);
-    //   tarifaDiv.appendChild(tarifaValor);
-    //   const valorValor = document.createTextNode("NA");
-    //   valorDiv.appendChild(valorP);
-    //   valorDiv.appendChild(valorValor);
-    // }
+
     if (
       valorAguaPotable === null ||
       valorAguaPotable === undefined ||
@@ -441,6 +416,7 @@ const editPlanilla = async (planillaId, contratoId, fechaEmision) => {
   console.log(planilla[0]);
   serviciosFijosList.innerHTML = "";
   otrosServiciosList.innerHTML = "";
+  otrosAplazablesList.innerHTML = "";
   serviciosFijos = await ipcRenderer.invoke(
     "getDatosServiciosByContratoId",
     contratoId,
@@ -473,68 +449,66 @@ function renderServicios(servicios, tipo) {
   servicios.forEach((servicio) => {
     // Crear el div principal
     if (servicio.nombre !== "Agua Potable") {
-      const divPrincipal = document.createElement("div");
-      divPrincipal.className = "col-12 card border-info mb-2 ";
-      divPrincipal.style.maxWidth = "100%";
-      divPrincipal.style.maxHeight = "45%";
-      divPrincipal.style.minHeight = "45%";
-      divPrincipal.style.padding = "0";
+      const tr = document.createElement("tr");
+      tr.id = servicio.id;
+      const tdServicio = document.createElement("td");
+      tdServicio.textContent = servicio.nombre;
+      const tdAplazable = document.createElement("td");
+      tdAplazable.textContent = servicio.aplazableSn;
+      const tdSubtotal = document.createElement("td");
+      tdSubtotal.textContent = servicio.valor;
+      const tdDescuento = document.createElement("td");
+      tdDescuento.textContent = servicio.descuento;
+      const tdTotal = document.createElement("td");
+      tdTotal.textContent = servicio.total;
+      const tdSaldo = document.createElement("td");
+      tdSaldo.textContent = servicio.total;
+      const tdAbono = document.createElement("td");
+      tdAbono.className = "valorAbono";
 
-      // Crear el div para el encabezado
-      const divEncabezado = document.createElement("div");
-      divEncabezado.className = "card-header titulo-detalles";
-      divEncabezado.style.margin = "0";
-      divEncabezado.style.padding = "0.5%";
-      divEncabezado.style.backgroundColor = "#85c1e9";
-      const encabezadoTexto = document.createElement("p");
-      encabezadoTexto.textContent = servicio.nombre;
-      divEncabezado.appendChild(encabezadoTexto);
-
-      // Crear el div para el cuerpo de la tarjeta
-      const divCuerpo = document.createElement("div");
-      divCuerpo.className = "card-body card-cuerpo card-s-cuerpo";
-      divCuerpo.style.padding = "1em";
-
-      // Crear el div con las columnas
-      const divColumnas = document.createElement("div");
-      divColumnas.className = "col-12";
-      const divFila = document.createElement("div");
-      divFila.className = "row";
-
-      // Crear las columnas con sus contenidos
-      totalPagarEdit += servicio.total;
-      const columnas = [
-        { titulo: "Valor:", contenido: servicio.valor },
-        { titulo: "Desc:", contenido: servicio.tipodescuento },
-        { titulo: "Valor desc:", contenido: servicio.descuento },
-        { titulo: "Total:", contenido: servicio.total },
-      ];
-
-      columnas.forEach((columna) => {
-        const divColumna = document.createElement("div");
-        divColumna.className = "col-3 card-cuerpo";
-        const pTitulo = document.createElement("p");
-        pTitulo.textContent = columna.titulo;
-        const pContenido = document.createElement("p");
-        pContenido.textContent = columna.contenido;
-        divColumna.appendChild(pTitulo);
-        divColumna.appendChild(pContenido);
-        divFila.appendChild(divColumna);
-      });
-
-      divColumnas.appendChild(divFila);
-      divCuerpo.appendChild(divColumnas);
-
-      // Agregar los elementos al div principal
-      divPrincipal.appendChild(divEncabezado);
-      divPrincipal.appendChild(divCuerpo);
-
-      // Agregar el div principal al documento (por ejemplo, al cuerpo del documento)
-      // document.body.appendChild(divPrincipal);
-      if (tipo == "fijos") {
-        serviciosFijosList.appendChild(divPrincipal);
+      tdAbono.textContent = servicio.abono;
+      if (servicio.aplazableSn === "Si") {
+        totalPagarEdit += servicio.abono;
       } else {
-        otrosServiciosList.appendChild(divPrincipal);
+        totalPagarEdit += servicio.total;
+      }
+      const tdBtnGestionar = document.createElement("td");
+      const btnGestionar = document.createElement("button");
+      btnGestionar.className = "btn";
+      btnGestionar.type = "button";
+      btnGestionar.onclick = () => {
+        detallesServiciodg(servicio);
+        valorAbonoEdit = servicio.id;
+      };
+      const iconGestionar = document.createElement("i");
+      iconGestionar.className = "fa-solid fa-ellipsis-vertical";
+      btnGestionar.appendChild(iconGestionar);
+      tdBtnGestionar.appendChild(btnGestionar);
+      if (tipo == "fijos") {
+        tr.appendChild(tdServicio);
+        tr.appendChild(tdSubtotal);
+        tr.appendChild(tdDescuento);
+        tr.appendChild(tdTotal);
+        tr.appendChild(tdBtnGestionar);
+        serviciosFijosList.appendChild(tr);
+      } else {
+        if (servicio.aplazableSn === "Si") {
+          tr.appendChild(tdServicio);
+          tr.appendChild(tdSubtotal);
+          tr.appendChild(tdDescuento);
+          tr.appendChild(tdTotal);
+          tr.appendChild(tdSaldo);
+          tr.appendChild(tdAbono);
+          tr.appendChild(tdBtnGestionar);
+          otrosAplazablesList.appendChild(tr);
+        } else {
+          tr.appendChild(tdServicio);
+          tr.appendChild(tdSubtotal);
+          tr.appendChild(tdDescuento);
+          tr.appendChild(tdTotal);
+          tr.appendChild(tdBtnGestionar);
+          otrosServiciosList.appendChild(tr);
+        }
       }
     } else if (servicio.nombre === "Agua Potable") {
       editDetalleId = servicio.id;
@@ -543,6 +517,108 @@ function renderServicios(servicios, tipo) {
   });
   totalFinal += totalPagarEdit;
 }
+// function renderServicios(servicios, tipo) {
+//   let totalPagarEdit = 0.0;
+//   console.log("Servicios a renderizard: ", servicios, tipo);
+
+//   servicios.forEach((servicio) => {
+//     // Crear el div principal
+//     if (servicio.nombre !== "Agua Potable") {
+//       const divPrincipal = document.createElement("div");
+//       divPrincipal.className = "col-12 card border-info mb-2 ";
+//       divPrincipal.style.maxWidth = "100%";
+//       divPrincipal.style.maxHeight = "45%";
+//       divPrincipal.style.minHeight = "45%";
+//       divPrincipal.style.padding = "0";
+
+//       // Crear el div para el encabezado
+//       const divEncabezado = document.createElement("div");
+//       divEncabezado.className = "card-header titulo-detalles";
+//       divEncabezado.style.margin = "0";
+//       divEncabezado.style.padding = "0.5%";
+//       divEncabezado.style.backgroundColor = "#85c1e9";
+//       const encabezadoTexto = document.createElement("p");
+//       encabezadoTexto.textContent = servicio.nombre;
+//       divEncabezado.appendChild(encabezadoTexto);
+
+//       // Crear el div para el cuerpo de la tarjeta
+//       const divCuerpo = document.createElement("div");
+//       divCuerpo.className = "card-body card-cuerpo card-s-cuerpo";
+//       divCuerpo.style.padding = "1em";
+
+//       // Crear el div con las columnas
+//       const divColumnas = document.createElement("div");
+//       divColumnas.className = "col-12";
+//       const divFila = document.createElement("div");
+//       divFila.className = "row";
+
+//       // Crear las columnas con sus contenidos
+//       totalPagarEdit += servicio.total;
+//       const columnas = [
+//         { titulo: "Valor:", contenido: servicio.valor },
+//         { titulo: "Desc:", contenido: servicio.tipodescuento },
+//         { titulo: "Valor desc:", contenido: servicio.descuento },
+//         { titulo: "Total:", contenido: servicio.total },
+//       ];
+
+//       columnas.forEach((columna) => {
+//         const divColumna = document.createElement("div");
+//         divColumna.className = "col-3 card-cuerpo";
+//         const pTitulo = document.createElement("p");
+//         pTitulo.textContent = columna.titulo;
+//         const pContenido = document.createElement("p");
+//         pContenido.textContent = columna.contenido;
+//         divColumna.appendChild(pTitulo);
+//         divColumna.appendChild(pContenido);
+//         divFila.appendChild(divColumna);
+//       });
+
+//       divColumnas.appendChild(divFila);
+//       divCuerpo.appendChild(divColumnas);
+
+//       // Agregar los elementos al div principal
+//       divPrincipal.appendChild(divEncabezado);
+//       divPrincipal.appendChild(divCuerpo);
+
+//       // Agregar el div principal al documento (por ejemplo, al cuerpo del documento)
+//       // document.body.appendChild(divPrincipal);
+//       if (tipo == "fijos") {
+//         serviciosFijosList.appendChild(divPrincipal);
+//       } else {
+//         otrosServiciosList.appendChild(divPrincipal);
+//       }
+//     } else if (servicio.nombre === "Agua Potable") {
+//       editDetalleId = servicio.id;
+//       console.log("Id del detalle Agua: " + editDetalleId);
+//     }
+//   });
+//   totalFinal += totalPagarEdit;
+// }
+guardarDg.onclick = function () {
+  let totalRc = totalFinal;
+  console.log("Total Rc: " + totalRc);
+  console.log("Fila a editar: " + valorAbonoEdit);
+  if (abonarStatus) {
+    let nuevoAbono = abonarDg.value;
+    const fila = document.getElementById(valorAbonoEdit);
+    const valorAnterior = fila.querySelector(".valorAbono").textContent;
+    console.log("Valor anterior: " + valorAnterior);
+    if (valorAnterior !== nuevoAbono) {
+      console.log("Compara: " + valorAnterior + " | " + nuevoAbono);
+      fila.querySelector(".valorAbono").textContent = nuevoAbono;
+      totalRc = totalFinal - valorAnterior;
+      console.log("Total rc: " + totalRc);
+      totalFinal = totalRc + parseFloat(nuevoAbono);
+      console.log("Total final: " + totalFinal);
+      valorTotalPagar.value = aproximarDosDecimales(
+        totalFinal + parseFloat(totalConsumo)
+      );
+      CerrarFormServicios();
+    } else {
+      CerrarFormServicios();
+    }
+  }
+};
 
 const getPlanillas = async () => {
   planillas = await ipcRenderer.invoke("getDatosPlanillas");
@@ -551,11 +627,13 @@ const getPlanillas = async () => {
 };
 async function init() {
   await getPlanillas();
+  cargarAnioBusquedas();
+  cargarMesActual();
 }
 async function calcularConsumo() {
   console.log("Consultando tarifas ...");
   let consumo = Math.round(lecturaActual.value - lecturaAnterior.value);
-
+  let preValorConsumo = 0.0;
   let base = 0.0;
   let limitebase = 15.0;
   console.log("Consumo: " + consumo);
@@ -565,6 +643,7 @@ async function calcularConsumo() {
       if (consumo >= tarifa.desde && consumo <= tarifa.hasta) {
         tarifaAplicada = tarifa.tarifa;
         valorTarifa = tarifa.valor;
+        console.log("Tarifa aplicada: " + tarifaAplicada);
       }
       if (tarifa.tarifa === "Familiar") {
         base = tarifa.valor;
@@ -574,10 +653,21 @@ async function calcularConsumo() {
   }
   if (tarifaAplicada === "Familiar") {
     valorConsumo.value = valorTarifa.toFixed(2);
+    totalConsumo = valorTarifa.toFixed(2);
+    console.log("totalConsumo 1: " + totalConsumo);
   } else {
-    totalConsumo = (consumo - limitebase) * valorTarifa;
-    valorConsumo.value = (totalConsumo + base).toFixed(2);
+    console.log("Entrando else");
+    if (consumo <= 0) {
+      totalConsumo = base;
+    } else {
+      totalConsumo = (consumo - limitebase) * valorTarifa;
+      preValorConsumo = totalConsumo + base;
+      console.log("totalConsumo 2: " + preValorConsumo);
+      totalConsumo = preValorConsumo;
+      valorConsumo.value = totalConsumo.toFixed(2);
+    }
   }
+
   tarifaConsumo.value = tarifaAplicada + "($" + valorTarifa + ")";
 
   console.log("Tarifa: " + tarifaAplicada + "(" + valorTarifa + ")");
@@ -624,7 +714,8 @@ async function recalcularConsumo() {
   console.log("totalRecalculado: " + totalRecalculado);
   console.log("Valor consumo: " + valorConsumo.value);
   totalRecalculado += parseFloat(valorConsumo.value);
-  valorTotalPagar.value = totalRecalculado.toFixed(2);
+  totalFinal = parseFloat(totalRecalculado).toFixed(2);
+  valorTotalPagar.value = totalFinal;
 }
 function formatearFecha(fecha) {
   const fechaOriginal = new Date(fecha);
@@ -641,21 +732,147 @@ async function generarPlanilla() {
   console.log(result);
   //getPlanillas();
 }
-// Funciones de los elementos
-// Obtener el elemento select
-var selectAnio = document.getElementById("anio");
-// Obtener el año actual
-var anioActual = new Date().getFullYear();
-// Crear opciones de años desde el año actual hacia atrás
-for (var i = anioActual; i >= 2000; i--) {
-  var option = document.createElement("option");
-  option.value = i;
-  option.text = i;
-  if (i === anioActual) {
-    option.selected = true;
+function cargarMesActual() {
+  mesBusqueda.innerHTML = "";
+  // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
+  const mesActual = new Date().getMonth();
+  // Array de nombres de meses
+  const nombresMeses = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+  // Llena el select con las opciones de los meses
+  for (let i = 0; i < nombresMeses.length; i++) {
+    const option = document.createElement("option");
+    option.value = i - 1; // El valor es el índice del mes
+    option.textContent = nombresMeses[i];
+    mesBusqueda.appendChild(option);
   }
 
-  selectAnio.appendChild(option);
+  // Establece el mes actual como seleccionado
+  mesBusqueda.value = mesActual;
+}
+function cargarAnioBusquedas() {
+  anioBusqueda.innerHTML = "";
+  // Obtener el año actual
+  var anioActual = new Date().getFullYear();
+  // Crear opciones de años desde el año actual hacia atrás
+  for (var i = anioActual; i >= 2020; i--) {
+    var option = document.createElement("option");
+    option.value = i;
+    option.text = i;
+    if (i === anioActual) {
+      option.selected = true;
+    }
+
+    anioBusqueda.appendChild(option);
+  }
+}
+const detallesServiciodg = async (servicio) => {
+  abonarStatus = true;
+  errortextAbono.textContent = "Error";
+  errContainer.style.display = "none";
+  abonarDg.readOnly = true;
+  let aplazable = "No aplazable";
+  let cancelados = 0;
+  let pendientes = 0;
+  let valorCancelado = 0;
+  let valorAbonar = 0;
+  let valorSaldo = 0;
+  console.log("Servicio al Dg: " + servicio.contratadosId);
+  servicioDg.textContent = servicio.nombre;
+  descripcionDg.textContent = servicio.descripcion;
+  if (servicioDg.aplazableSn === "Si") {
+    aplazable = "Aplazable";
+  }
+  detallesDg.textContent = servicio.tipo + " | " + aplazable;
+  subtotalDg.textContent = servicio.subtotal;
+  descuentoDg.textContent = servicio.descuento;
+  totalDg.textContent = servicio.total;
+  numPagosDg.textContent = servicio.numeroPagos;
+  if (servicio.estadoDetalle !== "Cancelado") {
+    pendientes + 1;
+  }
+  const pagosAnteriores = await ipcRenderer.invoke(
+    "getDetallesByContratadoId",
+    servicio.contratadosId
+  );
+  pagosAnteriores.forEach((pagoAnterior) => {
+    if (pagoAnterior !== null || pagoAnterior !== undefined) {
+      if (pagoAnterior.estado === "Cancelado") {
+        valorCancelado += pagoAnterior.abono;
+        cancelados++;
+      } else {
+        pendientes++;
+      }
+    }
+  });
+
+  canceladosDg.textContent = cancelados;
+  pendientesDg.textContent = pendientes;
+  valorSaldo = servicio.total - valorCancelado;
+  saldoDg.textContent = valorSaldo;
+  abonadoDg.textContent = valorCancelado;
+  if (valorSaldo - valorCancelado < servicio.valorPagos) {
+    valorAbonar = valorSaldo - valorCancelado;
+  } else {
+    if (servicio.valorPagos !== null) {
+      valorAbonar = servicio.valorPagos;
+    } else {
+      valorAbonar = valorSaldo - valorCancelado;
+    }
+  }
+  console.log("Abonar: " + valorAbonar);
+  if (servicio.tipo !== "Servicio fijo" && servicio.aplazableSn === "Si") {
+    abonarDg.readOnly = false;
+  }
+  abonarDg.value = valorAbonar;
+  abonarDg.placeHolder = "" + valorAbonar;
+  abonarDg.oninput = () => {
+    if (abonarDg.value < valorAbonar) {
+      abonarStatus = false;
+      errContainer.style.display = "flex";
+      errortextAbono.textContent =
+        "El abono no puede ser menor a " + valorAbonar;
+    } else if (abonarDg.value > valorSaldo) {
+      abonarStatus = false;
+      errContainer.style.display = "flex";
+      errortextAbono.textContent =
+        "El abono no puede ser mayor a " + valorSaldo;
+    } else {
+      abonarStatus = true;
+      errortextAbono.textContent = "Error";
+      errContainer.style.display = "none";
+    }
+  };
+  if (dialogServicios.close) {
+    dialogServicios.showModal();
+  }
+};
+
+function mostrarFormServicios() {
+  console.log("MostrarFormServicios");
+  if (dialogServicios.close) {
+    dialogServicios.showModal();
+  }
+}
+function CerrarFormServicios() {
+  dialogServicios.close();
+}
+function aproximarDosDecimales(numero) {
+  // Redondea el número hacia arriba
+  const numeroRedondeado = Math.ceil(numero * 100) / 100;
+  return numeroRedondeado.toFixed(2);
 }
 // Transicion entre las secciones de la vista
 var btnSeccion1 = document.getElementById("btnSeccion1");

@@ -122,6 +122,19 @@
     <div class="invoice">
       <div class="invoice-header">
         <img class="logo" src="../assets/fonts/logo.png" alt="Not found" />
+        <div
+          class="img-sv"
+          style="
+            width: 200px;
+            height: 200px;
+            background-image: url(../assets/fonts/logo.png);
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+          "
+        ></div>
+        <canvas id="myCanvas" width="200" height="200"></canvas>
+
         <div style="align-self: center; margin: 0 auto">
           <h1 style="background-color: red">
             RECAUDACION DE CONSUMO DE AGUA POTABLE Y SERVICIOS
@@ -238,12 +251,20 @@
       <div class="signature">Entregado</div>
       <div>
         <button type="button" onclick="imprimirYGuardarPDF()">Imprimir</button>
-        <button type="button"  onclick="abrirPagos()">Cancelar</button>
+        <button type="button" onclick="abrirPagos()">Cancelar</button>
         <!-- <p>Here:</p>
         <p id="mensaje"></p> -->
       </div>
       <div class="signature">Recibido</div>
     </div>
     <script src="./factura.js" defer></script>
+    <script>
+      const canvas = document.getElementById("myCanvas");
+      const context = canvas.getContext("2d");
+
+      // Dibuja un píxel rojo en las coordenadas (50, 50)
+      context.fillStyle = "red";
+      context.fillRect(500, 500, 5, 5);
+    </script>
   </body>
 </html>

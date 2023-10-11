@@ -1,9 +1,9 @@
-body {
+/* body {
     border: none;
     margin: 0;
     padding: 0;
     background-color: red;
-}
+} */
 
 .card-planilla {
 
@@ -44,9 +44,6 @@ body {
     padding: 0;
 }
 
-.servicios-contenedor {
-    /* background-color: black; */
-}
 
 .titulo-socio {
     align-items: baseline;
@@ -134,7 +131,8 @@ body {
     padding: 1em 1em 0 1em;
     background-color: #85C1E9;
     /* padding-bottom: .5em !important;*/
-    max-width: 100%;
+    /* max-width: 100%; */
+    width: 100%;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 
@@ -146,13 +144,91 @@ body {
     max-width: 100%;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border: solid 2px #85C1E9;
+    border-bottom: solid 2px #f2f2f2;
+}
+
+.encabezado-bt {
+    color: white;
+    font-size: 1.1em;
+    font-weight: 700;
+    background-color: #f8c471;
+    ;
+    border: solid 3px #85C1E9;
+    border-top: none;
+    padding: .5em 1.1em .1em 1.1em;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+
+}
+
+.dialog-servicios {
+    padding: 0;
+    border: none;
+    background-color: #00000000;
+    overflow: none;
+
+}
+
+.section-dialog {
+    background-color: white;
+    padding: 0;
+    overflow: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.item-custom label {
+    font-weight: 500;
+}
+
+.encabezado-bt p {
+    margin: 0 0 0 0;
+    padding: 0;
+
+}
+
+.err-container {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+
+
+}
+
+.err-container p {
+    margin: 0 12px;
+    color: red;
+}
+
+.encabezado-planillas div label {
+    font-weight: 500;
+}
+
+.encabezado-servicios {
+    font-weight: 600;
+    color: white;
+    position: sticky;
+    top: 0;
+    /* La posición superior en la que el encabezado se fijará */
+    z-index: 1;
+    /* Asegura que esté por encima del contenido de la lista */
+    margin-top: -5rem;
+    padding: 1em 1em 1em 1em;
+    background-color: #85C1E9;
+    /* padding-bottom: .5em !important;*/
+    max-width: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     border: solid 2px #85C1E9;
     border-bottom: none;
 }
 
-.encabezado-planilla div {
+/* .encabezado-planilla div {
     padding: 0 .5em;
-}
+} */
 
 .container-card-servicios {
     overflow-y: auto;
@@ -163,6 +239,25 @@ body {
 
 .card-s-cuerpo {
     padding: 1em
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td,
+th {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    position: sticky;
+    top: 0;
+    /* Mantendrá el encabezado en la parte superior de la tabla */
+    z-index: 1;
+    /* Asegura que el encabezado esté por encima de las celdas */
 }
 
 ::-webkit-scrollbar {
@@ -186,12 +281,15 @@ body {
 }
 
 section {
-    height: 100vh;
+    padding: 0 0 0 1em;
+    height: 80vh;
     display: none;
     transition: opacity 0.5s ease-in-out;
 }
 
 section.active {
+    height: 80vh;
+    width: 100%;
     display: block;
     opacity: 1;
 }
@@ -199,10 +297,17 @@ section.active {
 .btn-rd {
     border-radius: 5px;
 }
- input {
+
+input {
     border-radius: 5px;
- }
+}
+
 .mp-0 {
     margin: 0;
     padding: 0;
+}
+
+.trans {
+    color: #00000000;
+    background-color: #00000000;
 }

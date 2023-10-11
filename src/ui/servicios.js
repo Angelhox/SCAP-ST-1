@@ -16,14 +16,30 @@ const buscarServicios = document.getElementById("buscarServicios");
 const criterio = document.getElementById("criterio");
 const criterioContent = document.getElementById("criterio-content");
 // ----------------------------------------------------------------
-const servicioCreacionBn = document.getElementById("fechaCreacion-bn");
-const servicioNombreBn = document.getElementById("nombre-bn");
-const servicioDescripcionBn = document.getElementById("descripcion-bn");
-const servicioValorBn = document.getElementById("valor-bn");
 const buscarBeneficiarios = document.getElementById("buscarBeneficiarios");
 const criterioBn = document.getElementById("criterio-bn");
 const criterioContentBn = document.getElementById("criterio-bn-content");
+const servicioTit = document.getElementById("servicio-tit");
+const servicioDesc = document.getElementById("servicio-desc");
+const servicioDet = document.getElementById("servicio-det");
+const servicioVal = document.getElementById("servicio-val");
+const btnVolver = document.getElementById("btn-volver");
+// ----------------------------------------------------------------
+// Variables para mostrar el estado de recaudacion.
+// ----------------------------------------------------------------
 
+const valorRecaudado = document.getElementById("valorRecaudado");
+const valorPendiente = document.getElementById("valorPendiente");
+const valorTotal = document.getElementById("valorTotal");
+const buscarRecaudaciones = document.getElementById("buscarRecaudaciones");
+const criterioSt = document.getElementById("criterio-st");
+const recaudacionesList = document.getElementById("recaudaciones");
+const anioRecaudacion = document.getElementById("anioRecaudacion");
+const mesRecaudacion = document.getElementById("mesRecaudacion");
+const anioLimite = document.getElementById("anioLimite");
+const mesLimite = document.getElementById("mesLimite");
+
+let recaudaciones = [];
 let servicios = [];
 let usuarios = [];
 let contratados = [];
@@ -59,6 +75,10 @@ servicioForm.addEventListener("submit", async (e) => {
       tipo: "Servicio fijo",
       valor: servicioValor.value,
       aplazableSn: "No",
+      numeroPagos: 1,
+      valorPagos: servicioValor.value,
+      individualSn: "Si",
+      valoresDistintosSn: "No",
     };
     if (!editingStatus) {
       const result = await ipcRenderer.invoke(
@@ -67,8 +87,6 @@ servicioForm.addEventListener("submit", async (e) => {
       );
       console.log(result);
     } else {
-      console.log("Editing parametro with electron");
-
       Swal.fire({
         title: "¿Quieres guardar los cambios?",
         text: "No podrás deshacer esta acción.",
@@ -87,9 +105,6 @@ servicioForm.addEventListener("submit", async (e) => {
             editServicioId,
             newServicio
           );
-          editingStatus = false;
-          editServicioId = "";
-          console.log(result);
         }
       });
     }
@@ -416,7 +431,7 @@ const editServicio = async (id) => {
 };
 const deleteServicio = async (id) => {
   Swal.fire({
-    title: "¿Quieres borrar el servicio de " + socioNombre + " ?",
+    title: "¿Quieres borrar el servicio " + socioNombre + " ?",
     text: "No podrás deshacer esta acción.",
     icon: "question",
     iconColor: "#f8c471",
@@ -443,16 +458,88 @@ const mostrarEstadisticas = async (servicioId) => {
     "getServiciosFijosById",
     servicioId
   );
-  servicioCreacionBn.value = formatearFecha(servicio.fechaCreacion);
-  servicioNombreBn.value = servicio.nombre;
-  servicioDescripcionBn.value = servicio.descripcion;
-  servicioValorBn.value = servicio.valor;
+  servicioTit.textContent = servicio.nombre;
+  servicioDesc.textContent = "(" + servicio.descripcion + ")";
+  servicioVal.textContent = "Valor: $" + servicio.valor;
+  let aplazableSnText = "No aplazable";
+  if (servicio.aplazableSn !== "No") {
+    aplazableSnText = "Aplazable";
+  }
+  servicioDet.textContent = servicio.tipo + " | " + aplazableSnText;
   editingStatus = true;
   editServicioId = servicio.id;
   console.log(servicio);
   let criterioBuscar = "all";
   let criterioContentBuscar = "all";
   await getBeneficiarios(criterioBuscar, criterioContentBuscar, servicioId);
+  await getRecaudaciones(servicioId);
+};
+// ----------------------------------------------------------------
+// Funcion que muestra los estados de recaudacion de un servic.
+// ----------------------------------------------------------------
+const getRecaudaciones = async () => {
+  let valoresRecaudados = 0.0;
+  let valoresPendientes = 0.0;
+  let valoresTotales = 0.0;
+  let fechaDesde = "all";
+  let fechaHasta = "all";
+  let anioD = parseInt(anioRecaudacion.value);
+  let mesD = parseInt(mesRecaudacion.value);
+  console.log("Mes a buscar: " + mesD);
+  let anioH = anioRecaudacion.value;
+  let mesH = mesRecaudacion.value;
+  if (criterioSt.value === "periodo") {
+    let diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
+    let diaH = obtenerPrimerYUltimoDiaDeMes(anioH, mesH);
+    // fechaDesde = "'" + anioD + "-" + mesD + "-" + diaD + "'";
+    // fechaHasta = "'" + anioH + "-" + mesH + "-" + diaH + "'";
+    fechaDesde = formatearFecha(diaD.primerDia);
+    fechaHasta = formatearFecha(diaH.ultimoDia);
+  } else if (criterioSt.value === "mes") {
+    let diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
+    fechaDesde = formatearFecha(diaD.primerDia);
+    fechaHasta = formatearFecha(diaD.ultimoDia);
+    // console.log(
+    //   "fecha error? :" + diaD.ultimoDia + " " + fechaDesde + " " + fechaHasta
+    // );
+  } else if (criterioSt.value === "actual") {
+    console.log("Buscando Actual");
+    anioD = parseInt(new Date().getFullYear());
+    console.log("Actual: " + anioD);
+    mesD = parseInt(new Date().getMonth());
+    console.log("Mes actual: " + mesD);
+
+    let diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
+    fechaDesde = formatearFecha(diaD.primerDia);
+    fechaHasta = formatearFecha(diaD.ultimoDia);
+  }
+
+  recaudaciones = await ipcRenderer.invoke(
+    "getRecaudaciones",
+    editServicioId,
+    fechaDesde,
+    fechaHasta
+  );
+  console.log("Recaudaciones: ", recaudaciones);
+  recaudacionesList.innerHTML = "";
+  recaudaciones.forEach((recaudacion) => {
+    valoresPendientes += recaudacion.saldo;
+    valoresRecaudados += recaudacion.abono;
+    valoresTotales += recaudacion.total;
+    recaudacionesList.innerHTML += `
+           <tr>
+           <td>${recaudacion.contratosCodigo}</td>
+           <td>${recaudacion.nombres + " " + recaudacion.apellidos}</td>
+           <td>${recaudacion.detalleEstado}</td>
+           <td>${recaudacion.abono}</td>
+           <td>${recaudacion.saldo}</td>        
+           <td>${recaudacion.total}</td>
+       </tr>
+          `;
+  });
+  valorPendiente.textContent = valoresPendientes.toFixed(2);
+  valorRecaudado.textContent = valoresRecaudados.toFixed(2);
+  valorTotal.textContent = valoresTotales.toFixed(2);
 };
 const getBeneficiarios = async (criterio, criterioContent, servicioId) => {
   usuarios = await ipcRenderer.invoke(
@@ -516,6 +603,27 @@ buscarBeneficiarios.onclick = async () => {
   console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
   await getBeneficiarios(criterioBuscar, criterioContentBuscar, editServicioId);
 };
+criterioSt.onchange = async () => {
+  let criterioSeleccionado = criterioSt.value;
+  console.log("Seleccionado: ", criterioSeleccionado);
+  if (criterioSeleccionado === "all") {
+    await getRecaudaciones();
+  } else if (criterioSeleccionado === "actual") {
+    mesActual();
+    mesLimites();
+    anioActual();
+    anioLimites();
+    getRecaudaciones();
+    anioRecaudacion.disabled = true;
+    mesRecaudacion.disabled = true;
+  } else if (criterioSeleccionado === "mes") {
+    anioRecaudacion.disabled = false;
+    mesRecaudacion.disabled = false;
+  }
+};
+buscarRecaudaciones.onclick = async () => {
+  await getRecaudaciones();
+};
 const getContratados = async (servicioId) => {
   // Buscamos los contratos que hayan contratado el servicio segun el id del servicio
   // que se recibe!
@@ -530,10 +638,23 @@ const getContratados = async (servicioId) => {
 };
 async function init() {
   fechaCreacion.value = formatearFecha(new Date());
+  mesActual();
+  mesLimites();
+  anioActual();
+  anioLimites();
   let criterioBuscar = "all";
   let criterioContentBuscar = "all";
   await getServicios(criterioBuscar, criterioContentBuscar);
 }
+ipcRenderer.on("datos-a-servicios", async () => {
+  const datos = await ipcRenderer.invoke("pido-datos");
+  console.log("Estos: " + datos.id);
+  mostrarEstadisticas(datos.id);
+  mostrarSeccion("seccion2");
+  // console.log("Id recibido: " + servicioRv.id);
+  // await mostrarEstadisticas(servicioRv.id);
+  // mostrarSeccion("seccion2");
+});
 ipcRenderer.on("Notificar", (event, response) => {
   if (response.title === "Borrado!") {
     resetFormAfterSave();
@@ -587,6 +708,80 @@ function resetForm() {
   mensajeError.textContent = "";
   servicioCreacion.value = formatearFecha(new Date());
 }
+function mesActual() {
+  mesRecaudacion.innerHTML = "";
+  // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
+  const mesActual = new Date().getMonth();
+  // Array de nombres de meses
+  const nombresMeses = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+  // Llena el select con las opciones de los meses
+  for (let i = 0; i < nombresMeses.length; i++) {
+    const option = document.createElement("option");
+    option.value = i; // El valor es el índice del mes
+    option.textContent = nombresMeses[i];
+    mesRecaudacion.appendChild(option);
+  }
+
+  // Establece el mes actual como seleccionado
+  mesRecaudacion.value = mesActual;
+}
+function mesLimites() {
+  mesLimite.innerHTML = "";
+  // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
+  const mesActual = new Date().getMonth();
+  // Array de nombres de meses
+  const nombresMeses = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+  // Llena el select con las opciones de los meses
+  for (let i = 0; i < nombresMeses.length; i++) {
+    const option = document.createElement("option");
+    option.value = i; // El valor es el índice del mes
+    option.textContent = nombresMeses[i];
+    mesLimite.appendChild(option);
+  }
+
+  // Establece el mes actual como seleccionado
+  mesRecaudacion.value = mesActual;
+}
+function obtenerPrimerYUltimoDiaDeMes(anio, mes) {
+  // Meses en JavaScript se numeran de 0 a 11 (enero es 0, diciembre es 11)
+  const primerDia = new Date(anio, mes, 1);
+  const ultimoDia = new Date(anio, mes + 1, 0);
+  return {
+    primerDia,
+    ultimoDia,
+  };
+}
+
+// Ejemplo: Obtener el primer y último día de septiembre de 2023
+const resultado = obtenerPrimerYUltimoDiaDeMes("2023", 1); // 8 representa septiembre (0-indexed)
+console.log("Primer día:", formatearFecha(resultado.primerDia));
+console.log("Último día:", formatearFecha(resultado.ultimoDia));
 function formatearFecha(fecha) {
   const fechaOriginal = new Date(fecha);
   const year = fechaOriginal.getFullYear();
@@ -605,6 +800,40 @@ function mostrarSeccion(id) {
   } else {
     seccion1.classList.remove("active");
     seccion2.classList.add("active");
+  }
+}
+btnVolver.onclick = () => {
+  mostrarSeccion("seccion1");
+};
+function anioActual() {
+  anioRecaudacion.innerHTML = "";
+  // Obtener el año actual
+  var anioActual = new Date().getFullYear();
+  // Crear opciones de años desde el año actual hacia atrás
+  for (var i = anioActual; i >= 2020; i--) {
+    var option = document.createElement("option");
+    option.value = i;
+    option.text = i;
+    if (i === anioActual) {
+      option.selected = true;
+    }
+
+    anioRecaudacion.appendChild(option);
+  }
+}
+function anioLimites() {
+  anioLimite.innerHTML = "";
+  // Obtener el año actual
+  var anioActual = new Date().getFullYear();
+  // Crear opciones de años desde el año actual hacia atrás
+  for (var i = anioActual; i >= 2020; i--) {
+    var option = document.createElement("option");
+    option.value = i;
+    option.text = i;
+    if (i === anioActual) {
+      option.selected = true;
+    }
+    anioLimite.appendChild(option);
   }
 }
 

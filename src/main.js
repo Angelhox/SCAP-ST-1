@@ -5,34 +5,12 @@ const { getConnection, cerrarConnection } = require("./database");
 const path = require("path");
 const url = require("url");
 const { error } = require("console");
+let servicioEnviar = [];
 
 ipcMain.on("hello", () => {
   console.log("Hello from renderer process");
 });
-function mostrarNotificacionPersonalizada() {
-  console.log("respondiendo....");
-  const options = {
-    title: "Título de la Notificación",
-    message: "Este es el mensaje de la notificación",
-    buttons: ["Aceptar", "Cancelar"],
-    checkboxLabel: "No volver a mostrar",
-  };
 
-  dialog.showMessageBox(null, options).then((response) => {
-    const [buttonIndex, checked] = response.response;
-
-    if (checked) {
-      // Guardar en la configuración que no se debe mostrar la notificación
-      // Puedes usar el módulo "electron-settings" para esto, por ejemplo
-    }
-
-    if (buttonIndex === 0) {
-      // El usuario eligió "Aceptar"
-    } else {
-      // El usuario eligió "Cancelar" o cerró la notificación
-    }
-  });
-}
 // ----------------------------------------------------------------
 ipcMain.handle("getDocumentsPath", async (event, documentsPath) => {
   //const documentsPath = app.getPath('documentos');
@@ -283,6 +261,40 @@ function createWindow() {
       contextIsolation: false,
     },
   });
+  ipcMain.on("datos-a-servicios", async (event, servicio) => {
+    console.log("Datos a enviar: " + servicio.id);
+    servicioEnviar = servicio;
+    // pagina2Window = new BrowserWindow({ show: false });
+    await window.loadFile("src/ui/servicios.html");
+    // window.send("datos-a-pagina2", datos);
+    await window.show();
+    await window.webContents.send("datos-a-servicios");
+  });
+  ipcMain.on("datos-a-ocacionales", async (event, servicio) => {
+    console.log("Datos a enviar: " + servicio.id);
+    servicioEnviar = servicio;
+    // pagina2Window = new BrowserWindow({ show: false });
+    await window.loadFile("src/ui/cuotas.html");
+    // window.send("datos-a-pagina2", datos);
+    await window.show();
+    await window.webContents.send("datos-a-ocacionales");
+  });
+  // ipcMain.on("datos-a-servicios", async (event, servicio) => {
+  //   console.log("Datos a enviar: " + servicio.id);
+
+  //   // Cargar la página primero
+  //   window.loadFile("src/ui/servicios.html");
+
+  //   // Esperar a que la página se cargue completamente
+  //   window.webContents.once("did-finish-load", async () => {
+  //     // Enviar los datos a la página cargada
+  //     console.log(":) " + servicio.id);
+  //     window.webContents.send("datos-a-servicios", servicio);
+  //     window.show();
+
+  //     // Mostrar la ventana después de enviar los datos
+  //   });
+  // });
   window.loadFile("src/ui/principal.html");
 }
 ipcMain.on("abrirInterface", (event, interfaceName) => {
@@ -327,13 +339,25 @@ ipcMain.on(
       serviciosFijos,
       otrosServicios,
       datosAgua,
-      datosTotales,
+      datosTotales
     );
   }
 );
+// Recibe la peticion de la pagina de planillas para
+// enviar a la pagina de servicios.
+// ipcMain.on("datos-a-servicios", async (event, servicio) => {
+//   console.log("Datos a enviar: " + servicio.id);
+//   servicioEnviar = servicio;
+//   window.loadFile("src/ui/servicios.html");
+//   await window.webContents.send("datos-a-servicios", servicioEnviar);
+//   window.show();
+// });
 // ----------------------------------------------------------------
 // Funciones de los cargos
 // ----------------------------------------------------------------
+ipcMain.handle("pido-datos", async () => {
+  return servicioEnviar;
+});
 ipcMain.handle("getCargos", async () => {
   const conn = await getConnection();
   const results = conn.query("SELECT * FROM cargosempleados");
@@ -1037,6 +1061,34 @@ ipcMain.handle("getContratadosById", async (event, servicioId) => {
   console.log("Resultado: ", result);
   return result;
 });
+ipcMain.handle("getRecaudaciones", async (event, servicioId, desde, hasta) => {
+  const conn = await getConnection();
+  console.log("Buscando: " + desde + " " + hasta);
+  try {
+    if (desde === "all" || desde === undefined) {
+      const result = await conn.query(
+        "CALL selectRecaudaciones(" + servicioId + ",'2023-01-01',now()); "
+      );
+      console.log("Resultado: ", result[0]);
+      return result[0];
+    } else {
+      const result = await conn.query(
+        "CALL selectRecaudaciones(" +
+          servicioId +
+          ",'" +
+          desde +
+          "','" +
+          hasta +
+          "'); "
+      );
+      console.log("Resultado: ", result[0]);
+      return result[0];
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 // ----------------------------------------------------------------
 // Funciones de las cuotas
 // ----------------------------------------------------------------
@@ -1047,6 +1099,16 @@ ipcMain.handle("getCuotas", async () => {
   );
   console.log(results);
   return results;
+});
+ipcMain.handle("getCuotasById", async (event, id) => {
+  const conn = await getConnection();
+  const result = await conn.query(
+    "SELECT * FROM viewServicios where id = ?",
+    id
+  );
+
+  console.log("Resultado", result[0]);
+  return result[0];
 });
 ipcMain.handle("createCuotas", async (event, cuota) => {
   try {
@@ -1061,14 +1123,39 @@ ipcMain.handle("createCuotas", async (event, cuota) => {
     event.sender.send("Notificar", {
       success: true,
       title: "Guardado!",
-      message: "Se ha guardado una nueva cuota.",
+      message: "Se ha guardado un nuevo servicio ocacional.",
     });
     return resultServicio;
   } catch (error) {
     event.sender.send("Notificar", {
       success: false,
       title: "Error!",
-      message: "Ha ocurrido un error al guardar la cuota.",
+      message: "Ha ocurrido un error al guardar el servicio ocacional.",
+    });
+    console.log(error);
+  }
+});
+ipcMain.handle("createSercicioContratado", async (event, contratar) => {
+  try {
+    const conn = await getConnection();
+    console.log("Recibido: ", contratar);
+    const resultServicio = await conn.query(
+      "INSERT INTO serviciosContratados set ?;",
+      contratar
+    );
+    contratar.id = resultServicio.insertId;
+    console.log(resultServicio);
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Guardado!",
+      message: "Contratado.",
+    });
+    return resultServicio;
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al contratar.",
     });
     console.log(error);
   }
@@ -1080,21 +1167,44 @@ ipcMain.handle("updateCuotas", async (event, id, cuota) => {
       "UPDATE servicios SET ? where id = ?",
       [cuota, id]
     );
-
-    new Notification({
-      title: "SCAP Santo Domingo No.1",
-      body: cuota.nombre + " se ha actualizado :)",
-    }).show();
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Actualizado!",
+      message: "Se ha actualizado el servicio ocacional.",
+    });
     console.log(resultServicio);
     return resultServicio;
   } catch (error) {
-    new Notification({
-      title: "SCAP Santo Domingo No.1",
-      body: "Ha ocurrido un error en la actualización :(",
-    }).show();
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al actualizar el servicio ocacional.",
+    });
     console.log(error);
   }
 });
+ipcMain.handle("deleteCuotas", async (event, id) => {
+  console.log("id from main.js: ", id);
+  const conn = await getConnection();
+  try {
+    const result = await conn.query("DELETE FROM servicios WHERE id = ?", id);
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Borrado!",
+      message: "Se ha eliminado el servicio ocacional.",
+    });
+    console.log(result);
+    return result;
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al elimiar el registro.",
+    });
+    console.log(error);
+  }
+});
+
 // ----------------------------------------------------------------
 //   funciones de los Medidores
 // ----------------------------------------------------------------
@@ -1461,7 +1571,8 @@ async function createCuentaServicios(contratoId) {
   try {
     // Consultamos si existe un encabezado con los detalles de los servicios contratados segun el contrato
     const encabezadoExiste = await conn.query(
-      "select count(id) as existe, id from viewEncabezados WHERE month(fechaEmisionEncabezado)=month(now())" +
+      "select count(id) as existe, id from viewEncabezados WHERE tipo='planilla' and   " +
+        "month(fechaEmisionEncabezado)=month(now())" +
         " and year(fechaEmisionEncabezado)=year(now()) and contratosId=" +
         contratoId +
         ";"
@@ -1471,6 +1582,7 @@ async function createCuentaServicios(contratoId) {
       // Si no existe un encabezado para la fecha actual se procede a crear uno
       newEncabezado = {
         fechaPago: null,
+        tipo: "planilla",
       };
       const resultEncabezado = await conn.query(
         "INSERT INTO encabezado set ?;",
@@ -1483,34 +1595,43 @@ async function createCuentaServicios(contratoId) {
     }
     // Consultamos los servicios fijos contratados segun el id del contrato
     const serviciosContratados = await conn.query(
-      "SELECT serviciosContratados.id," +
-        "serviciosContratados.estado,serviciosContratados.fechaEmision,servicios.id as serviciosId," +
-        "servicios.nombre,servicios.descripcion,servicios.tipo,servicios.valor," +
-        "tiposdescuento.descripcion as descripcionDescuento,tiposdescuento.valor as valorDescuento " +
-        "from serviciosContratados join servicios on servicios.id=serviciosContratados.serviciosId join " +
-        "tiposdescuento on tiposdescuento.id=serviciosContratados.descuentosId " +
-        "where serviciosContratados.contratosId=" +
+      "SELECT * FROM viewServiciosCancelar WHERE contratosId=" +
         contratoId +
-        " and serviciosContratados.estado='Activo' and servicios.tipo='Servicio fijo' and servicios.aplazableSn='No';"
+        " AND estado='Activo' AND tipo='Servicio fijo' AND aplazableSn='No';"
     );
     createDetallesServicios(serviciosContratados, encabezadoId);
     // Consultamos los servicios ocacionales, las cuotas y las multas que no son aplazables para
     // incluirlas en el detalle de servicios y relacionarlos con un encabezado correspondiente a la
     // cuenta de servicios de cada mes.
-    const otrosValoresNoAplazables = await conn.query(
-      "SELECT serviciosContratados.id,serviciosContratados.estado," +
-        "serviciosContratados.fechaEmision,servicios.id as serviciosId," +
-        "servicios.nombre,servicios.descripcion,servicios.tipo,servicios.valor," +
-        "tiposdescuento.descripcion as descripcionDescuento,tiposdescuento.valor as valorDescuento " +
-        "from serviciosContratados join servicios on servicios.id=serviciosContratados.serviciosId join " +
-        "tiposdescuento on tiposdescuento.id=serviciosContratados.descuentosId " +
-        "where serviciosContratados.contratosId=" +
+    // const otrosValoresNoAplazables = await conn.query(
+    //   "SELECT serviciosContratados.id,serviciosContratados.estado," +
+    //     "serviciosContratados.fechaEmision,servicios.id as serviciosId," +
+    //     "servicios.nombre,servicios.descripcion,servicios.tipo,servicios.valor," +
+    //     "tiposdescuento.descripcion as descripcionDescuento,tiposdescuento.valor as valorDescuento " +
+    //     "from serviciosContratados join servicios on servicios.id=serviciosContratados.serviciosId join " +
+    //     "tiposdescuento on tiposdescuento.id=serviciosContratados.descuentosId " +
+    //     "where serviciosContratados.contratosId=" +
+    //     contratoId +
+    //     " and serviciosContratados.estado='Activo'  and not servicios.tipo='Servicio fijo' and " +
+    //     "servicios.aplazableSn='No' and month(servicioscontratados.fechaEmision)=" +
+    //     " month(now()) and year(servicioscontratados.fechaEmision)= year(now());"
+    // );
+    const otrosValores = await conn.query(
+      // "SELECT serviciosContratados.id,serviciosContratados.estado," +
+      //   "serviciosContratados.fechaEmision,serviciosContratados.valorIndividual,servicios.id as serviciosId," +
+      //   "servicios.aplazableSn,servicios.nombre,servicios.descripcion,servicios.tipo,servicios.valor,servicios.valorPagos," +
+      //   "tiposdescuento.descripcion as descripcionDescuento,tiposdescuento.valor as valorDescuento " +
+      //   "from serviciosContratados join servicios on servicios.id=serviciosContratados.serviciosId join " +
+      //   "tiposdescuento on tiposdescuento.id=serviciosContratados.descuentosId " +
+      //   "where serviciosContratados.contratosId=" +
+      //   contratoId +
+      //   " and serviciosContratados.estado='Sin aplicar' and not servicios.tipo='Servicio fijo'"
+      "SELECT * FROM viewServiciosCancelar WHERE contratosId=" +
         contratoId +
-        " and serviciosContratados.estado='Activo'  and not servicios.tipo='Servicio fijo' and " +
-        "servicios.aplazableSn='No' and month(servicioscontratados.fechaEmision)=" +
-        " month(now()) and year(servicioscontratados.fechaEmision)= year(now());"
+        " AND estado='Sin aplicar' AND NOT tipo='Servicio fijo';"
     );
-    createDetallesServicios(otrosValoresNoAplazables, encabezadoId);
+
+    createDetallesServicios(otrosValores, encabezadoId);
   } catch (error) {
     console.log("Error al crear cuentaservicios: " + error);
   }
@@ -1519,6 +1640,8 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
   const conn = await getConnection();
   serviciosContratados.forEach(async (servicioContratado) => {
     console.log("Servicio contratado a buscar: " + servicioContratado.id);
+    // Mediante la fecha consultamos si ya se ha creado un detalle para el servicio en determinado mes.
+    // para evitar que el servicio se aplique dos veces.
     detalleServicioExiste = await conn.query(
       "SELECT count(detallesServicio.id) as existe from detallesServicio where month" +
         "(detallesServicio.fechaEmision)=month(now()) and year(detallesServicio.fechaEmision)=year(now()) " +
@@ -1529,22 +1652,56 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
     console.log("Detalle servicio existe: " + detalleServicioExiste[0].existe);
     // Si no existen los detalles de servicios correspondiente a la fecha se crean y se añaden al encabezado
     if (detalleServicioExiste[0].existe === 0) {
-      // Obtenemos el valor de la lectura anterior en caso de existir
-      let total = servicioContratado.valor - servicioContratado.valorDescuento;
+      let valorPagos = 0.0;
+      let total = 0.0;
+      // El descuento esta en veremos :(
+      if (servicioContratado.valoresDistintos === "Si") {
+        if (serviciosContratado.aplazableSn === "Si") {
+          total = servicioContratado.valorIndividual;
+          valorPagos =
+            servicioContratados.valorPagosindividual -
+            servicioContratado.valorDescuento;
+        } else {
+          total = servicioContratado.valorIndividual;
+          valorPagos =
+            servicioContratado.valorIndividual -
+            servicioContratado.valorDescuento;
+        }
+      } else {
+        if (servicioContratado.aplazableSn === "Si") {
+          total = servicioContratado.valor;
+          valorPagos =
+            servicioContratado.valorPagos - servicioContratado.valorDescuento;
+        } else {
+          total = servicioContratado.valor;
+          valorPagos =
+            servicioContratado.valorPagos - servicioContratado.valorDescuento;
+        }
+      }
+
       const newDetalleServicios = {
         serviciosContratadosId: servicioContratado.id,
         descuento: servicioContratado.valorDescuento,
-        subtotal: servicioContratado.valor,
-        total: total,
-        saldo: total,
-        abono: 0.0,
+        subtotal: total,
+        total: total - servicioContratado.valorDescuento,
+        saldo: total - servicioContratado.valorDescuento,
+        abono: valorPagos,
         encabezadosId: encabezadoId,
+        estado: "Por cancelar",
         //fechaEmision
       };
       const resultadoDetalleServicio = await conn.query(
         "INSERT INTO detallesServicio set ?",
         newDetalleServicios
       );
+      if (!servicioContratado.tipo == "Servicio fijo") {
+        const modificaEstado = await conn.query(
+          "UPDATE serviciosContratados SET estado='Aplicado' WHERE serviciosContratados.id=" +
+            servicioContratado.id +
+            ";"
+        );
+      }
+
       console.log("Resultado de crear planillas: " + resultadoDetalleServicio);
       return resultadoDetalleServicio;
     }
@@ -1748,6 +1905,7 @@ ipcMain.handle(
     // );
   }
 );
+
 ipcMain.handle("updateDetalle", async (event, id, detalle) => {
   const conn = await getConnection();
   console.log("Actualizando detalle: " + id + detalle);
@@ -1758,7 +1916,16 @@ ipcMain.handle("updateDetalle", async (event, id, detalle) => {
   console.log(result);
   return result;
 });
-
+ipcMain.handle("getDetallesByContratadoId", async (event, contratadoId) => {
+  const conn = await getConnection();
+  const result = await conn.query(
+    "SELECT * FROM detallesServicio WHERE detallesServicio.serviciosContratadosId=" +
+      contratadoId +
+      ";"
+  );
+  console.log(result);
+  return result;
+});
 // ----------------------------------------------------------------
 // Funcion que consulta las tarifas por el servicio de agua potable
 // ----------------------------------------------------------------
