@@ -17,6 +17,7 @@ let editingStatus = false;
 const contratoCodigo = document.getElementById("codigocontrato");
 const contratoFecha = document.getElementById("fechaContrato");
 const contratoEstado = document.getElementById("estadoContrato");
+const labelEstadoContrato = document.getElementById("labelEstadoContrato");
 //Indica si se ha seleccionado el servicio de agua con medidor
 var contratoConMedidor = false;
 // Tabla de contratos con medidor
@@ -40,6 +41,10 @@ let serviciosDisponibles = [];
 var serviciosEditar = null;
 // Variable que almacena id de los servicios que se van a contratar
 let serviciosDisponiblesAContratar = [];
+// VAriable  para validar si se ha seleccionado al menos un servicio a contratar.
+let serviciosMarcados = [];
+let sectorId = "";
+let numero = "1";
 // ----------------------------------------------------------------
 // Variables del socio contratante
 // ----------------------------------------------------------------
@@ -67,11 +72,17 @@ const medidorSecundaria = document.getElementById("secundaria");
 const medidorNumeroCasa = document.getElementById("numerocasa");
 const medidorReferencia = document.getElementById("referencia");
 const medidorObservacion = document.getElementById("observacion");
+const errorContainer = document.getElementById("container-error");
+const medidorSinMedidor = document.getElementById("medidorSinMedidor");
+const conMedidor = document.getElementById("conMedidor");
+const sinMedidor = document.getElementById("sinMedidor");
+const titleContratos = document.getElementById("title-contratos");
 //Variable que indica el medidor a editar Borrar
 let editContratoId = "";
 // ----------------------------------------------------------------
 // Esta funcion obtiene los id de los servicios disponibles
 // los manipula como elementos del DOM asignandoles el evento de marcado y desmarcado
+// para validar si se ha seleccionado al menos un servicio a contratar.
 // ----------------------------------------------------------------
 async function eventoServiciosId(serviciosFijos) {
   serviciosFijos.forEach((servicioFijo) => {
@@ -82,85 +93,164 @@ async function eventoServiciosId(serviciosFijos) {
           if (event.target.checked) {
             habilitarFormMedidor();
             contratoConMedidor = true;
+            serviciosMarcados.push(servicioFijo);
+            console.log("Servicios Marcados: ", serviciosMarcados);
             console.log("Marcado Agua: " + servicioFijo.nombre);
           } else {
             inHabilitarFormMedidor();
             contratoConMedidor = false;
+            const idABuscar = servicioFijo.id; //--> El ID que deseas buscar y eliminar
+            const elementoAEliminar = serviciosMarcados.find(
+              (elemento) => elemento.id === idABuscar
+            );
+            if (elementoAEliminar) {
+              //--> Si se encontró el elemento, elimínalo
+              const indiceAEliminar =
+                serviciosMarcados.indexOf(elementoAEliminar);
+              serviciosMarcados.splice(indiceAEliminar, 1);
+              console.log(`Elemento con ID ${idABuscar} ha sido eliminado.`);
+            } else {
+              console.log(
+                `Elemento con ID ${idABuscar} no se encontró en el arreglo.`
+              );
+            }
+
+            console.log("Servicios Marcados: ", serviciosMarcados);
+            //--> El arreglo actualizado sin el elemento eliminado
             console.log("Desmarcado Agua: " + servicioFijo.nombre);
           }
         } else {
           if (event.target.checked) {
+            serviciosMarcados.push(servicioFijo);
+            console.log("Servicios Marcados: ", serviciosMarcados);
+
             console.log("Marcado: " + servicioFijo.nombre);
           } else {
             console.log("Desmarcado: " + servicioFijo.nombre);
+            const idABuscar = servicioFijo.id; //--> El ID que deseas buscar y eliminar
+            const elementoAEliminar = serviciosMarcados.find(
+              (elemento) => elemento.id === idABuscar
+            );
+            if (elementoAEliminar) {
+              //--> Si se encontró el elemento, elimínalo
+              const indiceAEliminar =
+                serviciosMarcados.indexOf(elementoAEliminar);
+              serviciosMarcados.splice(indiceAEliminar, 1);
+              console.log(`Elemento con ID ${idABuscar} ha sido eliminado.`);
+            } else {
+              console.log(
+                `Elemento con ID ${idABuscar} no se encontró en el arreglo.`
+              );
+            }
+            console.log("Servicios Marcados: ", serviciosMarcados);
+            //--> El arreglo actualizado sin el elemento eliminado
           }
         }
       });
   });
 }
 // ----------------------------------------------------------------
-// Funcion donde se insertan datos del contratato de los servicios a contratar
-// ademas del medidor de ser necesario
+// Funcion donde se validan e ingresan datos del contratato de los servicios a contratar
+// ademas del medidor de ser necesario.
 // ----------------------------------------------------------------
 contratoForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   var newMedidor = {};
-  if (validator.isEmpty(contratoFecha.value)) {
-    mensajeError.textContent = "La fecha del contrato es Obligatoria";
+  if (
+    validator.isEmpty(socioContratanteCedula.value) ||
+    validator.isEmpty(socioContratanteNombre.value) ||
+    validator.isEmpty(socioContratanteApellido.value)
+  ) {
+    errorContainer.style.color = "red";
+    mensajeError.textContent =
+      "Ingresa un número de cédula correspondiente a un socio registrado.";
+    socioContratanteCedula.focus();
+  } else if (validator.isEmpty(contratoFecha.value)) {
+    errorContainer.style.color = "red";
+    mensajeError.textContent = "Ingresa una fecha de contrato válida.";
     contratoFecha.focus();
   } else if (validator.isEmpty(contratoCodigo.value)) {
-    mensajeError.textContent = "El código del contrato es Obligatorio";
+    errorContainer.style.color = "red";
+    mensajeError.textContent = "Genera un código de contrato válido.";
     contratoCodigo.focus();
+    // } else if (validator.isEmpty(medidorNumeroCasa.value)) {
+    //   mensajeError.textContent = "Ingresa un numero de casa válido.";
+    //   medidorNumeroCasa.focus();
+  } else if (validator.isEmpty(medidorBarrio.value)) {
+    errorContainer.style.color = "red";
+    mensajeError.textContent =
+      "Genera un código de contrato para indicar un barrio válido.";
+    medidorBarrio.focus();
+    // } else if (validator.isEmpty(medidorPrincipal.value)) {
+    //   mensajeError.textContent = "Ingresa una calle principal válida.";
+    //   medidorPrincipal.focus();
+    // } else if ( validator.isEmpty(medidorSecundaria.value)) {
+    //   mensajeError.textContent = "Ingresa una calle secundaria válida.";
+    //   medidorSecundaria.focus();
+  } else if (validator.isEmpty(medidorReferencia.value)) {
+    errorContainer.style.color = "red";
+    mensajeError.textContent = "Ingresa una referencia válida.";
+    medidorReferencia.focus();
   } else if (
     contratoConMedidor &&
     validator.isEmpty(medidorInstalacion.value)
   ) {
-    mensajeError.textContent = "La fecha instalación es Obligatoria";
+    errorContainer.style.color = "red";
+    mensajeError.textContent = "Ingresa una fecha de instalación válida.";
     medidorInstalacion.focus();
   } else if (contratoConMedidor && validator.isEmpty(medidorMarca.value)) {
-    mensajeError.textContent = "El marca del medidor es Obligatoria";
+    errorContainer.style.color = "red";
+    mensajeError.textContent = "Ingresa una marca del medidor.";
     medidorMarca.focus();
-  } else if (contratoConMedidor && validator.isEmpty(medidorNumeroCasa.value)) {
-    mensajeError.textContent = "El número de casa es Obligatorio";
-    medidorNumeroCasa.focus();
-  } else if (contratoConMedidor && validator.isEmpty(medidorBarrio.value)) {
-    mensajeError.textContent = "El nombre del barrio es Obligatorio";
-    medidorBarrio.focus();
-  } else if (contratoConMedidor && validator.isEmpty(medidorPrincipal.value)) {
-    mensajeError.textContent = "La calle principal es Obligatoria";
-    medidorPrincipal.focus();
-  } else if (contratoConMedidor && validator.isEmpty(medidorSecundaria.value)) {
-    mensajeError.textContent = "La calle secundaria es Obligatoria";
-    medidorSecundaria.focus();
-  } else if (contratoConMedidor && validator.isEmpty(medidorReferencia.value)) {
-    mensajeError.textContent = "Indicar una referencia es Obligatorio";
-    medidorReferencia.focus();
-  } else if (
-    contratoConMedidor &&
-    validator.isEmpty(medidorObservacion.value)
-  ) {
-    mensajeError.textContent = "Indicar una observacion es Obligatorio";
-    medidorObservacion.focus();
+    // } else if (
+    //   contratoConMedidor &&
+    //   validator.isEmpty(medidorObservacion.value)
+    // ) {
+    //   mensajeError.textContent = "Ingresa una observación válida.";
+    //   medidorObservacion.focus();
+  } else if (serviciosDisponiblesAContratar.length === 0) {
+    errorContainer.style.color = "red";
+    mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
+  } else if (serviciosMarcados.length === 0) {
+    errorContainer.style.color = "red";
+    mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
   } else {
+    console.log("Servicios a contratar: " + serviciosDisponiblesAContratar);
     if (!socioContratanteId == "") {
-      var contratoEstadoDf = "Innactivo";
+      var contratoEstadoDf = "Activo";
       var medidorDf = "No";
+      var callePrincipalDf = "SN";
+      var calleSecundariaDf = "SN";
+      var numeroCasaDf = "SN";
+      var observacionDf = "SN";
       if (contratoConMedidor) {
         medidorDf = "Si";
       }
       if ((contratoEstado.checked = true)) {
         contratoEstadoDf = "Activo";
       }
+      if (!validator.isEmpty(medidorNumeroCasa.value)) {
+        numeroCasaDf = medidorNumeroCasa.value;
+      }
+      if (!validator.isEmpty(medidorPrincipal.value)) {
+        callePrincipalDf = medidorPrincipal.value;
+      }
+      if (!validator.isEmpty(medidorSecundaria.value)) {
+        calleSecundariaDf = medidorSecundaria.value;
+      }
+      if (!validator.isEmpty(medidorObservacion.value)) {
+        observacionDf = medidorObservacion.value;
+      }
       newMedidor = {
         codigo: contratoCodigo.value,
         fechaInstalacion: medidorInstalacion.value,
         marca: medidorMarca.value,
-        barrio: medidorBarrio.value,
-        callePrincipal: medidorPrincipal.value,
-        calleSecundaria: medidorSecundaria.value,
-        numeroCasa: medidorNumeroCasa.value,
-        referencia: medidorReferencia.value,
-        observacion: medidorObservacion.value,
+        observacion: observacionDf,
+        // barrio: medidorBarrio.value,
+        // callePrincipal: medidorPrincipal.value,
+        // calleSecundaria: medidorSecundaria.value,
+        // numeroCasa: medidorNumeroCasa.value,
+        // referencia: medidorReferencia.value,
         contratosId: contratoId,
       };
       const newContrato = {
@@ -169,13 +259,21 @@ contratoForm.addEventListener("submit", async (e) => {
         codigo: contratoCodigo.value,
         sociosId: socioContratanteId,
         medidorSn: medidorDf,
+        barrio: medidorBarrio.value,
+        callePrincipal: callePrincipalDf,
+        calleSecundaria: calleSecundariaDf,
+        numeroCasa: numeroCasaDf,
+        referencia: medidorReferencia.value,
+        // contratosId: contratoId,
       };
 
       if (!editingStatus) {
         try {
           const resultContrato = await ipcRenderer.invoke(
             "createContrato",
-            newContrato
+            newContrato,
+            numero,
+            sectorId
           );
           console.log(
             "Muestro resultado de insertar contrato: ",
@@ -186,8 +284,11 @@ contratoForm.addEventListener("submit", async (e) => {
             "Muestro id resultado de insertar contrato: ",
             contratoId
           );
-          if (!contratoId == "") {
-            contratarServicios(serviciosDisponiblesAContratar, contratoId);
+          if (!contratoId == "" || !contratoId == undefined) {
+            await contratarServicios(
+              serviciosDisponiblesAContratar,
+              contratoId
+            );
             if (contratoConMedidor) {
               console.log("vamos a crear un medidor");
               newMedidor.contratosId = contratoId;
@@ -238,11 +339,12 @@ contratoForm.addEventListener("submit", async (e) => {
     }
   }
 });
+
 // ----------------------------------------------------------------
 // Funcion que recibe los id de servicios a contratar y los relaciona con el id del contrato
 // ----------------------------------------------------------------
 function contratarServicios(serviciosAContratar, contratoId) {
-  console.log("Contrato ID: " + contratoId);
+  console.log("Contratando Servicios para: " + contratoId);
   var conteoRegistros = serviciosAContratar.length;
   try {
     serviciosAContratar.forEach(async (servicioAContratar) => {
@@ -285,36 +387,192 @@ function contratarServicios(serviciosAContratar, contratoId) {
 // ----------------------------------------------------------------
 function renderContratosConMedidor(datosContratos) {
   contratosList.innerHTML = "";
-  datosContratos.forEach((contrato) => {
-    contratosList.innerHTML += `
-    <tr class="fila-md">
-    <td>${contrato.codigo}</td>
-       <td>${formatearFecha(contrato.fecha)}</td>
-      <td>${
-        contrato.primerNombre +
-        " " +
-        contrato.segundoNombre +
-        " " +
-        contrato.primerApellido +
-        " " +
-        contrato.segundoApellido
-      }</td>
-      <td>${contrato.cedulaPasaporte}</td>
-      <td>${contrato.estado}</td>
-      <td>
-      <button onclick="detallesContratos('${
-        contrato.contratosId
-      }')" class="btn "> 
-      <i class="fa-solid fa-circle-info" style="color: #511f1f;"></i>
-      </button>
-      </td>
-      <td>
-      <button onclick="editContrato('${contrato.contratosId}')" class="btn ">
-      <i class="fa-solid fa-user-pen"></i>
-      </button>
-      </td>
-   </tr>
-      `;
+  // datosContratos.forEach((contrato) => {
+  //   contratosList.innerHTML += `
+  //   <tr class="fila-md ">
+  //   <td>${contrato.codigo}</td>
+  //      <td>${formatearFecha(contrato.fecha)}</td>
+  //     <td>${
+  //       contrato.primerNombre +
+  //       " " +
+  //       contrato.segundoNombre +
+  //       " " +
+  //       contrato.primerApellido +
+  //       " " +
+  //       contrato.segundoApellido
+  //     }</td>
+  //     <td>${contrato.cedulaPasaporte}</td>
+  //     <td>${contrato.estado}</td>
+  //     <td>
+  //     <button onclick="detallesContratos('${
+  //       contrato.contratosId
+  //     }')" class="btn ">
+  //     <i class="fa-solid fa-circle-info" style="color: #511f1f;"></i>
+  //     </button>
+  //     </td>
+  //     <td>
+  //     <button onclick="editContrato('${contrato.contratosId}')" class="btn ">
+  //     <i class="fa-solid fa-user-pen"></i>
+  //     </button>
+  //     </td>
+  //  </tr>
+  //     `;
+  // });
+  datosContratos.forEach((datosContrato) => {
+    // Crea un nuevo div con la clase "col-xl-6 col-lg-6 col-md-6 col-sm-12"
+    const divCol = document.createElement("div");
+    // divCol.style.backgroundColor = "black";
+    divCol.className = " col-xl-6 col-lg-6 col-md-6 col-sm-12 px-1";
+    // Crea el div con la clase "card" y estilos
+    const divCard = document.createElement("div");
+    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card";
+    divCard.style.padding = "0.3em";
+    divCard.style.width = "100%";
+    divCard.style.backgroundColor = "#d6eaf8";
+
+    // Crea el div del encabezado con la clase "card-header" y estilos
+    const divCardHeader = document.createElement("div");
+    divCardHeader.className =
+      "card-header d-flex justify-content-between align-items-center mp-0";
+    divCardHeader.style.backgroundColor = "#85c1e9";
+
+    // Crea el primer conjunto de elementos de texto
+    const divText1 = document.createElement("div");
+    divText1.className = "d-flex mp-0";
+    const pText1 = document.createElement("p");
+    pText1.className = "mp-0 fs-5";
+    pText1.textContent = "Contrato:";
+    const pTrans1 = document.createElement("p");
+    pTrans1.className = "trans mp-0";
+    pTrans1.textContent = "-";
+    const pText2 = document.createElement("p");
+    pText2.className = "mp-0 text-white fs-5";
+    pText2.textContent = datosContrato.codigo;
+    divText1.appendChild(pText1);
+    divText1.appendChild(pTrans1);
+    divText1.appendChild(pText2);
+
+    // Crea el segundo conjunto de elementos de texto
+    const divText2 = document.createElement("div");
+    divText2.className = "d-flex mp-0";
+    const pText3 = document.createElement("p");
+    pText3.className = "mp-0 fs-5";
+    pText3.textContent = "Socio:";
+    const pTrans2 = document.createElement("p");
+    pTrans2.classList.Name = "trans mp-0";
+    pTrans2.textContent = "-";
+    const pText4 = document.createElement("p");
+    pText4.className = "mp-0 mt-1";
+    pText4.style.fontSize = "1em";
+    pText4.textContent = datosContrato.socio;
+    divText2.appendChild(pText3);
+    divText2.appendChild(pTrans2);
+    divText2.appendChild(pText4);
+
+    // Agrega los conjuntos de elementos de texto al div del encabezado
+    divCardHeader.appendChild(divText1);
+    divCardHeader.appendChild(divText2);
+
+    // Crea el div del cuerpo con la clase "card-body" y estilos
+    const divCardBody = document.createElement("div");
+    divCardBody.className = "card-body";
+    divCardBody.style.backgroundColor = "white";
+    const divDateSt = document.createElement("div");
+    divDateSt.className = "d-flex justify-content-between";
+    // Crea un div para la fecha de contrato y agrega contenido
+    const divFechaContrato = document.createElement("div");
+    divFechaContrato.className = "col-9 d-flex";
+    const h6FechaContrato = document.createElement("h6");
+    h6FechaContrato.innerHTML =
+      '<i style="color: #85c1e9" class="fa-regular fa-calendar-days mx-2"></i>Fecha de contrato:';
+    const pFechaContrato = document.createElement("p");
+    const spaceFechaContrato = document.createElement("p");
+    spaceFechaContrato.className = "trans";
+    spaceFechaContrato.textContent = "-";
+    pFechaContrato.textContent = formatearFecha(datosContrato.fecha);
+    divFechaContrato.appendChild(h6FechaContrato);
+    divFechaContrato.appendChild(spaceFechaContrato);
+    divFechaContrato.appendChild(pFechaContrato);
+
+    // Crea un div para el estado "Activo" y agrega contenido
+    const divEstadoActivo = document.createElement("div");
+    divEstadoActivo.className =
+      "col-3 d-flex justify-content-end align-items-baseline";
+    const pEstadoActivo = document.createElement("p");
+    // pEstadoActivo.classList.add("trans");
+    // pEstadoActivo.textContent = "-";
+    pEstadoActivo.textContent = datosContrato.estado;
+    const iconActivo = document.createElement("i");
+    iconActivo.classList.add("mx-2", "fa-solid", "fa-toggle-on");
+    iconActivo.style.color = "#85c1e9";
+    divEstadoActivo.appendChild(pEstadoActivo);
+    divEstadoActivo.appendChild(iconActivo);
+    divDateSt.appendChild(divFechaContrato);
+    divDateSt.appendChild(divEstadoActivo);
+    // Crea un div para la ubicación y agrega contenido
+    const divUbicacion = document.createElement("div");
+    divUbicacion.className = "col-12 text-center";
+    const h6Ubicacion = document.createElement("h6");
+    h6Ubicacion.textContent = "Ubicacion";
+    const pUbicacion = document.createElement("p");
+    const icoLocation = document.createElement("i");
+    icoLocation.style.color = "#85c1e9";
+    icoLocation.className = "mx-2 fa-solid fa-location-dot";
+    pUbicacion.appendChild(icoLocation);
+    const locationText = document.createTextNode(
+      "Barrio " +
+        datosContrato.barrio +
+        ", " +
+        datosContrato.callePrincipal +
+        " y " +
+        datosContrato.calleSecundaria +
+        ", " +
+        datosContrato.numeroCasa +
+        "."
+    );
+    pUbicacion.appendChild(locationText);
+    // pUbicacion.innerHTML =
+    //   '<i style="color: #85c1e9" class="mx-2 fa-solid fa-location-dot"></i>
+    //   Barrio Los Laureles, Buenavista y La troncal, N-201';
+    divUbicacion.appendChild(h6Ubicacion);
+    divUbicacion.appendChild(pUbicacion);
+
+    // Crea un div para el botón
+    const divBoton = document.createElement("div");
+    divBoton.classList.add("col-12", "d-flex", "justify-content-end");
+    const boton = document.createElement("button");
+    boton.classList.add("btn-custom");
+    boton.innerHTML = 'Actualizar <i class="mx-1 fa-solid fa-file-pen"></i>';
+    boton.onclick = () => {
+      editContrato(datosContrato.contratosId);
+    };
+    divBoton.appendChild(boton);
+
+    // Agrega los elementos al cuerpo
+    divCardBody.appendChild(divDateSt);
+
+    divCardBody.appendChild(divUbicacion);
+    divCardBody.appendChild(divBoton);
+
+    // Agrega el encabezado y el cuerpo al div de la tarjeta
+    divCard.appendChild(divCardHeader);
+    divCard.appendChild(divCardBody);
+
+    // Agrega el div de la tarjeta al div de columna
+    divCol.appendChild(divCard);
+    divCol.onclick = () => {
+      // Elimina la clase "selected" de todos los elementos
+      const elementos = document.querySelectorAll(".clase"); // Reemplaza con la clase real de tus elementos
+      elementos.forEach((elemento) => {
+        elemento.classList.remove("bg-secondary");
+      });
+
+      // Agrega la clase "selected" al elemento que se hizo clic
+      divCard.classList.add("bg-secondary");
+      detallesContratos(datosContrato.contratosId);
+    };
+    // Agrega el div de columna al documento
+    contratosList.appendChild(divCol);
   });
 }
 // function renderContratosSinMedidor(datosContratosSinMedidor) {
@@ -367,36 +625,194 @@ function renderContratosConMedidor(datosContratos) {
 // }
 function renderContratosSinMedidor(datosContratosSinMedidor) {
   contratosSinMedidorList.innerHTML = "";
-  datosContratosSinMedidor.forEach((contratosinmedidor) => {
-    contratosSinMedidorList.innerHTML += `
-       <tr class="fila-md">
-       <td>${contratosinmedidor.codigo}</td>
-       <td>${formatearFecha(contratosinmedidor.fecha)}</td>
-      <td>${
-        contratosinmedidor.primerNombre +
-        " " +
-        contratosinmedidor.segundoNombre +
-        " " +
-        contratosinmedidor.primerApellido +
-        " " +
-        contratosinmedidor.segundoApellido
-      }</td>
-      <td>${contratosinmedidor.cedulaPasaporte}</td>
-      <td>${contratosinmedidor.estado}</td>
-      <td>
-      <button onclick="detallesContratos('${
-        contratosinmedidor.id
-      }')" class="btn ">
-      <i class="fa-solid fa-circle-info" style="color: #511f1f;"></i>
-      </button>
-      </td>
-      <td>
-      <button onclick="editContrato('${contratosinmedidor.id}')" class="btn ">
-      <i class="fa-solid fa-user-pen"></i>
-      </button>
-      </td>
-   </tr>
-      `;
+  // datosContratosSinMedidor.forEach((contratosinmedidor) => {
+  //   contratosSinMedidorList.innerHTML += `
+  //     <tr class="fila-md">
+  //     <td>${contratosinmedidor.codigo}</td>
+  //     <td>${formatearFecha(contratosinmedidor.fecha)}</td>
+  //     <td>${
+  //       contratosinmedidor.primerNombre +
+  //       " " +
+  //       contratosinmedidor.segundoNombre +
+  //       " " +
+  //       contratosinmedidor.primerApellido +
+  //       " " +
+  //       contratosinmedidor.segundoApellido
+  //     }</td>
+  //     <td>${contratosinmedidor.cedulaPasaporte}</td>
+  //     <td>${contratosinmedidor.estado}</td>
+  //     <td>
+  //     <button onclick="detallesContratos('${
+  //       contratosinmedidor.contratosId
+  //     }')" class="btn ">
+  //     <i class="fa-solid fa-circle-info" style="color: #511f1f;"></i>
+  //     </button>
+  //     </td>
+  //     <td>
+  //     <button onclick="editContrato('${
+  //       contratosinmedidor.contratosId
+  //     }')" class="btn ">
+  //     <i class="fa-solid fa-user-pen"></i>
+  //     </button>
+  //     </td>
+  // </tr>
+  //     `;
+  // });
+  datosContratosSinMedidor.forEach((datosContrato) => {
+    // Crea un nuevo div con la clase "col-xl-6 col-lg-6 col-md-6 col-sm-12"
+    const divCol = document.createElement("div");
+    // divCol.style.backgroundColor = "black";
+    divCol.className = " col-xl-6 col-lg-6 col-md-6 col-sm-12 px-1";
+    // Crea el div con la clase "card" y estilos
+    const divCard = document.createElement("div");
+    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card";
+    divCard.style.padding = "0.3em";
+    divCard.style.width = "100%";
+    divCard.style.backgroundColor = "#d6eaf8";
+
+    // Crea el div del encabezado con la clase "card-header" y estilos
+    const divCardHeader = document.createElement("div");
+    divCardHeader.className =
+      "card-header d-flex justify-content-between align-items-center mp-0";
+    divCardHeader.style.backgroundColor = "#85c1e9";
+
+    // Crea el primer conjunto de elementos de texto
+    const divText1 = document.createElement("div");
+    divText1.className = "d-flex mp-0";
+    const pText1 = document.createElement("p");
+    pText1.className = "mp-0 fs-5";
+    pText1.textContent = "Contrato:";
+    const pTrans1 = document.createElement("p");
+    pTrans1.className = "trans mp-0";
+    pTrans1.textContent = "-";
+    const pText2 = document.createElement("p");
+    pText2.className = "mp-0 text-white fs-5";
+    pText2.textContent = datosContrato.codigo;
+    divText1.appendChild(pText1);
+    divText1.appendChild(pTrans1);
+    divText1.appendChild(pText2);
+
+    // Crea el segundo conjunto de elementos de texto
+    const divText2 = document.createElement("div");
+    divText2.className = "d-flex mp-0";
+    const pText3 = document.createElement("p");
+    pText3.className = "mp-0 fs-5";
+    pText3.textContent = "Socio:";
+    const pTrans2 = document.createElement("p");
+    pTrans2.classList.Name = "trans mp-0";
+    pTrans2.textContent = "-";
+    const pText4 = document.createElement("p");
+    pText4.className = "mp-0 mt-1";
+    pText4.style.fontSize = "1em";
+    pText4.textContent = datosContrato.socio;
+    divText2.appendChild(pText3);
+    divText2.appendChild(pTrans2);
+    divText2.appendChild(pText4);
+
+    // Agrega los conjuntos de elementos de texto al div del encabezado
+    divCardHeader.appendChild(divText1);
+    divCardHeader.appendChild(divText2);
+
+    // Crea el div del cuerpo con la clase "card-body" y estilos
+    const divCardBody = document.createElement("div");
+    divCardBody.className = "card-body";
+    divCardBody.style.backgroundColor = "white";
+    const divDateSt = document.createElement("div");
+    divDateSt.className = "d-flex justify-content-between";
+    // Crea un div para la fecha de contrato y agrega contenido
+    const divFechaContrato = document.createElement("div");
+    divFechaContrato.className = "col-9 d-flex";
+    const h6FechaContrato = document.createElement("h6");
+    h6FechaContrato.innerHTML =
+      '<i style="color: #85c1e9" class="fa-regular fa-calendar-days mx-2"></i>Fecha de contrato:';
+    const pFechaContrato = document.createElement("p");
+    const spaceFechaContrato = document.createElement("p");
+    spaceFechaContrato.className = "trans";
+    spaceFechaContrato.textContent = "-";
+    pFechaContrato.textContent = formatearFecha(datosContrato.fecha);
+    divFechaContrato.appendChild(h6FechaContrato);
+    divFechaContrato.appendChild(spaceFechaContrato);
+    divFechaContrato.appendChild(pFechaContrato);
+
+    // Crea un div para el estado "Activo" y agrega contenido
+    const divEstadoActivo = document.createElement("div");
+    divEstadoActivo.className =
+      "col-3 d-flex justify-content-end align-items-baseline";
+    const pEstadoActivo = document.createElement("p");
+    // pEstadoActivo.classList.add("trans");
+    // pEstadoActivo.textContent = "-";
+    pEstadoActivo.textContent = datosContrato.estado;
+    const iconActivo = document.createElement("i");
+    iconActivo.classList.add("mx-2", "fa-solid", "fa-toggle-on");
+    iconActivo.style.color = "#85c1e9";
+    divEstadoActivo.appendChild(pEstadoActivo);
+    divEstadoActivo.appendChild(iconActivo);
+    divDateSt.appendChild(divFechaContrato);
+    divDateSt.appendChild(divEstadoActivo);
+    // Crea un div para la ubicación y agrega contenido
+    const divUbicacion = document.createElement("div");
+    divUbicacion.className = "col-12 text-center";
+    const h6Ubicacion = document.createElement("h6");
+    h6Ubicacion.textContent = "Ubicacion";
+    const pUbicacion = document.createElement("p");
+    const icoLocation = document.createElement("i");
+    icoLocation.style.color = "#85c1e9";
+    icoLocation.className = "mx-2 fa-solid fa-location-dot";
+    pUbicacion.appendChild(icoLocation);
+    const locationText = document.createTextNode(
+      "Barrio " +
+        datosContrato.barrio +
+        ", " +
+        datosContrato.callePrincipal +
+        " y " +
+        datosContrato.calleSecundaria +
+        ", " +
+        datosContrato.numeroCasa +
+        "."
+    );
+    pUbicacion.appendChild(locationText);
+    // pUbicacion.innerHTML =
+    //   '<i style="color: #85c1e9" class="mx-2 fa-solid fa-location-dot"></i>
+    //   Barrio Los Laureles, Buenavista y La troncal, N-201';
+    divUbicacion.appendChild(h6Ubicacion);
+    divUbicacion.appendChild(pUbicacion);
+
+    // Crea un div para el botón
+    const divBoton = document.createElement("div");
+    divBoton.classList.add("col-12", "d-flex", "justify-content-end");
+    const boton = document.createElement("button");
+    boton.classList.add("btn-custom");
+    boton.innerHTML = 'Actualizar <i class="mx-1 fa-solid fa-file-pen"></i>';
+    boton.onclick = () => {
+      editContrato(datosContrato.contratosId);
+    };
+    divBoton.appendChild(boton);
+
+    // Agrega los elementos al cuerpo
+    divCardBody.appendChild(divDateSt);
+
+    divCardBody.appendChild(divUbicacion);
+    divCardBody.appendChild(divBoton);
+
+    // Agrega el encabezado y el cuerpo al div de la tarjeta
+    divCard.appendChild(divCardHeader);
+    divCard.appendChild(divCardBody);
+
+    // Agrega el div de la tarjeta al div de columna
+    divCol.appendChild(divCard);
+    divCol.onclick = () => {
+      // Elimina la clase "selected" de todos los elementos
+      const elementos = document.querySelectorAll(".clase"); // Reemplaza con la clase real de tus elementos
+      elementos.forEach((elemento) => {
+        elemento.classList.remove("bg-secondary");
+      });
+
+      // Agrega la clase "selected" al elemento que se hizo clic
+      divCard.classList.add("bg-secondary");
+      detallesContratos(datosContrato.contratosId);
+    };
+    // Agrega el div de columna al documento
+    contratosSinMedidorList.appendChild(divCol);
   });
 }
 // function renderContratosSinMedidor(datosContratosSinMedidor) {
@@ -591,10 +1007,12 @@ function renderServiciosDisponibles(serviciosDisponibles) {
     servicosDisponiblesList.appendChild(cardContainer);
   }
   marcarServiciosContratados();
+
   console.log(serviciosDisponiblesAContratar[0]);
 }
 function marcarServiciosContratados() {
   if (serviciosEditar !== null) {
+    console.log("Marcando servicios: " + serviciosEditar);
     for (let i = 0; i < serviciosEditar.length; i++) {
       document.getElementById(serviciosEditar[i].serviciosId).checked = true;
     }
@@ -605,6 +1023,7 @@ function marcarServiciosContratados() {
 // segun se los seleccione
 // ----------------------------------------------------------------
 const detallesContratos = async (id) => {
+  console.log("Detallles de : " + id);
   contratoForm.reset();
   const serviciosContratos = await ipcRenderer.invoke(
     "getServiciosContratadosById",
@@ -626,53 +1045,30 @@ const editContrato = async (id) => {
   var conMedidor = contrato.medidorSn;
   if (conMedidor == "Si") {
     console.log("conMedidor");
+    habilitarFormMedidor();
     contratoFecha.value = formatearFecha(contrato.fecha);
     socioContratanteCedula.value = contrato.cedulaPasaporte;
     socioContratanteApellido.value =
       contrato.primerApellido + " " + contrato.segundoApellido;
     socioContratanteNombre.value =
       contrato.primerNombre + " " + contrato.segundoNombre;
-    // if (medidor.pagoRecoleccionDesechos == "Si") {
-    //   contratoPagoRecoleccion.checked = true;
-    // } else {
-    //   contratoPagoRecoleccion.checked = false;
-    // }
-    // if (medidor.pagoAlcanterillado == "Si") {
-    //   contratoPagoAlcanterillado.checked = true;
-    // } else {
-    //   contratoPagoAlcanterillado.checked = false;
-    // }
-    // if (medidor.pagoEscrituras == "Si") {
-    //   contratoPagoEscrituras.checked = true;
-    // } else {
-    //   contratoPagoEscrituras.checked = false;
-    // }
-    // if (medidor.pagoAguaPotable == "Si") {
-    //   contratoPagoAguaPotable.checked = true;
-    // } else {
-    //   contratoPagoAguaPotable.checked = false;
-    // }
     contratoCodigo.value = contrato.codigo;
     contratoConMedidor = true;
     //medidorCodigo.value = contrato.codigoMedidor;
     medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
     medidorMarca.value = contrato.marca;
+    medidorObservacion.value = contrato.observacion;
+
     medidorBarrio.value = contrato.barrio;
     medidorPrincipal.value = contrato.callePrincipal;
     medidorSecundaria.value = contrato.calleSecundaria;
     medidorNumeroCasa.value = contrato.numeroCasa;
     medidorReferencia.value = contrato.referencia;
-    medidorObservacion.value = contrato.observacion;
     // Permitimos editar los datos del medidor
     // medidorCodigo.disabled = false;
     medidorInstalacion.readOnly = true;
     medidorInstalacion.disabled = false;
     medidorMarca.disabled = false;
-    medidorBarrio.disabled = false;
-    medidorPrincipal.disabled = false;
-    medidorSecundaria.disabled = false;
-    medidorNumeroCasa.disabled = false;
-    medidorReferencia.disabled = false;
     medidorObservacion.disabled = false;
     // Inhabilitamos los campos que no se deben editar
     contratoFecha.readOnly = true;
@@ -683,6 +1079,7 @@ const editContrato = async (id) => {
     editContratoId = contrato.id;
   } else {
     console.log("sinMedidor");
+    inHabilitarFormMedidor();
     contratoCodigo.value = contrato.codigo;
     contratoFecha.value = formatearFecha(contrato.fecha);
 
@@ -716,20 +1113,18 @@ const editContrato = async (id) => {
     // medidoresDisponibles.selectedIndex = 0;
     // medidorMarca.value = medidor.marca;
     // medidorBarrio.value = medidor.barrio;
-    // medidorPrincipal.value = medidor.callePrincipal;
-    // medidorSecundaria.value = medidor.calleSecundaria;
-    // medidorNumeroCasa.value = medidor.numeroCasa;
-    // medidorReferencia.value = medidor.referencia;
     // medidorObservacion.value = medidor.observacion;
+    medidorBarrio.value = contrato.barrio;
+    medidorPrincipal.value = contrato.callePrincipal;
+    medidorSecundaria.value = contrato.calleSecundaria;
+    medidorNumeroCasa.value = contrato.numeroCasa;
+    medidorReferencia.value = contrato.referencia;
+    // Permitimos editar los datos del medidor
+    // medidorCodigo.disabled = false;
     // Inhabilitamos los campos que no se deben editar
     if (contrato.codigoMedidor != undefined) {
       medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
       medidorMarca.value = contrato.marca;
-      medidorBarrio.value = contrato.barrio;
-      medidorPrincipal.value = contrato.callePrincipal;
-      medidorSecundaria.value = contrato.calleSecundaria;
-      medidorNumeroCasa.value = contrato.numeroCasa;
-      medidorReferencia.value = contrato.referencia;
       medidorObservacion.value = contrato.observacion;
     }
 
@@ -746,8 +1141,8 @@ const editContrato = async (id) => {
   console.log("btn1");
   editarServiciosContratados(id);
   getServiciosDisponibles();
-  seccion1.classList.remove("active");
-  seccion2.classList.add("active");
+  seccion2.classList.remove("active");
+  seccion1.classList.add("active");
 };
 // ----------------------------------------------------------------
 // Funcion que carga los servicios contratados segun el id del contrato
@@ -940,61 +1335,183 @@ function habilitarFormMedidor() {
   fechaInstalacion.disabled = false;
   medidorMarca.disabled = false;
 
-  (medidorNumeroCasa.disabled = false), (medidorBarrio.disabled = false);
-  medidorPrincipal.disabled = false;
-  medidorSecundaria.disabled = false;
-  medidorReferencia.disabled = false;
+  // (medidorNumeroCasa.disabled = false), (medidorBarrio.disabled = false);
+  // medidorPrincipal.disabled = false;
+  // medidorSecundaria.disabled = false;
+  // medidorReferencia.disabled = false;
   medidorObservacion.disabled = false;
 }
 function inHabilitarFormMedidor() {
   fechaInstalacion.disabled = true;
   medidorMarca.disabled = true;
 
-  (medidorNumeroCasa.disabled = true), (medidorBarrio.disabled = true);
-  medidorPrincipal.disabled = true;
-  medidorSecundaria.disabled = true;
-  medidorReferencia.disabled = true;
+  // (medidorNumeroCasa.disabled = true), (medidorBarrio.disabled = true);
+  // medidorPrincipal.disabled = true;
+  // medidorSecundaria.disabled = true;
+  // medidorReferencia.disabled = true;
   medidorObservacion.disabled = true;
 }
-function generarCodigo() {
+// async function generarCodigo() {
+
+//   const sectores =await ipcRenderer.invoke("getSectores");
+//   Swal.fire({
+//     title: "Código de contrato.",
+//     html: `
+//         <label for="opciones">Barrio:</label>
+//         <select id="sectorNombre" class="form-select">
+//         </select>
+//         <br>
+//         <label for="texto">Numero de contrato:</label>
+//         <input type="text" id="numeroContrato" class="form-control" ">
+//     `,
+
+//     confirmButtonText: "Aceptar",
+//     confirmButtonColor: " #f8c471",
+//     showCancelButton: true,
+//     cancelButtonText: "Cancelar",
+//     preConfirm: () => {
+//       const sectorNombre = document.getElementById("sectorNombre").value;
+//       const numeroContrato = document.getElementById("numeroContrato").value;
+
+//       return { sector: sectorNombre, numero: numeroContrato };
+//     },
+//   }).then((result) => {
+//     if (result.isConfirmed) {
+//       // Aquí puedes usar result.value.opcion y result.value.texto
+//       const sector = result.value.sector;
+//       const numero = result.value.numero;
+
+//       // Realiza acciones con los valores obtenidos
+//       console.log("Código del contrato:", sector + numero);
+//       contratoCodigo.value = sector + numero;
+//       // console.log("Texto ingresado:", texto);
+//     }
+//   });
+// }
+async function generarCodigo() {
+  let codigoGenerado = "error";
+  let barrio = "No seleccionado";
+  const sectores = await ipcRenderer.invoke("getSectores");
+  const selectElement = document.createElement("select");
+  selectElement.id = "sectorNombre";
+  selectElement.classList.add("form-select");
+  // Itera sobre la lista de sectores y agrega opciones al select
+  const numeroContrato = document.createElement("input");
+  numeroContrato.type = "text";
+  numeroContrato.id = "numeroContrato";
+  numeroContrato.classList.add("form-control");
+  numeroContrato.readOnly = true;
+  sectores.forEach((sector) => {
+    const optionElement = document.createElement("option");
+    optionElement.value = sector.id; // Valor de la opción
+    optionElement.setAttribute("data-values", [
+      sector.abreviatura + sector.codigo + sector.numeroSocios,
+    ]);
+    optionElement.setAttribute("barrio", sector.barrio);
+    optionElement.textContent =
+      sector.barrio + " (" + sector.abreviatura + sector.codigo + ")"; // Texto visible de la opción
+
+    selectElement.appendChild(optionElement);
+  });
+
   Swal.fire({
     title: "Código de contrato.",
+    width: 600,
 
     html: `
-        <label for="opciones">Barrio:</label>
-        <select id="sectorNombre" class="form-select">
-        <option value="1N"selcted>Barrio 3 de Noviembre</option>
-            <option value="2C">Barrio Central</option>
-            <option value="3L">Barrio Los Laureles</option>
-            <option value="4B">Barrio El Bosque</option>
-        </select>
-        <br>
-        <label for="texto">Numero de contrato:</label>
-        <input type="text" id="numeroContrato" class="form-control">
+      <label for="opciones">Barrio:</label>
+      ${selectElement.outerHTML} <!-- Inserta el select aquí -->
+      <br>
+      <label for="texto">Numero de contrato:</label>
+      <p id="mensaje-codigo-error" class="fs-6 my-1 mx-1
+       d-flex justify-content-center align-items-baseline" 
+       style="color:#21618C; "><i class=" mx-2 fa-solid fa-circle-info" style="color:#21618C; ">
+       </i>Selecciona un sector para generar un código.</p>
+
+      ${numeroContrato.outerHTML}
+  
+        
+     
+   
     `,
     confirmButtonText: "Aceptar",
-    confirmButtonColor: " #f8c471",
+    confirmButtonColor: "#85C1E9",
     showCancelButton: true,
     cancelButtonText: "Cancelar",
+    cancelButtonColor: " #D98880",
     preConfirm: () => {
-      const sectorNombre = document.getElementById("sectorNombre").value;
-      const numeroContrato = document.getElementById("numeroContrato").value;
-
-      return { sector: sectorNombre, numero: numeroContrato };
+      // const sectorNombre = document.getElementById("sectorNombre").value;
+      num = document.getElementById("numeroContrato").value;
+      return { codigo: num, barrio: barrio };
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      // Aquí puedes usar result.value.opcion y result.value.texto
-      const sector = result.value.sector;
-      const numero = result.value.numero;
-
-      // Realiza acciones con los valores obtenidos
-      console.log("Código del contrato:", sector + numero);
-      contratoCodigo.value = sector + numero;
-      // console.log("Texto ingresado:", texto);
+      const codigo = result.value.codigo;
+      console.log("Código del contrato:", codigo);
+      contratoCodigo.value = codigo;
+      medidorBarrio.value = result.value.barrio;
     }
   });
+  // Obtén el select por su id
+  const select = document.getElementById("sectorNombre");
+  const codigoInput = document.getElementById("numeroContrato");
+  select.onchange = () => {
+    numero = 1;
+    const selectedOption = select.options[select.selectedIndex];
+    const atributoValor = selectedOption.getAttribute("data-values");
+
+    if (atributoValor[2] != "0") {
+      numero = parseInt(atributoValor[2]) + 1;
+    }
+    const numeroConRelleno = numero.toString().padStart(4, "0");
+    codigoGenerado = atributoValor[1] + atributoValor[0] + numeroConRelleno;
+    sectorId = select.value;
+    barrio = selectedOption.getAttribute("barrio");
+    console.log(
+      "Valor del atributo seleccionado:",
+      atributoValor[0],
+      atributoValor[1],
+      atributoValor[2],
+      barrio,
+      sectorId
+    );
+    codigoInput.value = codigoGenerado;
+  };
 }
+
+// ----------------------------------------------------------------
+// La fecha de contrato siempre este en la fecha actual.
+// ----------------------------------------------------------------
+contratoFecha.value = formatearFecha(new Date());
+// ----------------------------------------------------------------
+// Cambiar de texto si el checkbox es 'Check' y viceversa.
+// ----------------------------------------------------------------
+contratoEstado.onchange = () => {
+  if (contratoEstado.checked) {
+    labelEstadoContrato.textContent = "Activo";
+  } else {
+    labelEstadoContrato.textContent = "Innactivo";
+  }
+};
+medidorSinMedidor.onchange = () => {
+  if (medidorSinMedidor.value == "medidor") {
+    conMedidor.classList.remove("innactive-list");
+    conMedidor.classList.add("active-list");
+    sinMedidor.classList.remove("active-list");
+    sinMedidor.classList.add("innactive-list");
+    titleContratos.innerHTML =
+      "Contratos con medidor" +
+      '<i class="fs-1 fa-solid fa-file-signature mx-2 my-2"></i>';
+  } else {
+    sinMedidor.classList.remove("innactive-list");
+    sinMedidor.classList.add("active-list");
+    conMedidor.classList.remove("active-list");
+    conMedidor.classList.add("innactive-list");
+    titleContratos.innerHTML =
+      "Contratos sin medidor" +
+      '<i class="fs-1 fa-solid fa-file-signature mx-2 my-2"></i>';
+  }
+};
 // ----------------------------------------------------------------
 // Transicion entre las secciones de la vista
 // ----------------------------------------------------------------
@@ -1005,14 +1522,14 @@ var seccion2 = document.getElementById("seccion2");
 
 btnSeccion1.addEventListener("click", function () {
   console.log("btn1");
-  seccion1.classList.remove("active");
-  seccion2.classList.add("active");
+  seccion2.classList.remove("active");
+  seccion1.classList.add("active");
 });
 
 btnSeccion2.addEventListener("click", function () {
   console.log("btn2");
-  seccion2.classList.remove("active");
-  seccion1.classList.add("active");
+  seccion1.classList.remove("active");
+  seccion2.classList.add("active");
 });
 // ----------------------------------------------------------------
 // funciones de trancision entre interfaces

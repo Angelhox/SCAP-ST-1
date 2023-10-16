@@ -43,6 +43,7 @@ var anioRecaudacion = document.getElementById("anioRecaudacion");
 var mesRecaudacion = document.getElementById("mesRecaudacion");
 var anioLimite = document.getElementById("anioLimite");
 var mesLimite = document.getElementById("mesLimite");
+var btnReporte = document.getElementById("btnReporte");
 var recaudaciones = [];
 var servicios = [];
 var usuarios = [];
@@ -638,10 +639,20 @@ var getRecaudaciones = function getRecaudaciones() {
           console.log("Recaudaciones: ", recaudaciones);
           recaudacionesList.innerHTML = "";
           recaudaciones.forEach(function (recaudacion) {
-            valoresPendientes += recaudacion.saldo;
-            valoresRecaudados += recaudacion.abono;
+            var abonoRp = 0;
+
+            if (parseFloat(recaudacion.abono) == 0 && recaudacion.detalleEstado == "Cancelado") {
+              abonoRp = recaudacion.total;
+            } else if (recaudacion.detalleEstado == "Cancelado") {
+              abonoRp = recaudacion.abono;
+            } else {
+              abonoRp = 0;
+            }
+
+            valoresPendientes += recaudacion.saldo - abonoRp;
+            valoresRecaudados += abonoRp;
             valoresTotales += recaudacion.total;
-            recaudacionesList.innerHTML += "\n           <tr>\n           <td>".concat(recaudacion.contratosCodigo, "</td>\n           <td>").concat(recaudacion.nombres + " " + recaudacion.apellidos, "</td>\n           <td>").concat(recaudacion.detalleEstado, "</td>\n           <td>").concat(recaudacion.abono, "</td>\n           <td>").concat(recaudacion.saldo, "</td>        \n           <td>").concat(recaudacion.total, "</td>\n       </tr>\n          ");
+            recaudacionesList.innerHTML += "\n           <tr>\n           <td>".concat(recaudacion.contratosCodigo, "</td>\n           <td>").concat(recaudacion.nombres + " " + recaudacion.apellidos, "</td>\n           <td>").concat(recaudacion.detalleEstado, "</td>\n           <td>").concat(abonoRp, "</td>\n           <td>").concat(recaudacion.total, "</td>\n           <td>").concat(recaudacion.saldo - abonoRp, "</td>        \n       </tr>\n          ");
           });
           valorPendiente.textContent = valoresPendientes.toFixed(2);
           valorRecaudado.textContent = valoresRecaudados.toFixed(2);
@@ -1077,7 +1088,10 @@ function obtenerPrimerYUltimoDiaDeMes(anio, mes) {
     primerDia: primerDia,
     ultimoDia: ultimoDia
   };
-} // Ejemplo: Obtener el primer y último día de septiembre de 2023
+} // btnReporte.onclick = async () => {
+//   await abrirConsolidado();
+// };
+// Ejemplo: Obtener el primer y último día de septiembre de 2023
 
 
 var resultado = obtenerPrimerYUltimoDiaDeMes("2023", 1); // 8 representa septiembre (0-indexed)
@@ -1145,34 +1159,47 @@ function anioLimites() {
 
     anioLimite.appendChild(option);
   }
-} // funciones del navbar
+}
 
-
-var abrirInicio = function abrirInicio() {
-  var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context23) {
+function vistaFactura() {
+  var datos, encabezado, datosTotales;
+  return regeneratorRuntime.async(function vistaFactura$(_context23) {
     while (1) {
       switch (_context23.prev = _context23.next) {
         case 0:
-          url = "src/ui/principal.html";
-          _context23.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          datos = {
+            mensaje: "Hola desde pagina1",
+            otroDato: 12345
+          };
+          encabezado = {
+            servicio: servicioTit.textContent,
+            fechaD: "2023-10-01",
+            fechaH: "2023-10-31"
+          };
+          datosTotales = {
+            pendiente: valorRecaudado.textContent,
+            recaudado: valorPendiente.textContent,
+            totalFinal: valorTotal.textContent
+          };
+          _context23.next = 5;
+          return regeneratorRuntime.awrap(ipcRenderer.send("datos-a-pagina3", datos, encabezado, recaudaciones, datosTotales));
 
-        case 3:
+        case 5:
         case "end":
           return _context23.stop();
       }
     }
   });
-};
+} // funciones del navbar
 
-var abrirSocios = function abrirSocios() {
+
+var abrirInicio = function abrirInicio() {
   var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context24) {
+  return regeneratorRuntime.async(function abrirInicio$(_context24) {
     while (1) {
       switch (_context24.prev = _context24.next) {
         case 0:
-          url = "src/ui/socios.html";
+          url = "src/ui/principal.html";
           _context24.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1184,13 +1211,13 @@ var abrirSocios = function abrirSocios() {
   });
 };
 
-var abrirUsuarios = function abrirUsuarios() {
+var abrirSocios = function abrirSocios() {
   var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context25) {
+  return regeneratorRuntime.async(function abrirSocios$(_context25) {
     while (1) {
       switch (_context25.prev = _context25.next) {
         case 0:
-          url = "src/ui/usuarios.html";
+          url = "src/ui/socios.html";
           _context25.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1202,13 +1229,13 @@ var abrirUsuarios = function abrirUsuarios() {
   });
 };
 
-var abrirPagos = function abrirPagos() {
+var abrirUsuarios = function abrirUsuarios() {
   var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context26) {
+  return regeneratorRuntime.async(function abrirUsuarios$(_context26) {
     while (1) {
       switch (_context26.prev = _context26.next) {
         case 0:
-          url = "src/ui/planillas.html";
+          url = "src/ui/usuarios.html";
           _context26.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1220,13 +1247,13 @@ var abrirPagos = function abrirPagos() {
   });
 };
 
-var abrirPlanillas = function abrirPlanillas() {
+var abrirPagos = function abrirPagos() {
   var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context27) {
+  return regeneratorRuntime.async(function abrirPagos$(_context27) {
     while (1) {
       switch (_context27.prev = _context27.next) {
         case 0:
-          url = "src/ui/planillas-cuotas.html";
+          url = "src/ui/planillas.html";
           _context27.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1238,13 +1265,13 @@ var abrirPlanillas = function abrirPlanillas() {
   });
 };
 
-var abrirParametros = function abrirParametros() {
+var abrirPlanillas = function abrirPlanillas() {
   var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context28) {
+  return regeneratorRuntime.async(function abrirPlanillas$(_context28) {
     while (1) {
       switch (_context28.prev = _context28.next) {
         case 0:
-          url = "src/ui/parametros.html";
+          url = "src/ui/planillas-cuotas.html";
           _context28.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1256,13 +1283,13 @@ var abrirParametros = function abrirParametros() {
   });
 };
 
-var abrirImplementos = function abrirImplementos() {
+var abrirParametros = function abrirParametros() {
   var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context29) {
+  return regeneratorRuntime.async(function abrirParametros$(_context29) {
     while (1) {
       switch (_context29.prev = _context29.next) {
         case 0:
-          url = "src/ui/implementos.html";
+          url = "src/ui/parametros.html";
           _context29.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1274,19 +1301,55 @@ var abrirImplementos = function abrirImplementos() {
   });
 };
 
-var abrirContratos = function abrirContratos() {
+var abrirImplementos = function abrirImplementos() {
   var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context30) {
+  return regeneratorRuntime.async(function abrirImplementos$(_context30) {
     while (1) {
       switch (_context30.prev = _context30.next) {
         case 0:
-          url = "src/ui/medidores.html";
+          url = "src/ui/implementos.html";
           _context30.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
         case 3:
         case "end":
           return _context30.stop();
+      }
+    }
+  });
+};
+
+var abrirContratos = function abrirContratos() {
+  var url;
+  return regeneratorRuntime.async(function abrirContratos$(_context31) {
+    while (1) {
+      switch (_context31.prev = _context31.next) {
+        case 0:
+          url = "src/ui/medidores.html";
+          _context31.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context31.stop();
+      }
+    }
+  });
+};
+
+var abrirConsolidado = function abrirConsolidado() {
+  var url;
+  return regeneratorRuntime.async(function abrirConsolidado$(_context32) {
+    while (1) {
+      switch (_context32.prev = _context32.next) {
+        case 0:
+          url = "src/ui/consolidado.html";
+          _context32.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context32.stop();
       }
     }
   });

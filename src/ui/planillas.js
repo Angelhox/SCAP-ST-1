@@ -11,6 +11,13 @@ const valorConsumo = document.getElementById("valorConsumo");
 const tarifaConsumo = document.getElementById("tarifaConsumo");
 const planillasList = document.getElementById("planillas");
 // ----------------------------------------------------------------
+// Varibles de busqueda de las planillas
+// ----------------------------------------------------------------
+const estadoBuscar = document.getElementById("estado");
+const criterioBuscar = document.getElementById("criterio");
+const criterioContent = document.getElementById("criterioContent");
+const btnBuscar = document.getElementById("btnBuscar");
+// ----------------------------------------------------------------
 // Variables del socio
 // ----------------------------------------------------------------
 const socioNombres = document.getElementById("socioNombres");
@@ -597,13 +604,33 @@ function renderServicios(servicios, tipo) {
 //   totalFinal += totalPagarEdit;
 // }
 
-const getPlanillas = async () => {
-  planillas = await ipcRenderer.invoke("getDatosPlanillas");
+const getPlanillas = async (criterio, criterioContent, estado, anio, mes) => {
+  planillas = await ipcRenderer.invoke(
+    "getDatosPlanillas",
+    criterio,
+    criterioContent,
+    estado,
+    anio,
+    mes
+  );
   console.log(planillas);
   renderPlanillas(planillas);
 };
 async function init() {
-  await getPlanillas();
+  let fechaActual = new Date();
+  let anioEnviar = fechaActual.getFullYear();
+  let mesEnviar = fechaActual.getMonth() + 1;
+  let criterioEnviar = criterioBuscar.value;
+  let criterioContentEnviar = criterioContent.value;
+  let estadoEnviar = estadoBuscar.value;
+  console.log("error", mesEnviar, anioEnviar);
+  await getPlanillas(
+    criterioEnviar,
+    criterioContentEnviar,
+    estadoEnviar,
+    anioEnviar,
+    mesEnviar
+  );
   cargarAnioBusquedas();
   cargarMesActual();
 }
@@ -677,6 +704,23 @@ async function generarPlanilla() {
 
 //   selectAnio.appendChild(option);
 // }
+function obtenerRangoFecha() {
+  let anioD = parseInt(anioBusqueda.value);
+  let mesD = parseInt(mesBusqueda.value);
+  let fechaDesde = "all";
+  let fechaHasta = "all";
+  let fechaRango = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
+  return fechaRango;
+}
+function obtenerPrimerYUltimoDiaDeMes(anio, mes) {
+  // Meses en JavaScript se numeran de 0 a 11 (enero es 0, diciembre es 11)
+  const primerDia = new Date(anio, mes, 1);
+  const ultimoDia = new Date(anio, mes + 1, 0);
+  return {
+    primerDia,
+    ultimoDia,
+  };
+}
 function cargarMesActual() {
   mesBusqueda.innerHTML = "";
   // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
@@ -699,8 +743,13 @@ function cargarMesActual() {
   // Llena el select con las opciones de los meses
   for (let i = 0; i < nombresMeses.length; i++) {
     const option = document.createElement("option");
-    option.value = i - 1; // El valor es el índice del mes
+    option.value = i; // El valor es el índice del mes
     option.textContent = nombresMeses[i];
+    if (i === mesActual) {
+      console.log("seleccionando: " + mesActual);
+      option.selected = true;
+    }
+
     mesBusqueda.appendChild(option);
   }
 

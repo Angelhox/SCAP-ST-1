@@ -11,6 +11,13 @@ const valorConsumo = document.getElementById("valorConsumo");
 const tarifaConsumo = document.getElementById("tarifaConsumo");
 const planillasList = document.getElementById("planillas");
 // ----------------------------------------------------------------
+// Varibles de busqueda de las planillas
+// ----------------------------------------------------------------
+const estadoBuscar = document.getElementById("estado");
+const criterioBuscar = document.getElementById("criterio");
+const criterioContent = document.getElementById("criterioContent");
+const btnBuscar = document.getElementById("btnBuscar");
+// ----------------------------------------------------------------
 // Variables del socio
 // ----------------------------------------------------------------
 const socioNombres = document.getElementById("socioNombres");
@@ -61,9 +68,11 @@ let planillas = [];
 let datosServicios = [];
 let serviciosFijos = [];
 let otrosServicios = [];
+let editados = [];
 let editingStatus = false;
 let editPlanillaId = "";
 let editDetalleId = "";
+let encabezadoId = "";
 planillaForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const newPlanilla = {
@@ -387,6 +396,8 @@ const getDatosLecturas = async (contratoId, fechaEmision) => {
   return lectura;
 };
 const editPlanilla = async (planillaId, contratoId, fechaEmision) => {
+  encabezadoId = "";
+  editados = [];
   editingStatus = true;
   editPlanillaId = planillaId;
   console.log("Planilla a editar: " + planillaId);
@@ -449,6 +460,8 @@ function renderServicios(servicios, tipo) {
   servicios.forEach((servicio) => {
     // Crear el div principal
     if (servicio.nombre !== "Agua Potable") {
+      encabezadoId = servicio.encabezadosId;
+      console.log("Encabezado desde detalle : " + encabezadoId);
       const tr = document.createElement("tr");
       tr.id = servicio.id;
       const tdServicio = document.createElement("td");
@@ -511,6 +524,8 @@ function renderServicios(servicios, tipo) {
         }
       }
     } else if (servicio.nombre === "Agua Potable") {
+      encabezadoId = servicio.encabezadosId;
+      console.log("Encabezado desde detalle agua: " + encabezadoId);
       editDetalleId = servicio.id;
       console.log("Id del detalle Agua: " + editDetalleId);
     }
@@ -606,6 +621,10 @@ guardarDg.onclick = function () {
     if (valorAnterior !== nuevoAbono) {
       console.log("Compara: " + valorAnterior + " | " + nuevoAbono);
       fila.querySelector(".valorAbono").textContent = nuevoAbono;
+      editados.push({ id: valorAbonoEdit, valor: nuevoAbono });
+      editados.forEach((editado) => {
+        console.log("Editado: " + editado.id, " | " + editado.valor);
+      });
       totalRc = totalFinal - valorAnterior;
       console.log("Total rc: " + totalRc);
       totalFinal = totalRc + parseFloat(nuevoAbono);
@@ -620,13 +639,56 @@ guardarDg.onclick = function () {
   }
 };
 
-const getPlanillas = async () => {
-  planillas = await ipcRenderer.invoke("getDatosPlanillas");
+const getPlanillas = async (criterio, criterioContent, estado, anio, mes) => {
+  planillas = await ipcRenderer.invoke(
+    "getDatosPlanillas",
+    criterio,
+    criterioContent,
+    estado,
+    anio,
+    mes
+  );
   console.log(planillas);
   renderPlanillas(planillas);
 };
+btnBuscar.onclick = async () => {
+  let fechaActual = new Date();
+  let anioEnviar = fechaActual.getFullYear();
+  let mesEnviar = fechaActual.getMonth() + 1;
+  if (mesBusqueda.value === 0) {
+    mesEnviar = mesBusqueda.value;
+  }
+  if (anioBusqueda.value === 0) {
+    anioEnviar = anioBusqueda.value;
+  }
+
+  let criterioEnviar = criterioBuscar.value;
+  let criterioContentEnviar = criterioContent.value;
+  let estadoEnviar = estadoBuscar.value;
+  console.log("error", mesEnviar, anioEnviar);
+  await getPlanillas(
+    criterioEnviar,
+    criterioContentEnviar,
+    estadoEnviar,
+    anioEnviar,
+    mesEnviar
+  );
+};
 async function init() {
-  await getPlanillas();
+  let fechaActual = new Date();
+  let anioEnviar = fechaActual.getFullYear();
+  let mesEnviar = fechaActual.getMonth() + 1;
+  let criterioEnviar = criterioBuscar.value;
+  let criterioContentEnviar = criterioContent.value;
+  let estadoEnviar = estadoBuscar.value;
+  console.log("error", mesEnviar, anioEnviar);
+  await getPlanillas(
+    criterioEnviar,
+    criterioContentEnviar,
+    estadoEnviar,
+    anioEnviar,
+    mesEnviar
+  );
   cargarAnioBusquedas();
   cargarMesActual();
 }
@@ -680,6 +742,7 @@ async function vistaFactura() {
     otroDato: 12345,
   };
   const encabezado = {
+    encabezadoId: encabezadoId,
     socio: socioNombres.textContent,
     fecha: formatearFecha(planillaEmision.textContent),
     cedula: socioCedula.textContent,
@@ -687,6 +750,7 @@ async function vistaFactura() {
     planilla: planillaCodigo.textContent,
   };
   const datosAgua = {
+    planillaId: editPlanillaId,
     lecturaAnterior: lecturaAnterior.value,
     lecturaActual: lecturaActual.value,
     tarifaConsumo: tarifaConsumo.value,
@@ -704,7 +768,8 @@ async function vistaFactura() {
     serviciosFijos,
     otrosServicios,
     datosAgua,
-    datosTotales
+    datosTotales,
+    editados
   );
 }
 async function recalcularConsumo() {

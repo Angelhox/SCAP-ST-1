@@ -38,7 +38,7 @@ const anioRecaudacion = document.getElementById("anioRecaudacion");
 const mesRecaudacion = document.getElementById("mesRecaudacion");
 const anioLimite = document.getElementById("anioLimite");
 const mesLimite = document.getElementById("mesLimite");
-
+const btnReporte = document.getElementById("btnReporte");
 let recaudaciones = [];
 let servicios = [];
 let usuarios = [];
@@ -523,17 +523,28 @@ const getRecaudaciones = async () => {
   console.log("Recaudaciones: ", recaudaciones);
   recaudacionesList.innerHTML = "";
   recaudaciones.forEach((recaudacion) => {
-    valoresPendientes += recaudacion.saldo;
-    valoresRecaudados += recaudacion.abono;
+    let abonoRp = 0;
+    if (
+      parseFloat(recaudacion.abono) == 0 &&
+      recaudacion.detalleEstado == "Cancelado"
+    ) {
+      abonoRp = recaudacion.total;
+    } else if (recaudacion.detalleEstado == "Cancelado") {
+      abonoRp = recaudacion.abono;
+    } else {
+      abonoRp = 0;
+    }
+    valoresPendientes += recaudacion.saldo - abonoRp;
+    valoresRecaudados += abonoRp;
     valoresTotales += recaudacion.total;
     recaudacionesList.innerHTML += `
            <tr>
            <td>${recaudacion.contratosCodigo}</td>
            <td>${recaudacion.nombres + " " + recaudacion.apellidos}</td>
            <td>${recaudacion.detalleEstado}</td>
-           <td>${recaudacion.abono}</td>
-           <td>${recaudacion.saldo}</td>        
+           <td>${abonoRp}</td>
            <td>${recaudacion.total}</td>
+           <td>${recaudacion.saldo - abonoRp}</td>        
        </tr>
           `;
   });
@@ -777,7 +788,9 @@ function obtenerPrimerYUltimoDiaDeMes(anio, mes) {
     ultimoDia,
   };
 }
-
+// btnReporte.onclick = async () => {
+//   await abrirConsolidado();
+// };
 // Ejemplo: Obtener el primer y último día de septiembre de 2023
 const resultado = obtenerPrimerYUltimoDiaDeMes("2023", 1); // 8 representa septiembre (0-indexed)
 console.log("Primer día:", formatearFecha(resultado.primerDia));
@@ -836,7 +849,30 @@ function anioLimites() {
     anioLimite.appendChild(option);
   }
 }
+async function vistaFactura() {
+  const datos = {
+    mensaje: "Hola desde pagina1",
+    otroDato: 12345,
+  };
+  const encabezado = {
+    servicio: servicioTit.textContent,
+    fechaD: "2023-10-01",
+    fechaH: "2023-10-31",
+  };
 
+  const datosTotales = {
+    pendiente: valorRecaudado.textContent,
+    recaudado: valorPendiente.textContent,
+    totalFinal: valorTotal.textContent,
+  };
+  await ipcRenderer.send(
+    "datos-a-pagina3",
+    datos,
+    encabezado,
+    recaudaciones,
+    datosTotales
+  );
+}
 // funciones del navbar
 const abrirInicio = async () => {
   const url = "src/ui/principal.html";
@@ -868,6 +904,10 @@ const abrirImplementos = async () => {
 };
 const abrirContratos = async () => {
   const url = "src/ui/medidores.html";
+  await ipcRenderer.send("abrirInterface", url);
+};
+const abrirConsolidado = async () => {
+  const url = "src/ui/consolidado.html";
   await ipcRenderer.send("abrirInterface", url);
 };
 init();

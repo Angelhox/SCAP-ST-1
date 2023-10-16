@@ -14,6 +14,13 @@ var lecturaActual = document.getElementById("lecturaActual");
 var valorConsumo = document.getElementById("valorConsumo");
 var tarifaConsumo = document.getElementById("tarifaConsumo");
 var planillasList = document.getElementById("planillas"); // ----------------------------------------------------------------
+// Varibles de busqueda de las planillas
+// ----------------------------------------------------------------
+
+var estadoBuscar = document.getElementById("estado");
+var criterioBuscar = document.getElementById("criterio");
+var criterioContent = document.getElementById("criterioContent");
+var btnBuscar = document.getElementById("btnBuscar"); // ----------------------------------------------------------------
 // Variables del socio
 // ----------------------------------------------------------------
 
@@ -65,9 +72,11 @@ var planillas = [];
 var datosServicios = [];
 var serviciosFijos = [];
 var otrosServicios = [];
+var editados = [];
 var editingStatus = false;
 var editPlanillaId = "";
 var editDetalleId = "";
+var encabezadoId = "";
 planillaForm.addEventListener("submit", function _callee(e) {
   var newPlanilla, newDetalleServicio, result, _result, resultDetalle;
 
@@ -422,16 +431,18 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
+          encabezadoId = "";
+          editados = [];
           editingStatus = true;
           editPlanillaId = planillaId;
           console.log("Planilla a editar: " + planillaId);
           totalFinal = 0.0;
           totalConsumo = 0.0;
           console.log("LLamando funcion editPlanilla: " + planillaId, contratoId, fechaEmision);
-          _context4.next = 8;
+          _context4.next = 10;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getPlanillaById", planillaId));
 
-        case 8:
+        case 10:
           planilla = _context4.sent;
           // ----------------------------------------------------------------
           // Datos del encabezado de la planilla a editar
@@ -452,10 +463,10 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
           serviciosFijosList.innerHTML = "";
           otrosServiciosList.innerHTML = "";
           otrosAplazablesList.innerHTML = "";
-          _context4.next = 26;
+          _context4.next = 28;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosServiciosByContratoId", contratoId, formatearFecha(fechaEmision), "fijos"));
 
-        case 26:
+        case 28:
           serviciosFijos = _context4.sent;
 
           if (serviciosFijos[0] !== undefined) {
@@ -464,10 +475,10 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
             serviciosFijosList.innerHTML = "";
           }
 
-          _context4.next = 30;
+          _context4.next = 32;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosServiciosByContratoId", contratoId, formatearFecha(fechaEmision), "otros"));
 
-        case 30:
+        case 32:
           otrosServicios = _context4.sent;
 
           if (otrosServicios[0] !== undefined) {
@@ -479,7 +490,7 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
           calcularConsumo();
           valorTotalPagar.value = totalFinal + totalConsumo;
 
-        case 34:
+        case 36:
         case "end":
           return _context4.stop();
       }
@@ -493,6 +504,8 @@ function renderServicios(servicios, tipo) {
   servicios.forEach(function (servicio) {
     // Crear el div principal
     if (servicio.nombre !== "Agua Potable") {
+      encabezadoId = servicio.encabezadosId;
+      console.log("Encabezado desde detalle : " + encabezadoId);
       var tr = document.createElement("tr");
       tr.id = servicio.id;
       var tdServicio = document.createElement("td");
@@ -559,6 +572,8 @@ function renderServicios(servicios, tipo) {
         }
       }
     } else if (servicio.nombre === "Agua Potable") {
+      encabezadoId = servicio.encabezadosId;
+      console.log("Encabezado desde detalle agua: " + encabezadoId);
       editDetalleId = servicio.id;
       console.log("Id del detalle Agua: " + editDetalleId);
     }
@@ -648,6 +663,13 @@ guardarDg.onclick = function () {
     if (valorAnterior !== nuevoAbono) {
       console.log("Compara: " + valorAnterior + " | " + nuevoAbono);
       fila.querySelector(".valorAbono").textContent = nuevoAbono;
+      editados.push({
+        id: valorAbonoEdit,
+        valor: nuevoAbono
+      });
+      editados.forEach(function (editado) {
+        console.log("Editado: " + editado.id, " | " + editado.valor);
+      });
       totalRc = totalFinal - valorAnterior;
       console.log("Total rc: " + totalRc);
       totalFinal = totalRc + parseFloat(nuevoAbono);
@@ -660,13 +682,13 @@ guardarDg.onclick = function () {
   }
 };
 
-var getPlanillas = function getPlanillas() {
+var getPlanillas = function getPlanillas(criterio, criterioContent, estado, anio, mes) {
   return regeneratorRuntime.async(function getPlanillas$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
         case 0:
           _context5.next = 2;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosPlanillas"));
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosPlanillas", criterio, criterioContent, estado, anio, mes));
 
         case 2:
           planillas = _context5.sent;
@@ -681,21 +703,62 @@ var getPlanillas = function getPlanillas() {
   });
 };
 
-function init() {
-  return regeneratorRuntime.async(function init$(_context6) {
+btnBuscar.onclick = function _callee3() {
+  var fechaActual, anioEnviar, mesEnviar, criterioEnviar, criterioContentEnviar, estadoEnviar;
+  return regeneratorRuntime.async(function _callee3$(_context6) {
     while (1) {
       switch (_context6.prev = _context6.next) {
         case 0:
-          _context6.next = 2;
-          return regeneratorRuntime.awrap(getPlanillas());
+          fechaActual = new Date();
+          anioEnviar = fechaActual.getFullYear();
+          mesEnviar = fechaActual.getMonth() + 1;
 
-        case 2:
+          if (mesBusqueda.value === 0) {
+            mesEnviar = mesBusqueda.value;
+          }
+
+          if (anioBusqueda.value === 0) {
+            anioEnviar = anioBusqueda.value;
+          }
+
+          criterioEnviar = criterioBuscar.value;
+          criterioContentEnviar = criterioContent.value;
+          estadoEnviar = estadoBuscar.value;
+          console.log("error", mesEnviar, anioEnviar);
+          _context6.next = 11;
+          return regeneratorRuntime.awrap(getPlanillas(criterioEnviar, criterioContentEnviar, estadoEnviar, anioEnviar, mesEnviar));
+
+        case 11:
+        case "end":
+          return _context6.stop();
+      }
+    }
+  });
+};
+
+function init() {
+  var fechaActual, anioEnviar, mesEnviar, criterioEnviar, criterioContentEnviar, estadoEnviar;
+  return regeneratorRuntime.async(function init$(_context7) {
+    while (1) {
+      switch (_context7.prev = _context7.next) {
+        case 0:
+          fechaActual = new Date();
+          anioEnviar = fechaActual.getFullYear();
+          mesEnviar = fechaActual.getMonth() + 1;
+          criterioEnviar = criterioBuscar.value;
+          criterioContentEnviar = criterioContent.value;
+          estadoEnviar = estadoBuscar.value;
+          console.log("error", mesEnviar, anioEnviar);
+          _context7.next = 9;
+          return regeneratorRuntime.awrap(getPlanillas(criterioEnviar, criterioContentEnviar, estadoEnviar, anioEnviar, mesEnviar));
+
+        case 9:
           cargarAnioBusquedas();
           cargarMesActual();
 
-        case 4:
+        case 11:
         case "end":
-          return _context6.stop();
+          return _context7.stop();
       }
     }
   });
@@ -703,9 +766,9 @@ function init() {
 
 function calcularConsumo() {
   var consumo, preValorConsumo, base, limitebase, tarifas;
-  return regeneratorRuntime.async(function calcularConsumo$(_context7) {
+  return regeneratorRuntime.async(function calcularConsumo$(_context8) {
     while (1) {
-      switch (_context7.prev = _context7.next) {
+      switch (_context8.prev = _context8.next) {
         case 0:
           console.log("Consultando tarifas ...");
           consumo = Math.round(lecturaActual.value - lecturaAnterior.value);
@@ -713,11 +776,11 @@ function calcularConsumo() {
           base = 0.0;
           limitebase = 15.0;
           console.log("Consumo: " + consumo);
-          _context7.next = 8;
+          _context8.next = 8;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getTarifas"));
 
         case 8:
-          tarifas = _context7.sent;
+          tarifas = _context8.sent;
 
           if (tarifas[0] !== undefined) {
             tarifas.forEach(function (tarifa) {
@@ -757,7 +820,7 @@ function calcularConsumo() {
 
         case 13:
         case "end":
-          return _context7.stop();
+          return _context8.stop();
       }
     }
   });
@@ -765,9 +828,9 @@ function calcularConsumo() {
 
 function vistaFactura() {
   var socio, datos, encabezado, datosAgua, datosTotales;
-  return regeneratorRuntime.async(function vistaFactura$(_context8) {
+  return regeneratorRuntime.async(function vistaFactura$(_context9) {
     while (1) {
-      switch (_context8.prev = _context8.next) {
+      switch (_context9.prev = _context9.next) {
         case 0:
           socio = socioNombres.textContent;
           console.log("Encabezado a enviar: " + socio);
@@ -776,6 +839,7 @@ function vistaFactura() {
             otroDato: 12345
           };
           encabezado = {
+            encabezadoId: encabezadoId,
             socio: socioNombres.textContent,
             fecha: formatearFecha(planillaEmision.textContent),
             cedula: socioCedula.textContent,
@@ -783,6 +847,7 @@ function vistaFactura() {
             planilla: planillaCodigo.textContent
           };
           datosAgua = {
+            planillaId: editPlanillaId,
             lecturaAnterior: lecturaAnterior.value,
             lecturaActual: lecturaActual.value,
             tarifaConsumo: tarifaConsumo.value,
@@ -793,12 +858,12 @@ function vistaFactura() {
             descuento: valorTotalDescuento.value,
             totalPagar: valorTotalPagar.value
           };
-          _context8.next = 8;
-          return regeneratorRuntime.awrap(ipcRenderer.send("datos-a-pagina2", datos, encabezado, serviciosFijos, otrosServicios, datosAgua, datosTotales));
+          _context9.next = 8;
+          return regeneratorRuntime.awrap(ipcRenderer.send("datos-a-pagina2", datos, encabezado, serviciosFijos, otrosServicios, datosAgua, datosTotales, editados));
 
         case 8:
         case "end":
-          return _context8.stop();
+          return _context9.stop();
       }
     }
   });
@@ -806,11 +871,11 @@ function vistaFactura() {
 
 function recalcularConsumo() {
   var totalRecalculado;
-  return regeneratorRuntime.async(function recalcularConsumo$(_context9) {
+  return regeneratorRuntime.async(function recalcularConsumo$(_context10) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context10.prev = _context10.next) {
         case 0:
-          _context9.next = 2;
+          _context10.next = 2;
           return regeneratorRuntime.awrap(calcularConsumo());
 
         case 2:
@@ -824,7 +889,7 @@ function recalcularConsumo() {
 
         case 9:
         case "end":
-          return _context9.stop();
+          return _context10.stop();
       }
     }
   });
@@ -842,21 +907,21 @@ function formatearFecha(fecha) {
 
 function generarPlanilla() {
   var result;
-  return regeneratorRuntime.async(function generarPlanilla$(_context10) {
+  return regeneratorRuntime.async(function generarPlanilla$(_context11) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context11.prev = _context11.next) {
         case 0:
           console.log("js");
-          _context10.next = 3;
+          _context11.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("createPlanilla"));
 
         case 3:
-          result = _context10.sent;
+          result = _context11.sent;
           console.log(result); //getPlanillas();
 
         case 5:
         case "end":
-          return _context10.stop();
+          return _context11.stop();
       }
     }
   });
@@ -901,9 +966,9 @@ function cargarAnioBusquedas() {
 
 var detallesServiciodg = function detallesServiciodg(servicio) {
   var aplazable, cancelados, pendientes, valorCancelado, valorAbonar, valorSaldo, pagosAnteriores;
-  return regeneratorRuntime.async(function detallesServiciodg$(_context11) {
+  return regeneratorRuntime.async(function detallesServiciodg$(_context12) {
     while (1) {
-      switch (_context11.prev = _context11.next) {
+      switch (_context12.prev = _context12.next) {
         case 0:
           abonarStatus = true;
           errortextAbono.textContent = "Error";
@@ -933,11 +998,11 @@ var detallesServiciodg = function detallesServiciodg(servicio) {
             pendientes + 1;
           }
 
-          _context11.next = 22;
+          _context12.next = 22;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDetallesByContratadoId", servicio.contratadosId));
 
         case 22:
-          pagosAnteriores = _context11.sent;
+          pagosAnteriores = _context12.sent;
           pagosAnteriores.forEach(function (pagoAnterior) {
             if (pagoAnterior !== null || pagoAnterior !== undefined) {
               if (pagoAnterior.estado === "Cancelado") {
@@ -995,7 +1060,7 @@ var detallesServiciodg = function detallesServiciodg(servicio) {
 
         case 36:
         case "end":
-          return _context11.stop();
+          return _context12.stop();
       }
     }
   });
@@ -1037,29 +1102,11 @@ btnSeccion2.addEventListener("click", function () {
 
 var abrirInicio = function abrirInicio() {
   var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context12) {
-    while (1) {
-      switch (_context12.prev = _context12.next) {
-        case 0:
-          url = "src/ui/principal.html";
-          _context12.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context12.stop();
-      }
-    }
-  });
-};
-
-var abrirSocios = function abrirSocios() {
-  var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context13) {
+  return regeneratorRuntime.async(function abrirInicio$(_context13) {
     while (1) {
       switch (_context13.prev = _context13.next) {
         case 0:
-          url = "src/ui/socios.html";
+          url = "src/ui/principal.html";
           _context13.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1071,13 +1118,13 @@ var abrirSocios = function abrirSocios() {
   });
 };
 
-var abrirUsuarios = function abrirUsuarios() {
+var abrirSocios = function abrirSocios() {
   var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context14) {
+  return regeneratorRuntime.async(function abrirSocios$(_context14) {
     while (1) {
       switch (_context14.prev = _context14.next) {
         case 0:
-          url = "src/ui/usuarios.html";
+          url = "src/ui/socios.html";
           _context14.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1089,13 +1136,13 @@ var abrirUsuarios = function abrirUsuarios() {
   });
 };
 
-var abrirPagos = function abrirPagos() {
+var abrirUsuarios = function abrirUsuarios() {
   var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context15) {
+  return regeneratorRuntime.async(function abrirUsuarios$(_context15) {
     while (1) {
       switch (_context15.prev = _context15.next) {
         case 0:
-          url = "src/ui/planillas.html";
+          url = "src/ui/usuarios.html";
           _context15.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1107,13 +1154,13 @@ var abrirPagos = function abrirPagos() {
   });
 };
 
-var abrirPlanillas = function abrirPlanillas() {
+var abrirPagos = function abrirPagos() {
   var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context16) {
+  return regeneratorRuntime.async(function abrirPagos$(_context16) {
     while (1) {
       switch (_context16.prev = _context16.next) {
         case 0:
-          url = "src/ui/planillas-cuotas.html";
+          url = "src/ui/planillas.html";
           _context16.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1125,13 +1172,13 @@ var abrirPlanillas = function abrirPlanillas() {
   });
 };
 
-var abrirParametros = function abrirParametros() {
+var abrirPlanillas = function abrirPlanillas() {
   var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context17) {
+  return regeneratorRuntime.async(function abrirPlanillas$(_context17) {
     while (1) {
       switch (_context17.prev = _context17.next) {
         case 0:
-          url = "src/ui/parametros.html";
+          url = "src/ui/planillas-cuotas.html";
           _context17.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1143,19 +1190,37 @@ var abrirParametros = function abrirParametros() {
   });
 };
 
-var abrirImplementos = function abrirImplementos() {
+var abrirParametros = function abrirParametros() {
   var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context18) {
+  return regeneratorRuntime.async(function abrirParametros$(_context18) {
     while (1) {
       switch (_context18.prev = _context18.next) {
         case 0:
-          url = "src/ui/implementos.html";
+          url = "src/ui/parametros.html";
           _context18.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
         case 3:
         case "end":
           return _context18.stop();
+      }
+    }
+  });
+};
+
+var abrirImplementos = function abrirImplementos() {
+  var url;
+  return regeneratorRuntime.async(function abrirImplementos$(_context19) {
+    while (1) {
+      switch (_context19.prev = _context19.next) {
+        case 0:
+          url = "src/ui/implementos.html";
+          _context19.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context19.stop();
       }
     }
   });
@@ -1168,17 +1233,17 @@ function mostrarLogin() {
 
 var abrirContratos = function abrirContratos() {
   var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context19) {
+  return regeneratorRuntime.async(function abrirContratos$(_context20) {
     while (1) {
-      switch (_context19.prev = _context19.next) {
+      switch (_context20.prev = _context20.next) {
         case 0:
           url = "src/ui/medidores.html";
-          _context19.next = 3;
+          _context20.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
         case 3:
         case "end":
-          return _context19.stop();
+          return _context20.stop();
       }
     }
   });

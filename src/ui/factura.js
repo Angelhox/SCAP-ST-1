@@ -1,6 +1,7 @@
 // const puppeteer = require("puppeteer");
 const pdf = require("html-pdf");
 const printer = require("pdf-to-printer");
+// const html2pdf = require("html2pdf.js");
 const { ipcRenderer } = require("electron");
 const socioNombres = document.getElementById("socioNombres");
 const socioCedula = document.getElementById("socioCedula");
@@ -20,89 +21,71 @@ const descuento = document.getElementById("descuento");
 const totalPagar = document.getElementById("total-pagar");
 const detailsList = document.getElementById("servicios-details");
 let aguaSn = false;
-
-async function imprimirYGuardarPDF() {
-  //   // Configura las opciones para la generación de PDF
-  //   const content = document.querySelector(".invoice");
-  //   const pdfOptions = {
-  //     path: "X:/FacturasSCAP/respaldo.pdf", // Nombre del archivo PDF de salida
-  //     format: "A4", // Formato de página
-  //     margin: {
-  //       top: "10mm",
-  //       bottom: "10mm",
-  //       left: "10mm",
-  //       right: "10mm",
-  //     },
-  //   };
-
-  //   try {
-  //     // Crea una instancia de navegador
-  //     const browser = await puppeteer.launch();
-  //     const page = await browser.newPage();
-
-  //     // Contenido HTML que deseas convertir en PDF
-  //     const contenidoHTML =
-  //       "<html><body><h1>Mi contenido HTML</h1></body></html>";
-
-  //     // Configura la página como página sin margen
-  //     await page.setViewport({ width: 800, height: 600, deviceScaleFactor: 2 });
-
-  //     // Carga el contenido HTML en la página
-  //     await page.setContent(content.outerHTML);
-
-  //     // Genera el PDF
-  //     await page.pdf(pdfOptions);
-
-  //     // Cierra el navegador
-  //     await browser.close();
-  //     await window.print();
-  //     console.log("PDF generado y guardado correctamente.");
-  //   } catch (error) {
-  //     console.error("Error al generar el PDF:", error);
-  //   }
-  const content = document.querySelector(".invoice");
-  const timestamp = new Date().getTime(); // Obtener el timestamp actual
-  const fileName = `documento_${timestamp}.pdf`;
-  const filePath = "X:/FacturasSCAP/" + fileName;
-  pdf.create(content.outerHTML).toFile(filePath, async (err, res) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    console.log("Archivo PDF creado: ", res.filename);
-    // Enviamos el archivo a la cola de impresion
-    printer
-      .print(filePath)
-      // window
-      //   .print()
-      .then(() => {
-        printer.print(filePath);
-        // Impresión exitosa
-        abrirPagos();
-        console.log("El PDF se ha enviado a la cola de impresión.");
-      })
-      // try {
-      //   await imprime().then(() => {
-      //     window.print();
-      //   });
-      //   abrirPagos();
-      //   console.log("El PDF se ha enviado a la cola de impresión.");
-      // } catch (error) {
-      //   // Error de impresión
-      //   abrirPagos();
-      //   console.error("Error al imprimir el PDF:", error);
-      // }
-
-      .catch((error) => {
-        // Error de impresión
-        abrirPagos();
-        console.error("Error al imprimir el PDF:", error);
-      });
+document.addEventListener("DOMContentLoaded", () => {
+  // async function imprimirYGuardarPDF() {
+  const boton = document.getElementById("boton");
+  boton.addEventListener("click", async () => {
+    // // Configura las opciones para la generación de PDF
+    // const content = document.querySelector(".invoice");
+    // const pdfOptions = {
+    //   path: "X:/FacturasSCAP/respaldo.pdf", // Nombre del archivo PDF de salida
+    //   format: "A4", // Formato de página
+    //   margin: {
+    //     top: "10mm",
+    //     bottom: "10mm",
+    //     left: "10mm",
+    //     right: "10mm",
+    //   },
+    // };
+    // try {
+    //   // Crea una instancia de navegador
+    //   const browser = await puppeteer.launch();
+    //   const page = await browser.newPage();
+    //   // Contenido HTML que deseas convertir en PDF
+    //   const contenidoHTML =
+    //     "<html><body><h1>Mi contenido HTML</h1></body></html>";
+    //   // Configura la página como página sin margen
+    //   await page.setViewport({ width: 800, height: 600, deviceScaleFactor: 2 });
+    //   // Carga el contenido HTML en la página
+    //   await page.setContent(content.outerHTML);
+    //   // Genera el PDF
+    //   await page.pdf(pdfOptions);
+    //   // Cierra el navegador
+    //   await browser.close();
+    //   await window.print();
+    //   console.log("PDF generado y guardado correctamente.");
+    // } catch (error) {
+    //   console.error("Error al generar el PDF:", error);
+    // }
+    const content = document.querySelector(".invoice");
+    const timestamp = new Date().getTime(); // Obtener el timestamp actual
+    const fileName = `documento_${timestamp}.pdf`;
+    const filePath = "X:/FacturasSCAP/" + fileName;
+    await pdf.create(content.outerHTML).toFile(filePath, (err, res) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log("Archivo PDF creado: ", res.filename);
+      // Enviamos el archivo a la cola de impresion
+      printer
+        .print(filePath)
+        // window
+        //   .print()
+        .then(() => {
+          printer.print(filePath);
+          // Impresión exitosa
+          abrirPagos();
+          console.log("El PDF se ha enviado a la cola de impresión.");
+        })
+        .catch((error) => {
+          // Error de impresión
+          abrirPagos();
+          console.error("Error al imprimir el PDF:", error);
+        });
+    });
   });
-}
-async function imprime() {
-  window.print();
-}
+});
 ipcRenderer.on(
   "datos-a-pagina2",
   (
@@ -112,11 +95,13 @@ ipcRenderer.on(
     serviciosFijos,
     otrosServicios,
     datosAgua,
-    datosTotales
+    datosTotales,
+    editados
   ) => {
     console.log("Llego Petición");
     // Hacer algo con los datos recibidos
-    console.log(datos, encabezado);
+    console.log(datos, encabezado, serviciosFijos, otrosServicios);
+    console.log(-"servicios: ", serviciosFijos, otrosServicios);
 
     // Por ejemplo, mostrarlos en un elemento HTML
     // const mensajeElement = document.getElementById("mensaje");
@@ -180,9 +165,38 @@ function renderDetalles(servicio) {
       <td>${servicio.nombre}</td>
         <td>${servicio.descripcion}</td>
         <td>${servicio.total}</td>
+        <td>${servicio.descuento}</td>
+        <td>${servicio.saldo}</td>
+        <td>${servicio.abono}</td>
      </tr>
         `;
   // });
+}
+async function imprimirYGuardarPDFfinal() {
+  const elemento = document.body;
+  html2pdf()
+    .set({
+      margin: 1,
+      filename: "doculmento.pdf",
+      image: {
+        type: "jpeg",
+        quality: 0.98,
+      },
+      html2canvas: {
+        scale: 3,
+        letterRendering: true,
+      },
+      jsPDF: {
+        unit: "in",
+        format: "a3",
+        orientation: "portrait",
+      },
+    })
+    .from(elemento)
+    .save()
+    .catch((error) => {
+      console.log("Error: " + error);
+    });
 }
 const abrirPagos = async () => {
   const url = "src/ui/cobros.html";

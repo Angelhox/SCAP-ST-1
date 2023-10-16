@@ -1,3 +1,38 @@
+section {
+    padding: 0 0 0 1em;
+    height: 80vh;
+    display: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+section.active {
+
+    height: 80vh;
+    width: 100%;
+    display: block;
+    opacity: 1;
+}
+
+.encabezado-servicios {
+    font-weight: 600;
+    color: white;
+    position: sticky;
+    top: 0;
+    /* La posición superior en la que el encabezado se fijará */
+    z-index: 1;
+    /* Asegura que esté por encima del contenido de la lista */
+    margin-top: -5rem;
+    padding: 1em 1em 1em 1em;
+    background-color: #85C1E9;
+    /* padding-bottom: .5em !important;*/
+    max-width: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border: solid 2px #85C1E9;
+    border-bottom: none;
+}
+
+
 .card-fondo {
     height: 18rem;
     width: 100%;
@@ -118,6 +153,8 @@
 }
 
 .btn-custom {
+    background-color: #85C1E9;
+    color: white;
     padding: 0 20px;
     font-size: 16px;
     cursor: pointer;
@@ -130,6 +167,68 @@
 }
 
 .btn-custom:hover {
+    background-color: #D6EAF8;
+    color: #34495E;
+    /* Cambia el color de fondo al pasar el ratón por encima */
+}
+
+/* Estilos base del botón */
+.btn-custom-guardar {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #21618C;
+    /* Color de fondo predeterminado */
+    color: #fff;
+    /* Color del texto */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    /* Transición de cambio de color */
+}
+
+/* Estilo al pasar el cursor (hover) */
+.btn-custom-guardar:hover {
+    background-color: #85C1E9;
+    color: black;
+    /* Nuevo color de fondo al pasar el cursor */
+}
+
+/* Estilos base del botón */
+.btn-custom-cancelar {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #CD6155;
+    /* Color de fondo predeterminado */
+    color: #fff;
+    /* Color del texto */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    /* Transición de cambio de color */
+}
+
+/* Estilo al pasar el cursor (hover) */
+.btn-custom-cancelar:hover {
+    background-color: #D98880;
+    color: black;
+    /* Nuevo color de fondo al pasar el cursor */
+}
+
+.btn-buscar {
+    padding: .4em;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    /* Quita el outline predeterminado */
+    transition: background-color 0.3s;
+    /* Agrega una transición suave al color de fondo */
+}
+
+.btn-buscar:hover {
     background-color: #85C1E9;
     color: white;
     /* Cambia el color de fondo al pasar el ratón por encima */
@@ -143,4 +242,62 @@
 .lno-rd {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+}
+
+.btn-check-custom {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #85C1E9;
+    border-radius: 0.25rem;
+    color: #85C1E9;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Estilo para ocultar el input nativo del checkbox */
+.custom-checkbox {
+    display: none;
+}
+
+/* Estilo para el checkbox personalizado cuando está marcado */
+.custom-checkbox:checked+.btn-check-custom {
+    background-color: #85C1E9;
+    border: 1px solid #85C1E9;
+    color: #fff;
+}
+
+/*Cards de los contratos*/
+.trans {
+    color: #00000000;
+    background-color: #00000000;
+}
+
+.bg-custom-card {
+    background-color: yellow;
+}
+
+.mp-0 {
+    margin: 0;
+    padding: 0;
+}
+
+.active-list {
+
+    height: 60vh;
+    overflow-y: auto;
+    overflow-x: auto;
+    /* padding: 10px; */
+    display: block;
+
+}
+
+.innactive-list {
+    height: 63vh;
+    overflow-y: auto;
+    overflow-x: auto;
+    /* padding: 10px; */
+    display: none;
+
 }

@@ -14,6 +14,13 @@ var lecturaActual = document.getElementById("lecturaActual");
 var valorConsumo = document.getElementById("valorConsumo");
 var tarifaConsumo = document.getElementById("tarifaConsumo");
 var planillasList = document.getElementById("planillas"); // ----------------------------------------------------------------
+// Varibles de busqueda de las planillas
+// ----------------------------------------------------------------
+
+var estadoBuscar = document.getElementById("estado");
+var criterioBuscar = document.getElementById("criterio");
+var criterioContent = document.getElementById("criterioContent");
+var btnBuscar = document.getElementById("btnBuscar"); // ----------------------------------------------------------------
 // Variables del socio
 // ----------------------------------------------------------------
 
@@ -636,13 +643,13 @@ function renderServicios(servicios, tipo) {
 // }
 
 
-var getPlanillas = function getPlanillas() {
+var getPlanillas = function getPlanillas(criterio, criterioContent, estado, anio, mes) {
   return regeneratorRuntime.async(function getPlanillas$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
         case 0:
           _context5.next = 2;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosPlanillas"));
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosPlanillas", criterio, criterioContent, estado, anio, mes));
 
         case 2:
           planillas = _context5.sent;
@@ -658,18 +665,26 @@ var getPlanillas = function getPlanillas() {
 };
 
 function init() {
+  var fechaActual, anioEnviar, mesEnviar, criterioEnviar, criterioContentEnviar, estadoEnviar;
   return regeneratorRuntime.async(function init$(_context6) {
     while (1) {
       switch (_context6.prev = _context6.next) {
         case 0:
-          _context6.next = 2;
-          return regeneratorRuntime.awrap(getPlanillas());
+          fechaActual = new Date();
+          anioEnviar = fechaActual.getFullYear();
+          mesEnviar = fechaActual.getMonth() + 1;
+          criterioEnviar = criterioBuscar.value;
+          criterioContentEnviar = criterioContent.value;
+          estadoEnviar = estadoBuscar.value;
+          console.log("error", mesEnviar, anioEnviar);
+          _context6.next = 9;
+          return regeneratorRuntime.awrap(getPlanillas(criterioEnviar, criterioContentEnviar, estadoEnviar, anioEnviar, mesEnviar));
 
-        case 2:
+        case 9:
           cargarAnioBusquedas();
           cargarMesActual();
 
-        case 4:
+        case 11:
         case "end":
           return _context6.stop();
       }
@@ -798,6 +813,25 @@ function generarPlanilla() {
 // }
 
 
+function obtenerRangoFecha() {
+  var anioD = parseInt(anioBusqueda.value);
+  var mesD = parseInt(mesBusqueda.value);
+  var fechaDesde = "all";
+  var fechaHasta = "all";
+  var fechaRango = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
+  return fechaRango;
+}
+
+function obtenerPrimerYUltimoDiaDeMes(anio, mes) {
+  // Meses en JavaScript se numeran de 0 a 11 (enero es 0, diciembre es 11)
+  var primerDia = new Date(anio, mes, 1);
+  var ultimoDia = new Date(anio, mes + 1, 0);
+  return {
+    primerDia: primerDia,
+    ultimoDia: ultimoDia
+  };
+}
+
 function cargarMesActual() {
   mesBusqueda.innerHTML = ""; // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
 
@@ -807,9 +841,15 @@ function cargarMesActual() {
 
   for (var i = 0; i < nombresMeses.length; i++) {
     var option = document.createElement("option");
-    option.value = i - 1; // El valor es el índice del mes
+    option.value = i; // El valor es el índice del mes
 
     option.textContent = nombresMeses[i];
+
+    if (i === mesActual) {
+      console.log("seleccionando: " + mesActual);
+      option.selected = true;
+    }
+
     mesBusqueda.appendChild(option);
   } // Establece el mes actual como seleccionado
 

@@ -94,6 +94,50 @@ table {
     text-align: center;
 }
 
+.btn-print-custom {
+    margin: .5em;
+    height: 2.5em;
+    padding: 0 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    /* Quita el outline predeterminado */
+    transition: background-color 0.3s;
+    /* Agrega una transición suave al color de fondo */
+}
+
+.btn-cancel-custom {
+    margin: .5em;
+    height: 2.5em;
+    padding: 0 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    /* Quita el outline predeterminado */
+    transition: background-color 0.3s;
+    /* Agrega una transición suave al color de fondo */
+}
+
+.btn-print-custom:hover {
+    background-color: #85C1E9;
+    color: white;
+    /* Cambia el color de fondo al pasar el ratón por encima */
+}
+
+.btn-cancel-custom:hover {
+    background-color: #D98880;
+    color: white;
+    /* Cambia el color de fondo al pasar el ratón por encima */
+}
+
+.ico-btn {
+    margin: 0 .5em;
+}
+
 @media print {
     body {
         transform: scaleY(0.5);
@@ -112,11 +156,11 @@ table {
     /*}*/
 }
 
-/* .img-sv {
+.img-sv {
     width: 200px;
     height: 200px;
     background-image: url(../../assets/fonts/logo.png);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-} */
+}

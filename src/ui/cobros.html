@@ -192,7 +192,7 @@
                     class="form-select"
                     aria-label="Default select example"
                   >
-                    <option value="todas" selected>Todas</option>
+                    <option value="all" selected>Todas</option>
                     <option value="cedula">Cédula del socio</option>
                     <option value="apellidos">Apellidos del socio</option>
                     <option value="código">Código</option>
@@ -205,7 +205,7 @@
                       type="text"
                       class="form-control"
                       placeholder="Buscar..."
-                      id="cedula"
+                      id="criterioContent"
                     />
                   </div>
                 </div>
@@ -217,9 +217,9 @@
                     class="form-select"
                     aria-label="Default select example"
                   >
-                    <option value="all" selected>Todos</option>
+                    <option value="Por cobrar" selected>Sin cancelar</option>
                     <option value="Cancelado">Cancelado</option>
-                    <option value="Por cobrar">Sin cancelar</option>
+                    <option value="all">Todos</option>
                   </select>
                 </div>
 
@@ -247,25 +247,13 @@
                         class="form-select"
                       >
                         <option value="all">Todos los meses</option>
-                        <option value="01">Enero</option>
-                        <option value="02">Febrero</option>
-                        <option value="03">Marzo</option>
-                        <option value="04">Abril</option>
-                        <option value="05">Mayo</option>
-                        <option value="06">Junio</option>
-                        <option value="07">Julio</option>
-                        <option value="08">Agosto</option>
-                        <option value="09">Septiembre</option>
-                        <option value="10">Octubre</option>
-                        <option value="11">Noviembre</option>
-                        <option value="12">Diciembre</option>
                       </select>
                     </div>
                   </div>
                 </div>
                 <div class="col-2">
                   <label class="text-white" for="criterio">Buscar</label>
-                  <button type="button" class="btn-buscar" style="width: 100%">
+                  <button type="button" id="btnBuscar" class="btn-buscar" style="width: 100%">
                     Buscar<i class="fa fa-search mx-1"></i>
                   </button>
                 </div>

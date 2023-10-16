@@ -325,7 +325,8 @@ ipcMain.on(
     serviciosFijos,
     otrosServicios,
     datosAgua,
-    datosTotales
+    datosTotales,
+    editados
   ) => {
     console.log("Datos a enviar: " + datos.mensaje);
     // pagina2Window = new BrowserWindow({ show: false });
@@ -339,6 +340,24 @@ ipcMain.on(
       serviciosFijos,
       otrosServicios,
       datosAgua,
+      datosTotales,
+      editados
+    );
+  }
+);
+ipcMain.on(
+  "datos-a-pagina3",
+  async (event, datos, encabezado, recaudaciones, datosTotales) => {
+    console.log("Datos a enviar: " + datos.mensaje);
+    // pagina2Window = new BrowserWindow({ show: false });
+    await window.loadFile("src/ui/consolidado.html");
+    // window.send("datos-a-pagina2", datos);
+    await window.show();
+    await window.webContents.send(
+      "datos-a-pagina3",
+      datos,
+      encabezado,
+      recaudaciones,
       datosTotales
     );
   }
@@ -685,7 +704,9 @@ ipcMain.handle("getSocios", async (event, criterio, criterioContent) => {
   const conn = await getConnection();
   try {
     if (criterio === "all" || criterio === undefined) {
-      const results = conn.query("SELECT * FROM viewSocios;");
+      const results = conn.query(
+        "SELECT * FROM viewSocios order by primerApellido;"
+      );
       console.log(results);
       return results;
     } else {
@@ -1021,7 +1042,7 @@ ipcMain.handle("getServiciosContratadosById", async (event, id) => {
   const result = await conn.query(
     "SELECT * FROM viewServiciosContratados where id =" +
       id +
-      " and estado='Activo';"
+      " and tipo='Servicio fijo' and estado='Activo';"
   );
 
   console.log("Resultado", result);
@@ -1314,6 +1335,16 @@ ipcMain.handle("deleteMedidor", async (event, id) => {
   return result;
 });
 // ----------------------------------------------------------------
+// Funciones de los sectores
+// ----------------------------------------------------------------
+// Obtener los sectores y sus atributos
+ipcMain.handle("getSectores", async () => {
+  const conn = await getConnection();
+  const results = conn.query("SELECT * FROM sectores;");
+  console.log(results);
+  return results;
+});
+// ----------------------------------------------------------------
 // Funciones de los contratos
 // ----------------------------------------------------------------
 // Verificar contratos anteriores de los socios
@@ -1400,11 +1431,13 @@ ipcMain.handle("getContratosSinMedidor", async () => {
   console.log(contratosSinMedidor);
   return contratosSinMedidor;
 });
-ipcMain.handle("createContrato", async (event, contrato) => {
+ipcMain.handle("createContrato", async (event, contrato, numero, sectorId) => {
   try {
+    console.log("Recibido:", event, contrato, numero, sectorId);
     const conn = await getConnection();
     console.log("Recibido: ", contrato);
     const result = await conn.query("Insert into contratos set ?", contrato);
+    sumarSociosSectores(numero, sectorId);
     console.log(result);
     new Notification({
       title: "Registró guardado",
@@ -1416,6 +1449,25 @@ ipcMain.handle("createContrato", async (event, contrato) => {
     console.log(error);
   }
 });
+async function sumarSociosSectores(numero, sectorId) {
+  console.log("Recibido sectores: " + numero + " " + sectorId);
+  try {
+    const conn = await getConnection();
+    const result = await conn.query(
+      "Update sectores set numeroSocios=? WHERE id= ?",
+      [numero, sectorId]
+    );
+    console.log(result);
+    new Notification({
+      title: "Registró guardado",
+      body: "Se registró un nuevo sector con éxito",
+    }).show();
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 ipcMain.handle("updateContrato", async (event, id, contrato) => {
   const conn = await getConnection();
   var result;
@@ -1709,14 +1761,58 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
 }
 
 // Cargamos las planillas disponibles
-ipcMain.handle("getDatosPlanillas", async () => {
-  const conn = await getConnection();
-  const results = conn.query(
-    "SELECT * FROM viewPlanillas order by fechaEmision desc"
-  );
-  console.log(results);
-  return results;
-});
+ipcMain.handle(
+  "getDatosPlanillas",
+  async (event, criterio, criterioContent, estado, anio, mes) => {
+    console.log(
+      "Recibo parametros planillas: " + criterio,
+      criterioContent,
+      estado,
+      anio,
+      mes
+    );
+    try {
+      const conn = await getConnection();
+      if (estado === "all" || estado == undefined) {
+        estado = "";
+      }
+      if (criterio === "all" || criterio == undefined) {
+        const results = await conn.query(
+          "SELECT * FROM viewPlanillas WHERE " +
+            "estado='" +
+            estado +
+            "' and " +
+            " year(fechaEmision) = '" +
+            anio +
+            "' and month(fechaEmision) = '" +
+            mes +
+            "' order by fechaEmision desc"
+        );
+        console.log(results);
+        return results;
+      } else {
+        const results = await conn.query(
+          "SELECT * FROM viewPlanillas WHERE " +
+            criterio +
+            " = " +
+            criterioContent +
+            " and estado='" +
+            estado +
+            "' and " +
+            " year(fechaEmision) = '" +
+            anio +
+            "' and month(fechaEmision) = '" +
+            mes +
+            "' order by fechaEmision desc"
+        );
+        console.log("Con parametros", results);
+        return results;
+      }
+    } catch (error) {
+      console.log("Error en la busqueda de planillas: " + error);
+    }
+  }
+);
 // Funcion que carga los datos de la planilla para editarlos
 ipcMain.handle("getPlanillaById", async (event, planillaId) => {
   const conn = await getConnection();
@@ -1926,6 +2022,60 @@ ipcMain.handle("getDetallesByContratadoId", async (event, contratadoId) => {
   console.log(result);
   return result;
 });
+// ----------------------------------------------------------------
+// Funcion de cancelado
+// ----------------------------------------------------------------
+ipcMain.handle(
+  "cancelarServicios",
+  async (
+    event,
+    planillaCancelarId,
+    encabezadoCancelarId,
+    serviciosCancelar
+  ) => {
+    try {
+      const conn = await getConnection();
+      console.log(
+        "Actualizando detalle: ",
+        planillaCancelarId,
+        encabezadoCancelarId,
+        serviciosCancelar
+      );
+      serviciosCancelar.forEach(async (servicioCancelar) => {
+        let abono = parseFloat(servicioCancelar.abono).toFixed(2);
+        await conn.query(
+          "UPDATE detallesServicio set estado='Cancelado',abono=" +
+            abono +
+            " WHERE id = ? ;",
+          servicioCancelar.id
+        );
+      });
+      await conn.query(
+        "UPDATE planillas set estado='Cancelado' WHERE id = ? ;",
+        planillaCancelarId
+      );
+      const result = await conn.query(
+        "UPDATE encabezado set estado='Cancelado',fechaPago=Now() WHERE id = ? ;",
+        encabezadoCancelarId
+      );
+      event.sender.send("Notificar", {
+        success: true,
+        title: "Actualizado!",
+        message: "Se ha cancelado la planilla.",
+      });
+      console.log(result);
+      return result;
+    } catch (error) {
+      event.sender.send("Notificar", {
+        success: false,
+        title: "Error!",
+        message: "Ha ocurrido un error al cancelar la planilla.",
+      });
+      console.log("Error al cancelar: ", error);
+    }
+  }
+);
+
 // ----------------------------------------------------------------
 // Funcion que consulta las tarifas por el servicio de agua potable
 // ----------------------------------------------------------------

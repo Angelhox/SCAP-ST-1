@@ -172,8 +172,8 @@ function renderSocios(socios) {
     sociosList.innerHTML += `
        <tr>
    
+       <td>${socio.primerApellido + " " + socio.segundoApellido}</td>
       <td>${socio.primerNombre + " " + socio.segundoNombre}</td>
-      <td>${socio.primerApellido + " " + socio.segundoApellido}</td>
       <td>${socio.cedulaPasaporte}</td>
       <td>${telefonoValido}</td>
       <td>${socio.correo}</td>

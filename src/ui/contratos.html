@@ -31,13 +31,7 @@
       rel="stylesheet"
       href="../../node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css"
-      integrity="sha512-pTaEn+6gF1IeWv3W1+7X7eM60TFu/agjgoHmYhAfLEU8Phuf6JKiiE8YmsNC0aCgQv4192s4Vai8YZ6VNM6vyQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+
     <title>Contratos</title>
   </head>
   <body class="vh-100 overflow-hidden body">
@@ -165,528 +159,621 @@
         </div>
       </nav>
     </header>
-
-    <div class="row container-fluid">
-      <section class="container-fluid" style="padding-top: 150px" id="seccion1">
-        <div class="col-12">
-          <p class="fs-5">Administra los contratos existentes</p>
-        </div>
-        <div class="col-12 d-flex justify-content-end">
-          <button class="btn btn-outline-info" id="btnSeccion1">
-            Nuevo contrato
-          </button>
-        </div>
-        <div class="row">
-          <div class="col-8">
-            <div
-              class="col-lg-12 col-md-12 col-sm-12 my-2"
-              style="
-                height: 30vh;
-                overflow-y: auto;
-                overflow-x: auto;
-                /* padding: 10px; */
-                display: block;
-              "
+    <section class="" id="seccion1">
+      <div class="row container-fluid" style="padding-top: 2em">
+        <div class="col-lg-8 col-md-8 col-sm-12 encabezado-servicios">
+          <div
+            class="col-12 mp-0 d-flex align-items-center justify-content-between align-items-end"
+          >
+            <p class="fs-1 mp-0">
+              Contratos
+              <i class="fs-1 fa-solid fa-file-signature mx-2 my-2"></i>
+            </p>
+            <button
+              class="btn btn-outline-light"
+              type="button"
+              id="btnSeccion2"
             >
-              <div style="width: 100%; height: 100%">
-                <table class="table">
-                  <thead class="table-dark sticky-thead">
-                    <tr>
-                      <th colspan="9" class="text-center fs-4">
-                        Listado de contratos con medidor
-                        <i class="fa-solid fa-user-tie"></i>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th>Código</th>
-                      <th>Fecha</th>
-                      <th>Socio</th>
-                      <th>Cedula del Socio</th>
-                      <th>Estado</th>
-                      <th></th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="contratosconmedidor">
-                    <tr>
-                      <td>100200300</td>
-                      <td>Mario Salinas Fuentes</td>
-                      <td>1725674829</td>
-
-                      <td>calle principal y secundaria</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div
-              class="col-lg-12 col-md-12 col-sm-12 my-2"
-              style="
-                height: 30vh;
-                overflow-y: auto;
-                overflow-x: auto;
-                /* padding: 10px; */
-                display: block;
-              "
-            >
-              <!-- Tabla de listado de usuarios -->
-              <div style="width: 100%; height: 100%">
-                <!-- <div class="carousel" id="contratossinmedidor">
-                  <!-- Iterar y crear las tarjetas -->
-                <!-- 
-                </div>
-                <button class="btn-prev">Anterior</button>
-                <button class="btn-next">Siguiente</button> -->
-
-                <table class="table">
-                  <thead class="table-dark">
-                    <tr>
-                      <th colspan="9" class="text-center fs-4">
-                        Listado de contratos sin medidor
-                        <i class="fa-solid fa-user-tie"></i>
-                      </th>
-                    </tr>
-                    <tr>
-                      <th>Código</th>
-                      <th>Fecha</th>
-                      <th>Socio</th>
-                      <th>Cedula del Socio</th>
-                      <th>Estado</th>
-                      <th></th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="contratossinmedidor">
-                    <tr>
-                      <td>100200300</td>
-                      <td>Mario Salinas Fuentes</td>
-                      <td>1725674829</td>
-
-                      <td>calle principal y secundaria</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+              Contratos eixistentes
+            </button>
           </div>
-          <div class="col-4">
-            <div class="col-12">Servicios contratados</div>
-            <div
-              class="row contenedor-servicios-contratados"
-              id="servicios-contratados"
-            >
-              <div class="col-12 text-center">
-                <div class="card card-fondo" style="height: 12rem">
-                  <div class="card-zona-img"></div>
-                  <div class="card-body col-12 card-contenido">
-                    <div class="col-12">
-                      <h5 class="card-title">Recoleccion de Desechos</h5>
-                    </div>
-                    <div class="col-12 card-zona-desc-ct">
-                      <p class="card-text">
-                        Recoleccion de desechos orgánicos e inorgánicos
-                      </p>
-                    </div>
-                    <div
-                      class="col-12 d-flex justify-content-center align-items-center"
-                    ></div>
+          <div class="col-12">
+            <label for="criterio">Nuevo contrato</label>
+          </div>
+        </div>
+
+        <form class="row form-horizontal" id="contratoForm">
+          <div
+            id="container-error"
+            style="color: #00000000; font-size: 200; height: 20px"
+            class="d-flex justify-content-start px-1 align-items-center"
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p id="mensajeError" class="mt-3 mx-2"></p>
+          </div>
+          <div
+            class="col-lg-6 col-md-8 col-sm-12"
+            style="height: 68vh; padding: 0"
+          >
+            <div class="col-12">
+              <div
+                class="col-12 justify-content-start fs-6 mt-2"
+                style="font-style: italic"
+              >
+                Datos del socio contratante
+              </div>
+              <hr class="mt-2 mb-2 bg-dark" />
+              <div class="row">
+                <div class="col-3 my-2">
+                  <label for="cedulaSocioContratante">Cédula</label>
+                  <input
+                    type="number"
+                    id="cedulaSocioContratante"
+                    placeholder="Ingresa cedula o ruc"
+                    class="form-control"
+                  />
+                  <div id="contenedor-sugerencias">
+                    <ul
+                      id="lista-sugerencias"
+                      style="width: 100%; border: none"
+                    ></ul>
                   </div>
                 </div>
+                <div class="col-3 my-2">
+                  <label for="">Apellidos</label>
+
+                  <input
+                    type="text"
+                    id="apellidoSocioContratante"
+                    placeholder="Apellidos del socio"
+                    class="form-control"
+                    readonly
+                  />
+                  <!-- <div
+              id="suggestion-list2"
+              style="width: 100%; border: none"
+            ></div> -->
+                </div>
+                <div class="col-3">
+                  <label for="">Nombres</label>
+                  <input
+                    type="text"
+                    class="form-control my-2"
+                    placeholder="Nombres del socio"
+                    id="nombreSocioContratante"
+                    readonly
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-      <section
-        class="container-fluid active"
-        style="padding-top: 150px"
-        id="seccion2"
-      >
-        <div class="col-12 d-flex justify-content-between">
-          <div class="text-center fs-4">Nuevo contrato</div>
-          <button class="btn btn-outline-info align-self-end" id="btnSeccion2">
-            Lista de contratos
-          </button>
-        </div>
-        <div class="col-lg-12 col-md-12 col-sm-12" style="display: block">
-          <form class="form-horizontal" id="contratoForm">
+
+            <hr class="bg-dark mt-2 mb-2" />
+            <div class="col-12 fs-6" style="font-style: italic">Ubicacion</div>
+            <hr class="bg-dark mt-2 mb-2" />
             <div class="row">
+              <div class="col-3">
+                <label for="">Número de casa</label>
+                <input
+                  type="text"
+                  step="any"
+                  class="form-control my-2"
+                  placeholder="Numero de casa"
+                  id="numerocasa"
+                />
+              </div>
+              <div class="col-3">
+                <label for="">Barrio</label>
+                <input
+                  readonly
+                  type="text"
+                  step="any"
+                  class="form-control my-2"
+                  placeholder="Barrio"
+                  id="barrio"
+                />
+              </div>
               <div class="col-6">
-                <div
-                  id="mensajeError"
-                  style="color: red; font-size: 200; height: 20px"
-                ></div>
+                <label for="">Calle principal</label>
+                <input
+                  type="text"
+                  step="any"
+                  class="form-control my-2"
+                  placeholder="Calle principal"
+                  id="principal"
+                />
+              </div>
+              <div class="col-6">
+                <label for="">Calle secundaria</label>
+                <input
+                  type="text"
+                  step="any"
+                  class="form-control my-2"
+                  placeholder="Calle secundaria"
+                  id="secundaria"
+                />
+              </div>
+              <div class="col-12">
+                <label for="">Referencia</label>
+                <input
+                  type="text"
+                  step="any"
+                  class="form-control my-2"
+                  placeholder="Referencia"
+                  id="referencia"
+                />
+              </div>
+            </div>
 
-                <hr class="mt-2 mb-2 bg-dark" />
-                <div
-                  class="col-12 justify-content-start fs-6"
-                  style="font-style: italic"
-                >
-                  Datos del contrato
+            <div class="col-12">
+              <hr class="bg-dark mt-2 mb-2" />
+              <div class="col-12 fs-6" style="font-style: italic">
+                Contrato con medidor
+              </div>
+              <hr class="mt-2 mb-2 bg-dark" />
+              <!-- Select con la lista de medidores disponible -->
+              <div class="row">
+                <div class="col-4">
+                  <label class="">Fecha de instalación</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    placeholder="Fecha de Instalación"
+                    id="fechaInstalacion"
+                    disabled
+                  />
                 </div>
-                <hr class="mt-2 mb-2 bg-dark" />
-                <div class="row">
-                  <div class="col-4">
-                    <label for="fechaContrato">Fecha del contrato</label>
-                    <input
-                      type="date"
-                      class="form-control my-2"
-                      placeholder="Fecha de Instalación"
-                      id="fechaContrato"
-                    />
-                  </div>
-                  <div class="col-4">
-                    <label for="codigocontrato">Código de contrato</label>
 
-                    <div class="input-group">
-                      <input
-                        type="text"
-                        readonly
-                        class="form-control my-2 rno-rd"
-                        placeholder="Sector+Código"
-                        id="codigocontrato"
+                <div class="col-4" hidden>
+                  <label for="">Código</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Código del medidor"
+                    id="codigo"
+                    disabled
+                  />
+                </div>
+                <div class="col-4">
+                  <label for="">Marca</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Marca"
+                    id="marca"
+                    disabled
+                  />
+                </div>
+                <div class="col-12">
+                  <label for="">Observación</label>
+                  <input
+                    type="text"
+                    step="any"
+                    class="form-control my-2"
+                    placeholder="Observacion"
+                    id="observacion"
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="col-lg-6 col-md-4 col-sm-12"
+            style="margin: 0 0 0 0; padding: 0 0 0 0.5em"
+          >
+            <div class="col-12">
+              <div
+                class="col-12 justify-content-start fs-6 mt-2"
+                style="font-style: italic"
+              >
+                Datos del contrato
+              </div>
+              <hr class="mt-2 mb-2 bg-dark" />
+              <div class="row">
+                <div class="col-4">
+                  <label for="fechaContrato">Fecha del contrato</label>
+                  <input
+                    type="date"
+                    class="form-control my-2"
+                    placeholder="Fecha de Instalación"
+                    id="fechaContrato"
+                  />
+                </div>
+                <div class="col-4">
+                  <label for="codigocontrato">Código de contrato</label>
+
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      readonly
+                      class="form-control my-2 rno-rd"
+                      placeholder="Sector+Código"
+                      id="codigocontrato"
+                      style="
+                        border-top-left-radius: 0;
+                        border-bottom-left-radius: 0;
+                      "
+                    />
+                    <div class="input-group-append">
+                      <button
+                        class="btn btn-dark my-2 lno-rd pb-1"
+                        type="button"
+                        onclick="generarCodigo()"
+                        id="searchButton"
                         style="
+                          border: none;
                           border-top-left-radius: 0;
                           border-bottom-left-radius: 0;
+                          height: auto;
                         "
-                      />
-                      <div class="input-group-append">
-                        <button
-                          class="btn btn-dark my-2 lno-rd pb-1"
-                          type="button"
-                          onclick="generarCodigo()"
-                          id="searchButton"
-                          style="
-                            border: none;
-                            border-top-left-radius: 0;
-                            border-bottom-left-radius: 0;
-                            height: auto;
-                          "
-                        >
-                          Generar
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <label for="estadoContrato">Estado</label>
-
-                    <div
-                      class="form-check form-switch d-flex justify-content-center align-items-baseline"
-                    >
-                      <input
-                        class="form-check-input my-2"
-                        type="checkbox"
-                        role="switch"
-                        id="estadoContrato"
-                      />
-                      <label
-                        class="form-check-label"
-                        for="flexSwitchCheckDisabled"
-                        >Activo</label
                       >
+                        Generar
+                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="col-6" style="margin-top: 1.2rem">
-                <div class="row">
-                  <hr class="mt-2 mb-2 bg-dark" />
+                <div class="col-2">
+                  <label for="estadoContrato">Estado</label>
                   <div
-                    class="col-12 justify-content-start fs-6"
-                    style="font-style: italic"
+                    class="form-check form-switch d-flex justify-content-center align-items-baseline"
                   >
-                    Datos del socio contratante
-                  </div>
-                  <hr class="mt-2 mb-2 bg-dark" />
-                  <div class="col-3 my-2">
-                    <label for="cedulaSocioContratante">Cédula</label>
                     <input
-                      type="number"
-                      id="cedulaSocioContratante"
-                      placeholder="Ingresa cedula o ruc"
-                      class="form-control"
-                    />
-                    <div id="contenedor-sugerencias">
-                      <ul
-                        id="lista-sugerencias"
-                        style="width: 100%; border: none"
-                      ></ul>
-                    </div>
-                  </div>
-                  <div class="col-3 my-2">
-                    <label for="">Apellidos</label>
-
-                    <input
-                      type="text"
-                      id="apellidoSocioContratante"
-                      placeholder="Apellidos del socio"
-                      class="form-control"
-                      readonly
-                    />
-                    <!-- <div
-                id="suggestion-list2"
-                style="width: 100%; border: none"
-              ></div> -->
-                  </div>
-                  <div class="col-3">
-                    <label for="">Nombres</label>
-                    <input
-                      type="text"
-                      class="form-control my-2"
-                      placeholder="Nombres del socio"
-                      id="nombreSocioContratante"
-                      readonly
-                    />
-                  </div>
-                  <div
-                    class="col-3 d-flex justify-content-end my-2 align-items-center"
-                  >
-                    <label for="" class="text-white fs-4"> button</label>
-                    <button class="btn btn-primary rounded-2">
-                      Administrar socios
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <!-- Servicios del contrato -->
-
-              <!-- <div class="form-check form-switch col-3">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="flexSwitchCheckCheckedDisabled"
-                checked
-                disabled
-              />
-              <label
-                class="form-check-label"
-                for="flexSwitchCheckCheckedDisabled"
-                >Disabled checked switch checkbox input</label
-              >
-            </div> -->
-
-              <div class="col-6">
-                <hr class="bg-dark mt-2 mb-2" />
-                <div class="col-12 fs-6" style="font-style: italic">
-                  Contrato con medidor
-                </div>
-                <hr class="mt-2 mb-2 bg-dark" />
-                <!-- Select con la lista de medidores disponible -->
-                <div class="row">
-                  <div class="col-4">
-                    <label class="">Fecha de instalación</label>
-                    <input
-                      type="date"
-                      class="form-control"
-                      placeholder="Fecha de Instalación"
-                      id="fechaInstalacion"
+                      checked
                       disabled
+                      type="checkbox"
+                      class="custom-checkbox"
+                      autocomplete="off"
+                      id="estadoContrato"
                     />
+                    <label
+                      id="labelEstadoContrato"
+                      class="btn-check-custom"
+                      for="estadoContrato"
+                      >Activo</label
+                    ><br />
                   </div>
-
-                  <div class="col-4" hidden>
-                    <label for="">Código</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Código del medidor"
-                      id="codigo"
-                      disabled
-                    />
-                  </div>
-                  <div class="col-4">
-                    <label for="">Marca</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Marca"
-                      id="marca"
-                      disabled
-                    />
-                  </div>
-                </div>
-                <hr class="bg-dark mt-2 mb-2" />
-                <div class="col-12 fs-6" style="font-style: italic">
-                  Ubicacion del nuevo medidor
-                </div>
-                <hr class="bg-dark mt-2 mb-2" />
-                <div class="row">
-                  <div class="col-3">
-                    <label for="">Número de casa</label>
-                    <input
-                      type="text"
-                      step="any"
-                      class="form-control my-2"
-                      placeholder="Numero de casa"
-                      id="numerocasa"
-                      disabled
-                    />
-                  </div>
-                  <div class="col-3">
-                    <label for="">Barrio</label>
-                    <input
-                      type="text"
-                      step="any"
-                      class="form-control my-2"
-                      placeholder="Barrio"
-                      id="barrio"
-                      disabled
-                    />
-                  </div>
-                  <div class="col-6">
-                    <label for="">Calle principal</label>
-                    <input
-                      type="text"
-                      step="any"
-                      class="form-control my-2"
-                      placeholder="Calle principal"
-                      id="principal"
-                      disabled
-                    />
-                  </div>
-                  <div class="col-6">
-                    <label for="">Calle secundaria</label>
-                    <input
-                      type="text"
-                      step="any"
-                      class="form-control my-2"
-                      placeholder="Calle secundaria"
-                      id="secundaria"
-                      disabled
-                    />
-                  </div>
-                  <div class="col-12">
-                    <label for="">Referencia</label>
-                    <input
-                      type="text"
-                      step="any"
-                      class="form-control my-2"
-                      placeholder="Referencia"
-                      id="referencia"
-                      disabled
-                    />
-                  </div>
-                  <div class="col-12">
-                    <label for="">Observación</label>
-                    <input
-                      type="text"
-                      step="any"
-                      class="form-control my-2"
-                      placeholder="Observacion"
-                      id="observacion"
-                      disabled
-                    />
-                  </div>
-                </div>
-              </div>
-              <div class="col-6">
-                <hr class="mt-2 mb-2 bg-dark" />
-                <div class="col-12 fs-6 mb-1" style="font-style: italic">
-                  Servicios disponibles
-                </div>
-                <hr class="mt-2 mb-2 bg-dark" />
-                <div
-                  class="row"
-                  id="servicios-disponibles"
-                  style="height: 35vh; overflow-y: auto"
-                >
-                  <div class="col-6 text-center">
-                    <div class="card card-fondo" style="height: 18rem">
-                      <div class="card-zona-img"></div>
-                      <div class="card-body col-12 card-contenido">
-                        <div class="col-12">
-                          <h5 class="card-title">Recoleccion de Desechos</h5>
-                        </div>
-                        <div class="col-12 card-zona-desc">
-                          <p class="card-text">
-                            Recoleccion de desechos orgánicos e inorgánicos
-                          </p>
-                        </div>
-                        <div
-                          class="col-12 d-flex justify-content-center align-items-center"
-                        >
-                          <input
-                            type="checkbox"
-                            class="btn-check"
-                            name="options-outlined"
-                            id="success"
-                            autocomplete="off"
-                            checked
-                          />
-                          <label
-                            style="width: 40%"
-                            class="btn btn-outline-success"
-                            for="success"
-                            >Adquirido</label
-                          >
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-6 text-center">
-                    <div class="card card-fondo" style="height: 18rem">
-                      <div class="card-zona-img"></div>
-                      <div class="card-body col-12 card-contenido">
-                        <div class="col-12">
-                          <h5 class="card-title">Desechos</h5>
-                        </div>
-                        <div class="col-12 card-zona-desc">
-                          <p class="card-text">Recoleccion de desechos Lo</p>
-                        </div>
-                        <div
-                          class="col-12 d-flex justify-content-between align-items-center"
-                        >
-                          <input
-                            type="checkbox"
-                            class="btn-check"
-                            name="options-outlined"
-                            id="succ"
-                            autocomplete="off"
-                            checked
-                          />
-                          <label
-                            style="width: 40%"
-                            class="btn btn-outline-success"
-                            for="succ"
-                            >Adquirido</label
-                          >
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="col-12 d-flex justify-content-end"
-                  style="margin-top: 5rem"
-                >
-                  <button class="btn btn-primary mx-2 rounded-2">
-                    Guardar
-                  </button>
-                  <button class="btn btn-danger rounded-2">Cancelar</button>
                 </div>
               </div>
             </div>
-          </form>
-        </div>
-      </section>
-    </div>
+            <div class="col-12">
+              <hr class="mt-2 mb-2 bg-dark" />
+              <div class="col-12 fs-6 mb-1" style="font-style: italic">
+                Servicios disponibles
+              </div>
+              <hr class="mt-2 mb-2 bg-dark" />
+              <div
+                class="row"
+                id="servicios-disponibles"
+                style="height: 41vh; overflow-y: auto"
+              >
+                <div class="col-6 text-center">
+                  <div class="card card-fondo" style="height: 18rem">
+                    <div class="card-zona-img"></div>
+                    <div class="card-body col-12 card-contenido">
+                      <div class="col-12">
+                        <h5 class="card-title">Recoleccion de Desechos</h5>
+                      </div>
+                      <div class="col-12 card-zona-desc">
+                        <p class="card-text">
+                          Recoleccion de desechos orgánicos e inorgánicos
+                        </p>
+                      </div>
+                      <div
+                        class="col-12 d-flex justify-content-center align-items-center"
+                      >
+                        <input
+                          type="checkbox"
+                          class="btn-check"
+                          name="options-outlined"
+                          id="success"
+                          autocomplete="off"
+                          checked
+                        />
+                        <label
+                          style="width: 40%"
+                          class="btn btn-outline-success"
+                          for="success"
+                          >Adquirido</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6 text-center">
+                  <div class="card card-fondo" style="height: 18rem">
+                    <div class="card-zona-img"></div>
+                    <div class="card-body col-12 card-contenido">
+                      <div class="col-12">
+                        <h5 class="card-title">Desechos</h5>
+                      </div>
+                      <div class="col-12 card-zona-desc">
+                        <p class="card-text">Recoleccion de desechos Lo</p>
+                      </div>
+                      <div
+                        class="col-12 d-flex justify-content-between align-items-center"
+                      >
+                        <input
+                          type="checkbox"
+                          class="btn-check"
+                          name="options-outlined"
+                          id="succ"
+                          autocomplete="off"
+                          checked
+                        />
+                        <label
+                          style="width: 40%"
+                          class="btn btn-outline-success"
+                          for="succ"
+                          >Adquirido</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 d-flex justify-content-end my-3">
+                <button class="btn-custom-guardar mx-2">Guardar</button>
+                <button class="btn-custom-cancelar">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+    <section class="active" id="seccion2">
+      <div class="row container-fluid" style="padding-top: 2em">
+        <div class="col-lg-8 col-md-12 col-sm-12 encabezado-servicios">
+          <div
+            class="col-12 mp-0 d-flex align-items-center justify-content-between align-items-end"
+          >
+            <p class="fs-1 mp-0" id="title-contratos">
+              Contratos con medidor
+              <i class="fs-1 fa-solid fa-file-signature mx-2 my-2"></i>
+            </p>
+            <button
+              class="btn btn-outline-light"
+              type="button"
+              id="btnSeccion1"
+            >
+              Nuevo contrato
+            </button>
+          </div>
+          <div class="col-12">
+            <label for="criterio">Administra los contratos existentes</label>
+            </div>
+          <div class="col-12">
+            <label for="criterio">Buscar por...</label>
+            <div class="row">
+              <div class="col-3">
+                <select
+                  id="criterio"
+                  class="form-select btn-rd"
+                  aria-label="Default select example"
+                >
+                  <option value="all" selected>Todas</option>
+                  <option value="codigo">Código de contrato</option>
+                  <option value="cedulaPasaporte">Cédula del socio</option>
+                  <option value="apellidos">Apellidos del socio</option>
+                  <option value="nombres">Nombres del socio</option>
+                </select>
+              </div>
 
-    <dialog
-      id="loginDialog"
-      style="background-color: #00000000; border: #00000000"
-      class="w-100 vh-100"
-    >
-      <section
-        style="width: 100%; height: 100%"
-        class="d-flex flex-column justify-content-evenly align-items-center text-white container"
-      >
-        <div class="col-xl-6 col-lg-8 col-md-10 col-sm-12">
-          <!-- Login -->
+              <div class="col-3">
+                <div class="input-group">
+                  <input
+                    readonly
+                    type="text"
+                    class="form-control btn-rd"
+                    placeholder="Buscar..."
+                    id="criterio-content"
+                  />
+                </div>
+              </div>
+              <div class="col-3">
+                <select
+                  id="medidorSinMedidor"
+                  class="form-select btn-rd"
+                  aria-label="Default select example"
+                >
+                  <option value="medidor" selected>Con medidor</option>
+                  <option value="sinMedidor">Sin medidor</option>
+                </select>
+              </div>
+              <div class="col-3">
+                <!-- <label class="text-white" for="criterio">Buscar</label> -->
+                <button
+                  type="button"
+                  class="btn-buscar"
+                  style="width: 100%"
+                  id="buscarSocios"
+                >
+                  Buscar<i class="fa fa-search mx-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
-    </dialog>
+
+        <div
+          class="col-lg-8 col-md-12 col-sm-12"
+          style="height: 68vh; padding: 0"
+        >
+          <div
+            class="col-lg-12 col-md-12 col-sm-12 my-2 active-list"
+            id="conMedidor"
+          >
+            <div
+              style="overflow-y: hidden; width: 100%; padding: 0 0 0 0.5em"
+              id="contratosconmedidor"
+              class="row align-items-center justify-content-between"
+            >
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <div
+                  class="col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card"
+                  style="padding: 0.3em; width: 100%; background-color: #d6eaf8"
+                >
+                  <div
+                    class="card-header d-flex justify-content-between align-items-center mp-0"
+                    style="background-color: #85c1e9"
+                  >
+                    <div class="d-flex mp-0">
+                      <p class="mp-0 fs-5">Contrato:</p>
+                      <p class="trans mp-0">-</p>
+                      <p class="mp-0 text-white fs-5">1L001</p>
+                    </div>
+                    <div class="d-flex mp-0">
+                      <p class="mp-0 fs-5">Socio:</p>
+                      <p class="trans mp-0">-</p>
+                      <p class="mp-0 mt-1" style="font-size: 1em">
+                        Marcelino Altamirano Robalino
+                      </p>
+                    </div>
+                  </div>
+                  <div class="card-body" style="background-color: white">
+                    <div class="d-flex justify-content-between">
+                      <div class="col-9 d-flex">
+                        <h6>
+                          <i
+                            style="color: #85c1e9"
+                            class="fa-regular fa-calendar-days mx-2"
+                          ></i
+                          >Fecha de contrato:
+                        </h6>
+                        <p class="trans">-</p>
+                        <p>2023-12-11</p>
+                      </div>
+                      <div
+                        class="col-3 d-flex justify-content-end align-items-baseline"
+                      >
+                        <p class="trans">-</p>
+                        <p>
+                          Activo<i
+                            class="mx-2 fa-solid fa-toggle-on"
+                            style="color: #85c1e9"
+                          ></i>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="col-12 text-center">
+                      <h6>Ubicacion</h6>
+                      <p>
+                        <i
+                          style="color: #85c1e9"
+                          class="mx-2 fa-solid fa-location-dot"
+                        ></i
+                        >Barrio Los Laureles, Buenavista y La troncal,N-201
+                      </p>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end">
+                      <button class="btn-custom">
+                        <i class="fa-solid fa-file-pen"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div style="width: 100%; height: 100%">
+              <table class="table table-hover">
+                <thead class="table-dark sticky-thead">
+                  <tr>
+                    <th colspan="9" class="text-center fs-4">
+                      Listado de contratos con medidor
+                      <i class="fa-solid fa-user-tie"></i>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>Código</th>
+                    <th>Fecha</th>
+                    <th>Socio</th>
+                    <th>Cedula del Socio</th>
+                    <th>Estado</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="contratosconmedidor">
+                  <tr>
+                    <td>100200300</td>
+                    <td>Mario Salinas Fuentes</td>
+                    <td>1725674829</td>
+
+                    <td>calle principal y secundaria</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div> -->
+          </div>
+
+          <div
+            class="col-lg-12 col-md-12 col-sm-12 my-2 innactive-list"
+            id="sinMedidor"
+          >
+            <div
+              style="overflow-y: hidden; width: 100%; padding: 0 0 0 0.5em"
+              id="contratossinmedidor"
+              class="row align-items-center justify-content-between"
+            ></div>
+            <!-- <div style="width: 100%; height: 100%">
+              <table class="table">
+                <thead class="table-dark">
+                  <tr>
+                    <th colspan="9" class="text-center fs-4">
+                      Listado de contratos sin medidor
+                      <i class="fa-solid fa-user-tie"></i>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>Código</th>
+                    <th>Fecha</th>
+                    <th>Socio</th>
+                    <th>Cedula del Socio</th>
+                    <th>Estado</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="contratossinmedidor">
+                  <tr>
+                    <td>100200300</td>
+                    <td>Mario Salinas Fuentes</td>
+                    <td>1725674829</td>
+
+                    <td>calle principal y secundaria</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div> -->
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="col-12">Servicios contratados</div>
+          <div
+            class="row contenedor-servicios-contratados"
+            id="servicios-contratados"
+          >
+            <div class="col-12 text-center">
+              <div class="card card-fondo" style="height: 12rem">
+                <div class="card-zona-img"></div>
+                <div class="card-body col-12 card-contenido">
+                  <div class="col-12">
+                    <h5 class="card-title">Recoleccion de Desechos</h5>
+                  </div>
+                  <div class="col-12 card-zona-desc-ct">
+                    <p class="card-text">
+                      Recoleccion de desechos orgánicos e inorgánicos
+                    </p>
+                  </div>
+                  <div
+                    class="col-12 d-flex justify-content-center align-items-center"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </body>
   <script
     src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"
