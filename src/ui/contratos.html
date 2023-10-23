@@ -227,7 +227,6 @@
                     id="apellidoSocioContratante"
                     placeholder="Apellidos del socio"
                     class="form-control"
-                    readonly
                   />
                   <!-- <div
               id="suggestion-list2"
@@ -241,7 +240,6 @@
                     class="form-control my-2"
                     placeholder="Nombres del socio"
                     id="nombreSocioContratante"
-                    readonly
                   />
                 </div>
               </div>
@@ -398,8 +396,7 @@
                       <button
                         class="btn btn-dark my-2 lno-rd pb-1"
                         type="button"
-                        onclick="generarCodigo()"
-                        id="searchButton"
+                        id="generar-codigo"
                         style="
                           border: none;
                           border-top-left-radius: 0;
@@ -446,7 +443,24 @@
                 id="servicios-disponibles"
                 style="height: 41vh; overflow-y: auto"
               >
-                <div class="col-6 text-center">
+                <div
+                  class="col-12 text-center d-flex justify-content-center align-items-center"
+                  style="
+                    width: 96%;
+                    margin: 0 auto;
+                    border: solid 3px #f1f1f1;
+                    border-radius: 5px;
+                  "
+                >
+                  <div>
+                    <h3 class="text-secondary">
+                      Registra el contrato para poder acceder a los servicios
+                      disponibles
+                    </h3>
+                    <p><i class="text-secondary fs-1 fa-solid fa-gears"></i></p>
+                  </div>
+                </div>
+                <!-- <div class="col-6 text-center">
                   <div class="card card-fondo" style="height: 18rem">
                     <div class="card-zona-img"></div>
                     <div class="card-body col-12 card-contenido">
@@ -478,42 +492,17 @@
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-6 text-center">
-                  <div class="card card-fondo" style="height: 18rem">
-                    <div class="card-zona-img"></div>
-                    <div class="card-body col-12 card-contenido">
-                      <div class="col-12">
-                        <h5 class="card-title">Desechos</h5>
-                      </div>
-                      <div class="col-12 card-zona-desc">
-                        <p class="card-text">Recoleccion de desechos Lo</p>
-                      </div>
-                      <div
-                        class="col-12 d-flex justify-content-between align-items-center"
-                      >
-                        <input
-                          type="checkbox"
-                          class="btn-check"
-                          name="options-outlined"
-                          id="succ"
-                          autocomplete="off"
-                          checked
-                        />
-                        <label
-                          style="width: 40%"
-                          class="btn btn-outline-success"
-                          for="succ"
-                          >Adquirido</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                </div> -->
               </div>
               <div class="col-12 d-flex justify-content-end my-3">
                 <button class="btn-custom-guardar mx-2">Guardar</button>
-                <button class="btn-custom-cancelar">Cancelar</button>
+                <button
+                  class="btn-custom-cancelar"
+                  type="button"
+                  id="cancelar-contrato"
+                >
+                  Cancelar
+                </button>
               </div>
             </div>
           </div>
@@ -521,83 +510,82 @@
       </div>
     </section>
     <section class="active" id="seccion2">
-      <div class="row container-fluid" style="padding-top: 2em">
-        <div class="col-lg-8 col-md-12 col-sm-12 encabezado-servicios">
-          <div
-            class="col-12 mp-0 d-flex align-items-center justify-content-between align-items-end"
-          >
-            <p class="fs-1 mp-0" id="title-contratos">
-              Contratos con medidor
-              <i class="fs-1 fa-solid fa-file-signature mx-2 my-2"></i>
-            </p>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="btnSeccion1"
-            >
-              Nuevo contrato
-            </button>
-          </div>
-          <div class="col-12">
-            <label for="criterio">Administra los contratos existentes</label>
-            </div>
-          <div class="col-12">
-            <label for="criterio">Buscar por...</label>
-            <div class="row">
-              <div class="col-3">
-                <select
-                  id="criterio"
-                  class="form-select btn-rd"
-                  aria-label="Default select example"
-                >
-                  <option value="all" selected>Todas</option>
-                  <option value="codigo">Código de contrato</option>
-                  <option value="cedulaPasaporte">Cédula del socio</option>
-                  <option value="apellidos">Apellidos del socio</option>
-                  <option value="nombres">Nombres del socio</option>
-                </select>
-              </div>
-
-              <div class="col-3">
-                <div class="input-group">
-                  <input
-                    readonly
-                    type="text"
-                    class="form-control btn-rd"
-                    placeholder="Buscar..."
-                    id="criterio-content"
-                  />
-                </div>
-              </div>
-              <div class="col-3">
-                <select
-                  id="medidorSinMedidor"
-                  class="form-select btn-rd"
-                  aria-label="Default select example"
-                >
-                  <option value="medidor" selected>Con medidor</option>
-                  <option value="sinMedidor">Sin medidor</option>
-                </select>
-              </div>
-              <div class="col-3">
-                <!-- <label class="text-white" for="criterio">Buscar</label> -->
-                <button
-                  type="button"
-                  class="btn-buscar"
-                  style="width: 100%"
-                  id="buscarSocios"
-                >
-                  Buscar<i class="fa fa-search mx-1"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div class="row container-fluid" style="padding-top: 7em">
         <div
-          class="col-lg-8 col-md-12 col-sm-12"
+          class="col-xl-8 col-lg-12 col-md-12 col-sm-12"
           style="height: 68vh; padding: 0"
         >
+          <div class="col-lg-12 col-md-12 col-sm-12 encabezado-servicios">
+            <div
+              class="col-12 mp-0 d-flex align-items-center justify-content-between align-items-end"
+            >
+              <p class="fs-1 mp-0" id="title-contratos">
+                Contratos con medidor
+                <i class="fs-1 fa-solid fa-file-signature mx-2 my-2"></i>
+              </p>
+              <button
+                class="btn btn-outline-light"
+                type="button"
+                id="btnSeccion1"
+              >
+                Nuevo contrato
+              </button>
+            </div>
+            <div class="col-12">
+              <label for="criterio">Administra los contratos existentes</label>
+            </div>
+            <div class="col-12">
+              <label for="criterio">Buscar por...</label>
+              <div class="row">
+                <div class="col-3">
+                  <select
+                    id="criterio"
+                    class="form-select btn-rd"
+                    aria-label="Default select example"
+                  >
+                    <option value="all" selected>Todas</option>
+                    <option value="codigo">Código de contrato</option>
+                    <option value="cedulaPasaporte">Cédula del socio</option>
+                    <option value="apellidos">Apellidos del socio</option>
+                    <option value="nombres">Nombres del socio</option>
+                  </select>
+                </div>
+
+                <div class="col-3">
+                  <div class="input-group">
+                    <input
+                      readonly
+                      type="text"
+                      class="form-control btn-rd"
+                      placeholder="Buscar..."
+                      id="criterio-content"
+                    />
+                  </div>
+                </div>
+                <div class="col-3">
+                  <select
+                    id="medidorSinMedidor"
+                    class="form-select btn-rd"
+                    aria-label="Default select example"
+                  >
+                    <option value="medidor" selected>Con medidor</option>
+                    <option value="sinMedidor">Sin medidor</option>
+                  </select>
+                </div>
+                <div class="col-3">
+                  <!-- <label class="text-white" for="criterio">Buscar</label> -->
+                  <button
+                    type="button"
+                    class="btn-buscar"
+                    style="width: 100%"
+                    id="buscarSocios"
+                  >
+                    Buscar<i class="fa fa-search mx-1"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div
             class="col-lg-12 col-md-12 col-sm-12 my-2 active-list"
             id="conMedidor"
@@ -746,27 +734,67 @@
             </div> -->
           </div>
         </div>
-        <div class="col-4">
-          <div class="col-12">Servicios contratados</div>
-          <div
-            class="row contenedor-servicios-contratados"
-            id="servicios-contratados"
-          >
-            <div class="col-12 text-center">
-              <div class="card card-fondo" style="height: 12rem">
-                <div class="card-zona-img"></div>
-                <div class="card-body col-12 card-contenido">
-                  <div class="col-12">
-                    <h5 class="card-title">Recoleccion de Desechos</h5>
+
+        <div
+          class="col-xl-4 col-lg-12 col-md-12 col-sm-12 encabezado-form"
+          style="margin: -5em 0 0 0; padding: 0 0 0 0.5em"
+        >
+          <div class="row mx-1 encabezado-st">
+            <div class="col-12 text-center fs-4">Detalles del contrato</div>
+
+            <div class="col-4 mt-2 text-center">
+              <p class="title-item mp-0">Código</p>
+              <p class="mp-0 text-center">2C001</p>
+            </div>
+            <div class="col-4 mt-2 text-center">
+              <p class="title-item mp-0">Estado</p>
+              <p class="mp-0 text-center">Activo</p>
+            </div>
+            <div class="col-4 mt-2 text-center">
+              <p class="title-item mp-0">Medidor</p>
+              <p class="mp-0 text-center">Si</p>
+            </div>
+            <div class="mx-2 col-12 mt-4 d-flex">
+              <p class="title-item mp-0">Fecha de contrato:</p>
+              <p class="trans">-</p>
+              <p class="mp-0 text-center">2023-12-11</p>
+            </div>
+            <div class="mx-2 col-12 d-flex mp-0">
+              <p class="title-item">Socio:</p>
+              <p class="trans">-</p>
+              <p class="mp-0 text-center">
+                Solavino Juansino Pereira Sifuentes
+              </p>
+            </div>
+            <div class="mx-2 col-12 d-flex mp-0">
+              <p class="title-item">Ubicacion:</p>
+              <p class="trans">-</p>
+              <p class="mp-0 text-center">
+                Barrio Central, Bella vista y La troncal, 205.
+              </p>
+            </div>
+
+            <div class="title-item col-12 mx-2">Servicios contratados</div>
+            <div
+              class="row contenedor-servicios-contratados justify-content-between"
+              id="servicios-contratados"
+            >
+              <div class="col-12 text-center">
+                <div class="card card-fondo" style="height: 12rem">
+                  <div class="card-zona-img"></div>
+                  <div class="card-body col-12 card-contenido">
+                    <div class="col-12">
+                      <h5 class="card-title">Recoleccion de Desechos</h5>
+                    </div>
+                    <div class="col-12 card-zona-desc-ct">
+                      <p class="card-text">
+                        Recoleccion de desechos orgánicos e inorgánicos
+                      </p>
+                    </div>
+                    <div
+                      class="col-12 d-flex justify-content-center align-items-center"
+                    ></div>
                   </div>
-                  <div class="col-12 card-zona-desc-ct">
-                    <p class="card-text">
-                      Recoleccion de desechos orgánicos e inorgánicos
-                    </p>
-                  </div>
-                  <div
-                    class="col-12 d-flex justify-content-center align-items-center"
-                  ></div>
                 </div>
               </div>
             </div>

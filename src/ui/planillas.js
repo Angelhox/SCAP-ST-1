@@ -34,8 +34,7 @@ const otrosServiciosList = document.getElementById("otrosServicios");
 const otrosAplazablesList = document.getElementById("otrosAplazables");
 const mesBusqueda = document.getElementById("mesBusqueda");
 const anioBusqueda = document.getElementById("anioBusqueda");
-const errortextAbono = document.getElementById("errorTextAbono");
-const errContainer = document.getElementById("err-container");
+
 // ----------------------------------------------------------------
 // Variables del los totales de la planilla
 // ----------------------------------------------------------------
@@ -49,6 +48,8 @@ const valorTotalDescuento = document.getElementById("valorTotalDescuento");
 const valorTotalPagar = document.getElementById("valorTotalPagar");
 // Variables del dialogo de los servicios
 const dialogServicios = document.getElementById("formServicios");
+const errortextAbono = document.getElementById("errorTextAbono");
+const errContainer = document.getElementById("err-container");
 const servicioDg = document.getElementById("title-dg");
 const descripcionDg = document.getElementById("descripcion-dg");
 const detallesDg = document.getElementById("detalles-dg");
@@ -149,17 +150,30 @@ function renderPlanillas(datosPlanillas) {
   planillasList.innerHTML = "";
   datosPlanillas.forEach(async (datosPlanilla) => {
     // Crear el elemento div principal con las clases y el estilo
+    const divContainer = document.createElement("div");
+    divContainer.className = "col-xl-6 col-lg-12 col-md-12 col-sm-12 px-1";
+    divContainer.style.height = "fit-content";
+    divContainer.style.maxHeight = "fit-content";
+    // divContainer.style.backgroundColor = "black";
     const cardDiv = document.createElement("div");
-    cardDiv.className = "col-6 mx-1 card mb-3 border-info card-planilla";
-    cardDiv.style.maxWidth = "48%";
+    cardDiv.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card ";
+    cardDiv.style.backgroundColor = "red";
+
+    cardDiv.style.width = "100%";
+    // cardDiv.style.maxWidth = "100%";
+    cardDiv.style.padding = "0.3em";
+    cardDiv.style.backgroundColor = "#d6eaf8";
+    cardDiv.style.height = "fit-content";
+    cardDiv.style.maxHeight = "fit-content";
     // Crear el elemento div para el encabezado de la tarjeta con la clase y el estilo
     const headerDiv = document.createElement("div");
-    headerDiv.className = "card-header row d-flex ";
+    headerDiv.className = "card-header d-flex ";
     headerDiv.style.backgroundColor = "#85c1e9";
 
     // Crear el elemento div para la información del contrato
     const contratoDiv = document.createElement("div");
     contratoDiv.className = "d-flex col-6 titulo-detalles header-planilla";
+
     const contratoP = document.createElement("p");
     contratoP.textContent = "Contrato: ";
     const contratoValor = document.createTextNode(datosPlanilla.codigo);
@@ -183,7 +197,7 @@ function renderPlanillas(datosPlanillas) {
     // Crear el elemento div para el cuerpo de la tarjeta
     const bodyDiv = document.createElement("div");
     bodyDiv.className = "card-body cuerpo";
-
+    bodyDiv.style.backgroundColor = "white";
     // Crear el elemento div para el título del socio
     const socioDiv = document.createElement("div");
     socioDiv.className = "card-title d-flex titulo-socio";
@@ -340,6 +354,7 @@ function renderPlanillas(datosPlanillas) {
     // Crear el elemento para el pie de la tarjeta
     const footerDiv = document.createElement("div");
     footerDiv.className = "card-footer row d-flex";
+    footerDiv.style.border = "none";
     // Crear elemento para el total
     const totalDiv = document.createElement("div");
     totalDiv.className = "col-6 titulo-detalles d-flex";
@@ -381,10 +396,11 @@ function renderPlanillas(datosPlanillas) {
     // cardDiv.appendChild(serviciosDiv);
     // cardDiv.appendChild(listaServiciosDiv);
     cardDiv.appendChild(footerDiv);
+    divContainer.appendChild(cardDiv);
 
     // Agregar la tarjeta al documento (por ejemplo, al elemento con el id "planillasList")
     // const planillasList = document.getElementById("planillasList");
-    planillasList.appendChild(cardDiv);
+    planillasList.appendChild(divContainer);
   });
 }
 const getDatosLecturas = async (contratoId, fechaEmision) => {

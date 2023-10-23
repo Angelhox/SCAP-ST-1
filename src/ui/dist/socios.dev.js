@@ -41,14 +41,14 @@ socioForm.addEventListener("submit", function _callee2(e) {
           e.preventDefault();
           segundoNombreSociodf = "NA";
           segundoApellidoSociodf = "NA";
-          correoSociodf = "NA";
+          correoSociodf = "actualizarCorreo@mail.com";
           fijoSociodf = "9999999999";
           movilSociodf = "9999999999";
           casaSociodf = "NA";
           barrioSociodf = "NA";
-          principalSociodf = "NA";
-          secundariaSociodf = "NA";
-          parroquiaSociodf = "NA";
+          principalSociodf = "Principal";
+          secundariaSociodf = "Secundaria";
+          parroquiaSociodf = "Ayora";
 
           if (socioSegundoNombre.value !== null && socioSegundoNombre.value !== "") {
             segundoNombreSociodf = socioSegundoNombre.value;
@@ -97,7 +97,7 @@ socioForm.addEventListener("submit", function _callee2(e) {
 
           mensajeError.textContent = "El primer nombre es obligatorio.";
           socioPrimerNombre.focus();
-          _context2.next = 76;
+          _context2.next = 66;
           break;
 
         case 26:
@@ -108,7 +108,7 @@ socioForm.addEventListener("submit", function _callee2(e) {
 
           mensajeError.textContent = "El primer apellido es obligatorio.";
           socioPrimerApellido.focus();
-          _context2.next = 76;
+          _context2.next = 66;
           break;
 
         case 31:
@@ -122,7 +122,7 @@ socioForm.addEventListener("submit", function _callee2(e) {
 
           mensajeError.textContent = "Ingresa un número de cédula válido.";
           socioCedula.focus();
-          _context2.next = 76;
+          _context2.next = 66;
           break;
 
         case 36:
@@ -133,7 +133,7 @@ socioForm.addEventListener("submit", function _callee2(e) {
 
           mensajeError.textContent = "Ingresa una fecha de nacimiento válida.";
           socioNacimiento.focus();
-          _context2.next = 76;
+          _context2.next = 66;
           break;
 
         case 41:
@@ -144,7 +144,7 @@ socioForm.addEventListener("submit", function _callee2(e) {
 
           mensajeError.textContent = "Ingresa una provincia válida";
           socioProvincia.focus();
-          _context2.next = 76;
+          _context2.next = 66;
           break;
 
         case 46:
@@ -155,7 +155,7 @@ socioForm.addEventListener("submit", function _callee2(e) {
 
           mensajeError.textContent = "Ingresa un canton válido.";
           socioCanton.focus();
-          _context2.next = 76;
+          _context2.next = 66;
           break;
 
         case 51:
@@ -168,36 +168,17 @@ socioForm.addEventListener("submit", function _callee2(e) {
           }
 
           mensajeError.textContent = "Ingresa una referencia valida de máximo 45 caracteres.";
-          socioReferencia.focus();
-          _context2.next = 76;
+          socioReferencia.focus(); // } else if (!validator.isEmail(socioCorreo.value)) {
+          //   mensajeError.textContent = "Ingresa un correo válido.";
+          //   socioCorreo.focus();
+          // } else if (!validator.isLength(socioMovil.value, { max: 10, min: 10 })) {
+          //   mensajeError.textContent = "Ingresa un télefono móvil válido.";
+          //   socioMovil.focus();
+
+          _context2.next = 66;
           break;
 
         case 56:
-          if (validator.isEmail(socioCorreo.value)) {
-            _context2.next = 61;
-            break;
-          }
-
-          mensajeError.textContent = "Ingresa un correo válido.";
-          socioCorreo.focus();
-          _context2.next = 76;
-          break;
-
-        case 61:
-          if (validator.isLength(socioMovil.value, {
-            max: 10,
-            min: 10
-          })) {
-            _context2.next = 66;
-            break;
-          }
-
-          mensajeError.textContent = "Ingresa un télefono móvil válido.";
-          socioMovil.focus();
-          _context2.next = 76;
-          break;
-
-        case 66:
           newSocio = {
             primerNombre: socioPrimerNombre.value,
             segundoNombre: segundoNombreSociodf,
@@ -219,20 +200,20 @@ socioForm.addEventListener("submit", function _callee2(e) {
           };
 
           if (editingStatus) {
-            _context2.next = 74;
+            _context2.next = 64;
             break;
           }
 
-          _context2.next = 70;
+          _context2.next = 60;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("createSocio", newSocio));
 
-        case 70:
+        case 60:
           result = _context2.sent;
           console.log(result);
-          _context2.next = 76;
+          _context2.next = 66;
           break;
 
-        case 74:
+        case 64:
           console.log("Editing socio with electron");
           Swal.fire({
             title: "¿Quieres guardar los cambios?",
@@ -273,7 +254,7 @@ socioForm.addEventListener("submit", function _callee2(e) {
             });
           });
 
-        case 76:
+        case 66:
         case "end":
           return _context2.stop();
       }
@@ -544,9 +525,10 @@ function resetFormAfterUpdate() {
           return regeneratorRuntime.awrap(getSocios(criterioBuscar, criterioContentBuscar));
 
         case 6:
+          socioPrimerNombre.focus();
           mensajeError.textContent = "";
 
-        case 7:
+        case 8:
         case "end":
           return _context10.stop();
       }
@@ -571,9 +553,10 @@ function resetFormAfterSave() {
           editingStatus = false;
           editSocioId = "";
           socioForm.reset();
+          socioPrimerNombre.focus();
           mensajeError.textContent = "";
 
-        case 10:
+        case 11:
         case "end":
           return _context11.stop();
       }
@@ -585,6 +568,7 @@ function resetForm() {
   editingStatus = false;
   editSocioId = "";
   socioForm.reset();
+  socioPrimerNombre.focus();
   mensajeError.textContent = "";
 }
 

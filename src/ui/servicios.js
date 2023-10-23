@@ -113,16 +113,22 @@ servicioForm.addEventListener("submit", async (e) => {
 function renderServiciosFijos(serviciosFijos) {
   serviciosList.innerHTML = "";
   serviciosFijos.forEach((servicioFijo) => {
+    const divContainer = document.createElement("div");
+    divContainer.className = "col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1";
+    divContainer.style.height = "fit-content";
+    divContainer.style.maxHeight = "fit-content";
     const divCol6 = document.createElement("div");
-    divCol6.className = "col-6 card mx-2 my-2 card-servicios";
-    divCol6.style.width = "48%";
-    divCol6.style.maxWidth = "48%";
+    divCol6.className = "clase col-6 card  card-servicios";
+    divCol6.style.width = "100%";
+    divCol6.style.maxWidth = "100%";
+    divCol6.style.padding = "0.3em";
+    divCol6.style.backgroundColor = "#d6eaf8";
     divCol6.style.height = "fit-content";
     divCol6.style.maxHeight = "fit-content";
-    divCol6.style.margin = "0";
 
     const divRowG0 = document.createElement("div");
-    divRowG0.className = "row g-0";
+    divRowG0.className = "row g-0 px-2";
+    divRowG0.style.backgroundColor = "white";
 
     const divCol2 = document.createElement("div");
     divCol2.className =
@@ -164,7 +170,7 @@ function renderServiciosFijos(serviciosFijos) {
     divContainerDetalles.className = "row container-detalles";
 
     const detalles = [
-      { label: "Valor:", value: servicioFijo.valor },
+      { label: "Valor:$", value: parseFloat(servicioFijo.valor).toFixed(2) },
       { label: "Tipo:", value: servicioFijo.tipo },
       { label: "Aplazable:", value: servicioFijo.aplazableSn },
     ];
@@ -172,14 +178,16 @@ function renderServiciosFijos(serviciosFijos) {
     detalles.forEach((detalle) => {
       const divDetalle = document.createElement("div");
       divDetalle.className = "d-flex align-items-baseline col-4 pm-0";
-
+      const esp = document.createElement("p");
+      esp.textContent = "-";
+      esp.className = "trans";
       const h6Label = document.createElement("h6");
       h6Label.textContent = detalle.label;
-
       const pValue = document.createElement("p");
-      pValue.textContent = detalle.value;
 
+      pValue.textContent = detalle.value;
       divDetalle.appendChild(h6Label);
+      divDetalle.appendChild(esp);
       divDetalle.appendChild(pValue);
       divContainerDetalles.appendChild(divDetalle);
     });
@@ -199,9 +207,7 @@ function renderServiciosFijos(serviciosFijos) {
     const iconEdit = document.createElement("i");
     iconEdit.className = "fa fa-file-pen";
     btnEditServicio.appendChild(iconEdit);
-    btnEditServicio.onclick = function () {
-      console.log("Editar ...");
-    };
+
     const btnDeleteServicio = document.createElement("button");
     btnDeleteServicio.className =
       "btn-servicios-custom d-flex justify-content-center align-items-center";
@@ -225,6 +231,7 @@ function renderServiciosFijos(serviciosFijos) {
     };
     divCol1.appendChild(btnEditServicio);
     btnEditServicio.onclick = () => {
+      console.log("Editar ...");
       console.log("Detalles del servicio: " + servicioFijo.id);
       editServicio(servicioFijo.id);
     };
@@ -246,9 +253,23 @@ function renderServiciosFijos(serviciosFijos) {
     divRowG0.appendChild(divCol2);
     divRowG0.appendChild(divCol9);
     divRowG0.appendChild(divCol1);
-
     divCol6.appendChild(divRowG0);
-    serviciosList.appendChild(divCol6);
+    divContainer.appendChild(divCol6);
+    divContainer.onclick = () => {
+      // Elimina la clase "selected" de todos los elementos
+      const elementos = document.querySelectorAll(".clase"); // Reemplaza con la clase real de tus elementos
+      elementos.forEach((elemento) => {
+        elemento.classList.remove("bg-secondary");
+      });
+
+      // Agrega la clase "selected" al elemento que se hizo clic
+      divCol6.classList.add("bg-secondary");
+
+      console.log("Editar ...");
+      console.log("Detalles del servicio: " + servicioFijo.id);
+      editServicio(servicioFijo.id);
+    };
+    serviciosList.appendChild(divContainer);
   });
 }
 async function renderUsuarios(usuarios, servicioId) {
@@ -635,18 +656,18 @@ criterioSt.onchange = async () => {
 buscarRecaudaciones.onclick = async () => {
   await getRecaudaciones();
 };
-const getContratados = async (servicioId) => {
-  // Buscamos los contratos que hayan contratado el servicio segun el id del servicio
-  // que se recibe!
-  const contratadosId = await ipcRenderer.invoke(
-    "getContratadosById",
-    servicioId
-  );
-  contratadosId.forEach((contratadoId) => {
-    contratados.push(contratadoId.id);
-  });
-  contratados = console.log("Contratados", contratados);
-};
+// const getContratados = async (servicioId) => {
+//   // Buscamos los contratos que hayan contratado el servicio segun el id del servicio
+//   // que se recibe!
+//   const contratadosId = await ipcRenderer.invoke(
+//     "getContratadosById",
+//     servicioId
+//   );
+//   contratadosId.forEach((contratadoId) => {
+//     contratados.push(contratadoId.id);
+//   });
+//   contratados = console.log("Contratados", contratados);
+// };
 async function init() {
   fechaCreacion.value = formatearFecha(new Date());
   mesActual();
@@ -711,6 +732,7 @@ async function resetFormAfterSave() {
   editServicioId = "";
   servicioForm.reset();
   mensajeError.textContent = "";
+  fechaCreacion.value = formatearFecha(new Date());
 }
 function resetForm() {
   editingStatus = false;
@@ -803,18 +825,6 @@ function formatearFecha(fecha) {
   const fechaFormateada = `${year}-${month}-${day}`;
   return fechaFormateada;
 }
-function mostrarSeccion(id) {
-  const seccion1 = document.getElementById("seccion1");
-  const seccion2 = document.getElementById("seccion2");
-
-  if (id === "seccion1") {
-    seccion1.classList.add("active");
-    seccion2.classList.remove("active");
-  } else {
-    seccion1.classList.remove("active");
-    seccion2.classList.add("active");
-  }
-}
 btnVolver.onclick = () => {
   mostrarSeccion("seccion1");
 };
@@ -873,6 +883,19 @@ async function vistaFactura() {
     datosTotales
   );
 }
+function mostrarSeccion(id) {
+  const seccion1 = document.getElementById("seccion1");
+  const seccion2 = document.getElementById("seccion2");
+
+  if (id === "seccion1") {
+    seccion1.classList.add("active");
+    seccion2.classList.remove("active");
+  } else {
+    seccion1.classList.remove("active");
+    seccion2.classList.add("active");
+  }
+}
+
 // funciones del navbar
 const abrirInicio = async () => {
   const url = "src/ui/principal.html";

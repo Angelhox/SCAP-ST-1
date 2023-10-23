@@ -48,7 +48,7 @@ th {
 }
 
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 10px;
     /* Ancho de la barra de desplazamiento*/
 }
 

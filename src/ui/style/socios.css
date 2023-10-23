@@ -16,17 +16,19 @@
     border-bottom: none;
 }
 
+
 .encabezado-form {
     position: sticky;
     top: 0;
     z-index: 1;
-    margin-top: -5rem;
-    padding: 1em 1em 1em 1em !important;
+    margin-top: -5rem !important;
+    padding: 1em 1em 1em 1em;
     max-width: 100%;
     height: fit-content;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
+
 
 table {
     width: 100%;
@@ -51,7 +53,7 @@ th {
 }
 
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 10px;
     /* Ancho de la barra de desplazamiento*/
 }
 
@@ -66,7 +68,7 @@ th {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
+    background-color: #f8c471;
     /* Cambia el color del "pulgar" al pasar el ratón por encima */
 }
 
@@ -114,7 +116,7 @@ th {
 @media print {
 
     /* Establece la escala de impresión al 50% */
-    body {
+    /* body {
         transform: scale(0.5);
         transform-origin: top left;
     }
@@ -153,5 +155,5 @@ th {
 
     #socioForm {
         display: none;
-    }
+    } */
 }

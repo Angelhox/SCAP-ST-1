@@ -6,10 +6,7 @@
 } */
 
 .card-planilla {
-
-    max-width: 28rem;
-
-    /* max-height: 28rem; */
+    /* max-width: 28rem; */
 }
 
 .header-planilla {
@@ -229,6 +226,9 @@
 /* .encabezado-planilla div {
     padding: 0 .5em;
 } */
+.container-servicios-list {
+    overflow-y: auto;
+}
 
 .container-card-servicios {
     overflow-y: auto;
@@ -261,7 +261,7 @@ th {
 }
 
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 10px;
     /* Ancho de la barra de desplazamiento*/
 }
 
@@ -271,7 +271,9 @@ th {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #888;
+    background-color: #f8c471;
+
+    /* background-color: #888; */
     /* Color del "pulgar" de la barra de desplazamiento */
 }
 

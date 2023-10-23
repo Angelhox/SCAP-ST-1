@@ -80,6 +80,14 @@ const titleContratos = document.getElementById("title-contratos");
 //Variable que indica el medidor a editar Borrar
 let editContratoId = "";
 // ----------------------------------------------------------------
+// Variables componentes del formulario.
+// ----------------------------------------------------------------
+const cancelarContrato = document.getElementById("cancelar-contrato");
+const generarCodigoBt = document.getElementById("generar-codigo");
+
+var listaSugerencias = document.getElementById("lista-sugerencias");
+var sugerencias = [];
+// ----------------------------------------------------------------
 // Esta funcion obtiene los id de los servicios disponibles
 // los manipula como elementos del DOM asignandoles el evento de marcado y desmarcado
 // para validar si se ha seleccionado al menos un servicio a contratar.
@@ -97,7 +105,7 @@ async function eventoServiciosId(serviciosFijos) {
             console.log("Servicios Marcados: ", serviciosMarcados);
             console.log("Marcado Agua: " + servicioFijo.nombre);
           } else {
-            inHabilitarFormMedidor();
+            // inHabilitarFormMedidor();
             contratoConMedidor = false;
             const idABuscar = servicioFijo.id; //--> El ID que deseas buscar y eliminar
             const elementoAEliminar = serviciosMarcados.find(
@@ -208,12 +216,12 @@ contratoForm.addEventListener("submit", async (e) => {
     // ) {
     //   mensajeError.textContent = "Ingresa una observación válida.";
     //   medidorObservacion.focus();
-  } else if (serviciosDisponiblesAContratar.length === 0) {
-    errorContainer.style.color = "red";
-    mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
-  } else if (serviciosMarcados.length === 0) {
-    errorContainer.style.color = "red";
-    mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
+    // } else if (serviciosDisponiblesAContratar.length === 0) {
+    //   errorContainer.style.color = "red";
+    //   mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
+    // } else if (serviciosMarcados.length === 0) {
+    //   errorContainer.style.color = "red";
+    //   mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
   } else {
     console.log("Servicios a contratar: " + serviciosDisponiblesAContratar);
     if (!socioContratanteId == "") {
@@ -284,22 +292,23 @@ contratoForm.addEventListener("submit", async (e) => {
             "Muestro id resultado de insertar contrato: ",
             contratoId
           );
-          if (!contratoId == "" || !contratoId == undefined) {
-            await contratarServicios(
-              serviciosDisponiblesAContratar,
-              contratoId
-            );
-            if (contratoConMedidor) {
-              console.log("vamos a crear un medidor");
-              newMedidor.contratosId = contratoId;
-              const result = await ipcRenderer.invoke(
-                "createMedidor",
-                newMedidor
-              );
+          editContrato(contratoId);
+          // if (!contratoId == "" || !contratoId == undefined) {
+          //   await contratarServicios(
+          //     serviciosDisponiblesAContratar,
+          //     contratoId
+          //   );
+          //   // if (contratoConMedidor) {
+          //   //   console.log("vamos a crear un medidor");
+          //   //   newMedidor.contratosId = contratoId;
+          //   //   const result = await ipcRenderer.invoke(
+          //   //     "createMedidor",
+          //   //     newMedidor
+          //   //   );
 
-              console.log(result);
-            }
-          }
+          //   //   console.log(result);
+          //   // }
+          // }
         } catch (e) {
           console.log("Error al registrar el contrato: ", e);
         }
@@ -319,21 +328,21 @@ contratoForm.addEventListener("submit", async (e) => {
               newMedidor
             );
           }
-          contratarServicios(serviciosDisponiblesAContratar, editContratoId);
+          // contratarServicios(serviciosDisponiblesAContratar, editContratoId);
           console.log(resultContrato);
         } catch (error) {
           console.log("Error al editar el contrato: ", error);
         }
-        editingStatus = false;
-        editContratoId = "";
+        // editingStatus = false;
+        // editContratoId = "";
       }
 
-      getContratos();
-      contratoId = "";
-      editContratoId = "";
-      contratoConMedidor = false;
-      contratoForm.reset();
-      socioContratanteCedula.focus();
+      // getContratos();
+      // contratoId = "";
+      // editContratoId = "";
+      // contratoConMedidor = false;
+      // contratoForm.reset();
+      // socioContratanteCedula.focus();
     } else {
       console.log("Socio not found");
     }
@@ -341,7 +350,37 @@ contratoForm.addEventListener("submit", async (e) => {
 });
 
 // ----------------------------------------------------------------
+// Funcion que recibe el id del servicio a contratar y los relaciona con el id del contrato
+// Registra un servicio contratado a la vez.
+// ----------------------------------------------------------------
+async function contratarServicio(servicioAContratar, contratoId) {
+  console.log(
+    "Contratando Servicios para: " + contratoId + "|" + servicioAContratar
+  );
+  try {
+    var adquiridoSn = "Innactivo";
+    if (document.getElementById(servicioAContratar).checked) {
+      adquiridoSn = "Activo";
+    }
+    var resultServiciosContratados = await ipcRenderer.invoke(
+      "createServicioFijoContratado",
+      servicioAContratar,
+      contratoId,
+      1,
+      adquiridoSn
+    );
+
+    console.log(
+      "Resultado de contratar servicios: ",
+      resultServiciosContratados
+    );
+  } catch (e) {
+    console.log(e);
+  }
+}
+// ----------------------------------------------------------------
 // Funcion que recibe los id de servicios a contratar y los relaciona con el id del contrato
+// Registra varios servicios contratados a la vez
 // ----------------------------------------------------------------
 function contratarServicios(serviciosAContratar, contratoId) {
   console.log("Contratando Servicios para: " + contratoId);
@@ -425,7 +464,7 @@ function renderContratosConMedidor(datosContratos) {
     divCol.className = " col-xl-6 col-lg-6 col-md-6 col-sm-12 px-1";
     // Crea el div con la clase "card" y estilos
     const divCard = document.createElement("div");
-    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card";
+    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 card";
     divCard.style.padding = "0.3em";
     divCard.style.width = "100%";
     divCard.style.backgroundColor = "#d6eaf8";
@@ -459,8 +498,8 @@ function renderContratosConMedidor(datosContratos) {
     pText3.className = "mp-0 fs-5";
     pText3.textContent = "Socio:";
     const pTrans2 = document.createElement("p");
-    pTrans2.classList.Name = "trans mp-0";
     pTrans2.textContent = "-";
+    pTrans2.className = "trans mp-0";
     const pText4 = document.createElement("p");
     pText4.className = "mp-0 mt-1";
     pText4.style.fontSize = "1em";
@@ -918,8 +957,8 @@ function renderServiciosContratados(serviciosContratados) {
   serviciosContratados.forEach((servicioContratado) => {
     serviciosContratadosList.innerHTML += `
      
-    <div class="col-12 text-center ">
-    <div class="card card-fondo card-espacios" style="height: 12rem">
+    <div class="col-12 text-center  my-1">
+    <div class="card card-fondo card-espacios mx-2" style="height: 12rem; width:100%">
       <div class="card-zona-img"></div>
       <div class="card-body col-12 card-contenido">
         <div class="col-12">
@@ -944,6 +983,7 @@ function renderServiciosContratados(serviciosContratados) {
 // Funcion que crea las cards de los servicios disponibles para los nuevos contratos
 // ----------------------------------------------------------------
 function renderServiciosDisponibles(serviciosDisponibles) {
+  serviciosDisponiblesAContratar = [];
   servicosDisponiblesList.innerHTML = "";
   for (let i = 0; i < serviciosDisponibles.length; i++) {
     console.log("Servicios: ", serviciosDisponibles[i]);
@@ -971,10 +1011,18 @@ function renderServiciosDisponibles(serviciosDisponibles) {
     const description = document.createElement("p");
     description.classList.add("card-text");
     description.textContent = serviciosDisponibles[i].descripcion;
-
+    const divValue = document.createElement("div");
+    const divRowBtn = document.createElement("div");
+    divRowBtn.className = "row";
+    divValue.className = "col-4 mp-0 text-center";
+    const pValue = document.createElement("p");
+    pValue.className = "mp-0 value-disponibles";
+    pValue.textContent =
+      "$" + parseFloat(serviciosDisponibles[i].valor).toFixed(2);
+    divValue.appendChild(pValue);
     const checkboxDiv = document.createElement("div");
     checkboxDiv.classList.add(
-      "col-12",
+      "col-8",
       "d-flex",
       "justify-content-center",
       "align-items-center"
@@ -986,20 +1034,122 @@ function renderServiciosDisponibles(serviciosDisponibles) {
     checkbox.classList.add("btn-check");
     //checkbox.name = "options-outlined";
     checkbox.id = serviciosDisponibles[i].id;
-    // checkbox.autocomplete = "off";
+    checkbox.autocomplete = "off";
     checkbox.checked = false;
+    checkbox.onclick = () => {
+      if (serviciosDisponibles[i].nombre === "Agua Potable") {
+        habilitarFormMedidor();
+        if (validator.isEmpty(medidorInstalacion.value)) {
+          errorContainer.style.color = "red";
+          mensajeError.textContent =
+            "Debes ingresar una fecha de instalacion válida.";
+          medidorInstalacion.focus();
+          checkbox.checked = false;
+        } else if (validator.isEmpty(medidorMarca.value)) {
+          errorContainer.style.color = "red";
+          mensajeError.textContent =
+            "Debes ingresar una marca valida para el medidor.";
+          medidorMarca.focus();
+          checkbox.checked = false;
+        } else {
+          Swal.fire({
+            title: "¿Quieres contratar este servicio para este contrato?",
+            text: "El valor se cargara en la planilla a partir del mes próximo.",
+            icon: "question",
+            iconColor: "#f8c471",
+            showCancelButton: true,
+            confirmButtonColor: "#2874A6",
+            cancelButtonColor: "#EC7063 ",
+            confirmButtonText: "Sí, continuar",
+            cancelButtonText: "Cancelar",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+              // checkbox.checked = true;
+              var observacionDf = "SN";
+              if (!validator.isEmpty(medidorObservacion.value)) {
+                observacionDf = medidorObservacion.value;
+              }
+
+              newContrato = {
+                medidorSn: "Si",
+              };
+              newMedidor = {
+                codigo: contratoCodigo.value,
+                fechaInstalacion: medidorInstalacion.value,
+                marca: medidorMarca.value,
+                observacion: observacionDf,
+                // barrio: medidorBarrio.value,
+                // callePrincipal: medidorPrincipal.value,
+                // calleSecundaria: medidorSecundaria.value,
+                // numeroCasa: medidorNumeroCasa.value,
+                // referencia: medidorReferencia.value,
+                contratosId: editContratoId,
+              };
+              const resultContrato = await ipcRenderer.invoke(
+                "updateContrato",
+                editContratoId,
+                newContrato
+              );
+              console.log("vamos a crear un medidor");
+              const result = await ipcRenderer.invoke(
+                "updateMedidor",
+                editContratoId,
+                newMedidor
+              );
+              console.log("Resultado del medidor: " + result);
+              if (result.id !== undefined) {
+                console.log("Muestro result del medior: " + result.id);
+                contratarServicio(serviciosDisponibles[i].id, editContratoId);
+              }
+              await editContrato(editContratoId);
+              await editContrato(editContratoId);
+            } else {
+              checkbox.checked = false;
+              inHabilitarFormMedidor();
+            }
+          });
+        }
+      } else {
+        Swal.fire({
+          title: "¿Quieres contratar este servicio para este contrato?",
+          text: "El valor se cargara en la planilla a partir del mes próximo.",
+          icon: "question",
+          iconColor: "#f8c471",
+          showCancelButton: true,
+          confirmButtonColor: "#2874A6",
+          cancelButtonColor: "#EC7063 ",
+          confirmButtonText: "Sí, continuar",
+          cancelButtonText: "Cancelar",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+            // checkbox.checked = true;
+            contratarServicio(serviciosDisponibles[i].id, editContratoId);
+            await editContrato(editContratoId);
+            await editContrato(editContratoId);
+          } else {
+            checkbox.checked = false;
+          }
+        });
+      }
+    };
 
     const label = document.createElement("label");
-    label.style.width = "40%";
+    label.style.width = "100%";
     label.classList.add("btn", "btn-outline-warning");
     label.setAttribute("for", serviciosDisponibles[i].id);
-    label.textContent = "Adquirido";
+    label.textContent = "Contratar";
 
     checkboxDiv.appendChild(checkbox);
     checkboxDiv.appendChild(label);
+    divRowBtn.appendChild(divValue);
+    divRowBtn.appendChild(checkboxDiv);
     cardBody.appendChild(title);
     cardBody.appendChild(description);
-    cardBody.appendChild(checkboxDiv);
+    cardBody.appendChild(divRowBtn);
+    // cardBody.appendChild(divValue);
+    // cardBody.appendChild(checkboxDiv);
 
     card.appendChild(cardImage);
     card.appendChild(cardBody);
@@ -1014,7 +1164,49 @@ function marcarServiciosContratados() {
   if (serviciosEditar !== null) {
     console.log("Marcando servicios: " + serviciosEditar);
     for (let i = 0; i < serviciosEditar.length; i++) {
-      document.getElementById(serviciosEditar[i].serviciosId).checked = true;
+      const checkContratados = document.getElementById(
+        serviciosEditar[i].serviciosId
+      );
+      checkContratados.checked = true;
+      checkContratados.onclick = () => {
+        // checkContratados.checked = false;
+        Swal.fire({
+          title: "¿Quieres quitar este servicio de este contrato?",
+          text: "El valor no se cargara en la planilla a partir del mes próximo.",
+          icon: "question",
+          iconColor: "#f8c471",
+          showCancelButton: true,
+          confirmButtonColor: "#2874A6",
+          cancelButtonColor: "#EC7063 ",
+          confirmButtonText: "Sí, continuar",
+          cancelButtonText: "Cancelar",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+            if (serviciosEditar[i].nombre === "Agua Potable") {
+              const newContrato = {
+                medidorSn: "No",
+              };
+              const resultContrato = await ipcRenderer.invoke(
+                "updateContrato",
+                editContratoId,
+                newContrato
+              );
+              contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
+            } else {
+              contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
+            }
+            await editContrato(editContratoId);
+            await editContrato(editContratoId);
+          } else {
+            checkContratados.checked = true;
+          }
+        });
+      };
+      const labelElement = document.querySelector(
+        'label[for="' + serviciosEditar[i].serviciosId + '"]'
+      );
+      labelElement.textContent = "Contratado";
     }
   }
 }
@@ -1039,13 +1231,15 @@ const detallesContratos = async (id) => {
 // ----------------------------------------------------------------
 const editContrato = async (id) => {
   contratoForm.reset();
+  getServiciosDisponibles();
   const contrato = await ipcRenderer.invoke("getDatosContratosById", id);
   console.log("Recibido: " + contrato);
 
   var conMedidor = contrato.medidorSn;
   if (conMedidor == "Si") {
+    contratoConMedidor = true;
     console.log("conMedidor");
-    habilitarFormMedidor();
+    await habilitarFormMedidor();
     contratoFecha.value = formatearFecha(contrato.fecha);
     socioContratanteCedula.value = contrato.cedulaPasaporte;
     socioContratanteApellido.value =
@@ -1075,10 +1269,13 @@ const editContrato = async (id) => {
     socioContratanteCedula.readOnly = true;
     socioContratanteApellido.readOnly = true;
     socioContratanteNombre.readOnly = true;
+    generarCodigoBt.disabled = true;
+
     // ~~~~~~~~~~~~~~~~
     editContratoId = contrato.id;
   } else {
     console.log("sinMedidor");
+    contratoConMedidor = false;
     inHabilitarFormMedidor();
     contratoCodigo.value = contrato.codigo;
     contratoFecha.value = formatearFecha(contrato.fecha);
@@ -1132,6 +1329,7 @@ const editContrato = async (id) => {
     socioContratanteCedula.readOnly = true;
     socioContratanteApellido.readOnly = true;
     socioContratanteNombre.readOnly = true;
+    generarCodigoBt.disabled = true;
     // ~~~~~~~~~~~~~~~~
     editContratoId = contrato.id;
   }
@@ -1206,7 +1404,7 @@ const getServiciosDisponibles = async () => {
 async function init() {
   await getContratos();
   await getContratosSinMedidor();
-  await getServiciosDisponibles();
+  // await getServiciosDisponibles();
   // await getMedidoresDisponibles();
 }
 function formatearFecha(fecha) {
@@ -1220,9 +1418,9 @@ function formatearFecha(fecha) {
 // ----------------------------------------------------------------
 // Cargar datos de los socios registrados
 // ----------------------------------------------------------------
-var inputSugerencias = document.getElementById("cedulaSocioContratante");
-var listaSugerencias = document.getElementById("lista-sugerencias");
-var sugerencias = [];
+// var inputSugerencias = document.getElementById("cedulaSocioContratante");
+// var listaSugerencias = document.getElementById("lista-sugerencias");
+// var sugerencias = [];
 // ----------------------------------------------------------------
 // Obtener las sugerencias desde la base de datos
 // ----------------------------------------------------------------
@@ -1246,17 +1444,55 @@ async function obtenerSugerencias() {
   }
 }
 
-inputSugerencias.addEventListener("input", function () {
-  var textoIngresado = inputSugerencias.value;
+socioContratanteCedula.addEventListener("input", function () {
+  socioContratanteNombre.value = "";
+  socioContratanteApellido.value = "";
+  var textoIngresado = socioContratanteCedula.value;
   var sugerenciasFiltradas = sugerencias.filter(function (sugerencia) {
     return sugerencia.cedulaPasaporte.startsWith(textoIngresado);
   });
-
-  mostrarSugerencias(sugerenciasFiltradas);
+  if (socioContratanteCedula.value !== "") {
+    mostrarSugerencias(sugerenciasFiltradas);
+  } else {
+    listaSugerencias.style.display = "none";
+  }
+});
+socioContratanteApellido.addEventListener("input", function () {
+  socioContratanteNombre.value = "";
+  socioContratanteCedula.value = "";
+  var textoIngresado = socioContratanteApellido.value;
+  var sugerenciasFiltradas = sugerencias.filter(function (sugerencia) {
+    return (
+      sugerencia.primerApellido.startsWith(textoIngresado),
+      sugerencia.segundoApellido.startsWith(textoIngresado)
+    );
+  });
+  if (socioContratanteApellido.value !== "") {
+    mostrarSugerencias(sugerenciasFiltradas);
+  } else {
+    listaSugerencias.style.display = "none";
+  }
+});
+socioContratanteNombre.addEventListener("input", function () {
+  socioContratanteApellido.value = "";
+  socioContratanteCedula.value = "";
+  var textoIngresado = socioContratanteNombre.value;
+  var sugerenciasFiltradas = sugerencias.filter(function (sugerencia) {
+    return (
+      sugerencia.primerNombre.startsWith(textoIngresado),
+      sugerencia.segundoNombre.startsWith(textoIngresado)
+    );
+  });
+  if (socioContratanteNombre.value !== "") {
+    mostrarSugerencias(sugerenciasFiltradas);
+  } else {
+    listaSugerencias.style.display = "none";
+  }
 });
 
 function mostrarSugerencias(sugerencias) {
   listaSugerencias.innerHTML = "";
+  listaSugerencias.style.display = "block";
   sugerencias.forEach(function (sugerencia) {
     var li = document.createElement("li");
 
@@ -1265,12 +1501,14 @@ function mostrarSugerencias(sugerencias) {
       " (" +
       sugerencia.primerNombre +
       " " +
+      sugerencia.segundoNombre +
+      " " +
       sugerencia.primerApellido +
       " " +
       sugerencia.segundoApellido +
       ")";
     li.addEventListener("click", function () {
-      inputSugerencias.value = sugerencia.cedulaPasaporte;
+      socioContratanteCedula.value = sugerencia.cedulaPasaporte;
       obtenerDatosSocioContratante(sugerencia.cedulaPasaporte);
       listaSugerencias.innerHTML = "";
     });
@@ -1332,7 +1570,9 @@ ipcRenderer.on("showAlertMedidoresExistentes", (event, message) => {
 //medidor en funcion de si el socio solicita el servicio de agua potable
 // ----------------------------------------------------------------
 function habilitarFormMedidor() {
+  console.log("Habilitando form medidor");
   fechaInstalacion.disabled = false;
+  fechaInstalacion.readOnly = false;
   medidorMarca.disabled = false;
 
   // (medidorNumeroCasa.disabled = false), (medidorBarrio.disabled = false);
@@ -1512,6 +1752,98 @@ medidorSinMedidor.onchange = () => {
       '<i class="fs-1 fa-solid fa-file-signature mx-2 my-2"></i>';
   }
 };
+ipcRenderer.on("Notificar", (event, response) => {
+  if (response.title === "Borrado!") {
+    resetForm();
+  } else if (response.title === "Actualizado!") {
+    resetFormAfterUpdate();
+  } else if (response.title === "Guardado!") {
+    resetFormAfterSave();
+  }
+  console.log("Response: " + response);
+  if (response.success) {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "success",
+      confirmButtonColor: "#f8c471",
+    });
+  } else {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "error",
+      confirmButtonColor: "#f8c471",
+    });
+  }
+});
+async function resetFormAfterUpdate() {
+  // let criterioBuscar = criterio.value;
+  // let criterioContentBuscar = criterioContent.value;
+  // console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  // console;
+  await getContratos();
+  await getContratosSinMedidor();
+  mensajeError.textContent = "";
+  errorContainer.style.color = "white";
+}
+async function resetFormAfterSave() {
+  // let criterioBuscar = criterio.value;
+  // let criterioContentBuscar = criterioContent.value;
+  // console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+  // console;
+  await getContratos();
+  await getContratosSinMedidor();
+  // editingStatus = false;
+  // editContratoId = "";
+  // contratoForm.reset();
+  mensajeError.textContent = "";
+  errorContainer.style.color = "white";
+  // fechaCreacion.value = formatearFecha(new Date());
+}
+function resetForm() {
+  editingStatus = false;
+  editContratoId = "";
+  contratoForm.reset();
+  mensajeError.textContent = "";
+  inHabilitarFormMedidor();
+  ocultarServiciosDisponibles();
+  habilitarNuevoContrato();
+  errorContainer.style.color = "white";
+  contratoFecha.value = formatearFecha(new Date());
+}
+function habilitarNuevoContrato() {
+  socioContratanteCedula.readOnly = false;
+  socioContratanteApellido.readOnly = false;
+  socioContratanteNombre.readOnly = false;
+  generarCodigoBt.disabled = false;
+  contratoFecha.readOnly = false;
+  listaSugerencias.style.display = "none";
+}
+function ocultarServiciosDisponibles() {
+  servicosDisponiblesList.innerHTML = "";
+  const divNoServiciosContainer = document.createElement("div");
+  divNoServiciosContainer.className =
+    "col-12 text-center d-flex justify-content-center align-items-center";
+  const divNoServiciosText = document.createElement("div");
+  const noServiciosTitle = document.createElement("h3");
+  noServiciosTitle.className = "text-secondary";
+  noServiciosTitle.textContent =
+    "Registra el contrato para " + "poder acceder a los servicios disponibles";
+  const noServiciosText = document.createElement("p");
+  noServiciosText.innerHTML =
+    '<i class="text-secondary fs-1 fa-solid fa-gears"></i>';
+  divNoServiciosText.appendChild(noServiciosTitle);
+  divNoServiciosText.appendChild(noServiciosText);
+  divNoServiciosContainer.appendChild(divNoServiciosText);
+  servicosDisponiblesList.appendChild(divNoServiciosContainer);
+}
+generarCodigoBt.onclick = () => {
+  generarCodigo();
+};
+cancelarContrato.onclick = () => {
+  resetForm();
+};
 // ----------------------------------------------------------------
 // Transicion entre las secciones de la vista
 // ----------------------------------------------------------------
@@ -1524,6 +1856,7 @@ btnSeccion1.addEventListener("click", function () {
   console.log("btn1");
   seccion2.classList.remove("active");
   seccion1.classList.add("active");
+  resetForm();
 });
 
 btnSeccion2.addEventListener("click", function () {

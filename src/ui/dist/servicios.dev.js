@@ -184,15 +184,21 @@ servicioForm.addEventListener("submit", function _callee2(e) {
 function renderServiciosFijos(serviciosFijos) {
   serviciosList.innerHTML = "";
   serviciosFijos.forEach(function (servicioFijo) {
+    var divContainer = document.createElement("div");
+    divContainer.className = "col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1";
+    divContainer.style.height = "fit-content";
+    divContainer.style.maxHeight = "fit-content";
     var divCol6 = document.createElement("div");
-    divCol6.className = "col-6 card mx-2 my-2 card-servicios";
-    divCol6.style.width = "48%";
-    divCol6.style.maxWidth = "48%";
+    divCol6.className = "clase col-6 card  card-servicios";
+    divCol6.style.width = "100%";
+    divCol6.style.maxWidth = "100%";
+    divCol6.style.padding = "0.3em";
+    divCol6.style.backgroundColor = "#d6eaf8";
     divCol6.style.height = "fit-content";
     divCol6.style.maxHeight = "fit-content";
-    divCol6.style.margin = "0";
     var divRowG0 = document.createElement("div");
-    divRowG0.className = "row g-0";
+    divRowG0.className = "row g-0 px-2";
+    divRowG0.style.backgroundColor = "white";
     var divCol2 = document.createElement("div");
     divCol2.className = "col-2 d-flex justify-content-center align-items-center container-img";
     var imgServicios = document.createElement("img");
@@ -218,8 +224,8 @@ function renderServiciosFijos(serviciosFijos) {
     var divContainerDetalles = document.createElement("div");
     divContainerDetalles.className = "row container-detalles";
     var detalles = [{
-      label: "Valor:",
-      value: servicioFijo.valor
+      label: "Valor:$",
+      value: parseFloat(servicioFijo.valor).toFixed(2)
     }, {
       label: "Tipo:",
       value: servicioFijo.tipo
@@ -230,11 +236,15 @@ function renderServiciosFijos(serviciosFijos) {
     detalles.forEach(function (detalle) {
       var divDetalle = document.createElement("div");
       divDetalle.className = "d-flex align-items-baseline col-4 pm-0";
+      var esp = document.createElement("p");
+      esp.textContent = "-";
+      esp.className = "trans";
       var h6Label = document.createElement("h6");
       h6Label.textContent = detalle.label;
       var pValue = document.createElement("p");
       pValue.textContent = detalle.value;
       divDetalle.appendChild(h6Label);
+      divDetalle.appendChild(esp);
       divDetalle.appendChild(pValue);
       divContainerDetalles.appendChild(divDetalle);
     });
@@ -250,11 +260,6 @@ function renderServiciosFijos(serviciosFijos) {
     var iconEdit = document.createElement("i");
     iconEdit.className = "fa fa-file-pen";
     btnEditServicio.appendChild(iconEdit);
-
-    btnEditServicio.onclick = function () {
-      console.log("Editar ...");
-    };
-
     var btnDeleteServicio = document.createElement("button");
     btnDeleteServicio.className = "btn-servicios-custom d-flex justify-content-center align-items-center";
     var iconDelete = document.createElement("i");
@@ -280,6 +285,7 @@ function renderServiciosFijos(serviciosFijos) {
     divCol1.appendChild(btnEditServicio);
 
     btnEditServicio.onclick = function () {
+      console.log("Editar ...");
       console.log("Detalles del servicio: " + servicioFijo.id);
       editServicio(servicioFijo.id);
     };
@@ -300,7 +306,23 @@ function renderServiciosFijos(serviciosFijos) {
     divRowG0.appendChild(divCol9);
     divRowG0.appendChild(divCol1);
     divCol6.appendChild(divRowG0);
-    serviciosList.appendChild(divCol6);
+    divContainer.appendChild(divCol6);
+
+    divContainer.onclick = function () {
+      // Elimina la clase "selected" de todos los elementos
+      var elementos = document.querySelectorAll(".clase"); // Reemplaza con la clase real de tus elementos
+
+      elementos.forEach(function (elemento) {
+        elemento.classList.remove("bg-secondary");
+      }); // Agrega la clase "selected" al elemento que se hizo clic
+
+      divCol6.classList.add("bg-secondary");
+      console.log("Editar ...");
+      console.log("Detalles del servicio: " + servicioFijo.id);
+      editServicio(servicioFijo.id);
+    };
+
+    serviciosList.appendChild(divContainer);
   });
 }
 
@@ -879,37 +901,25 @@ buscarRecaudaciones.onclick = function _callee10() {
       }
     }
   });
-};
+}; // const getContratados = async (servicioId) => {
+//   // Buscamos los contratos que hayan contratado el servicio segun el id del servicio
+//   // que se recibe!
+//   const contratadosId = await ipcRenderer.invoke(
+//     "getContratadosById",
+//     servicioId
+//   );
+//   contratadosId.forEach((contratadoId) => {
+//     contratados.push(contratadoId.id);
+//   });
+//   contratados = console.log("Contratados", contratados);
+// };
 
-var getContratados = function getContratados(servicioId) {
-  var contratadosId;
-  return regeneratorRuntime.async(function getContratados$(_context18) {
-    while (1) {
-      switch (_context18.prev = _context18.next) {
-        case 0:
-          _context18.next = 2;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratadosById", servicioId));
-
-        case 2:
-          contratadosId = _context18.sent;
-          contratadosId.forEach(function (contratadoId) {
-            contratados.push(contratadoId.id);
-          });
-          contratados = console.log("Contratados", contratados);
-
-        case 5:
-        case "end":
-          return _context18.stop();
-      }
-    }
-  });
-};
 
 function init() {
   var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function init$(_context19) {
+  return regeneratorRuntime.async(function init$(_context18) {
     while (1) {
-      switch (_context19.prev = _context19.next) {
+      switch (_context18.prev = _context18.next) {
         case 0:
           fechaCreacion.value = formatearFecha(new Date());
           mesActual();
@@ -918,12 +928,12 @@ function init() {
           anioLimites();
           criterioBuscar = "all";
           criterioContentBuscar = "all";
-          _context19.next = 9;
+          _context18.next = 9;
           return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
 
         case 9:
         case "end":
-          return _context19.stop();
+          return _context18.stop();
       }
     }
   });
@@ -931,15 +941,15 @@ function init() {
 
 ipcRenderer.on("datos-a-servicios", function _callee11() {
   var datos;
-  return regeneratorRuntime.async(function _callee11$(_context20) {
+  return regeneratorRuntime.async(function _callee11$(_context19) {
     while (1) {
-      switch (_context20.prev = _context20.next) {
+      switch (_context19.prev = _context19.next) {
         case 0:
-          _context20.next = 2;
+          _context19.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("pido-datos"));
 
         case 2:
-          datos = _context20.sent;
+          datos = _context19.sent;
           console.log("Estos: " + datos.id);
           mostrarEstadisticas(datos.id);
           mostrarSeccion("seccion2"); // console.log("Id recibido: " + servicioRv.id);
@@ -948,7 +958,7 @@ ipcRenderer.on("datos-a-servicios", function _callee11() {
 
         case 6:
         case "end":
-          return _context20.stop();
+          return _context19.stop();
       }
     }
   });
@@ -985,7 +995,31 @@ ipcRenderer.on("Notificar", function (event, response) {
 
 function resetFormAfterUpdate() {
   var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context21) {
+  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context20) {
+    while (1) {
+      switch (_context20.prev = _context20.next) {
+        case 0:
+          criterioBuscar = criterio.value;
+          criterioContentBuscar = criterioContent.value;
+          console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+          console;
+          _context20.next = 6;
+          return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
+
+        case 6:
+          mensajeError.textContent = "";
+
+        case 7:
+        case "end":
+          return _context20.stop();
+      }
+    }
+  });
+}
+
+function resetFormAfterSave() {
+  var criterioBuscar, criterioContentBuscar;
+  return regeneratorRuntime.async(function resetFormAfterSave$(_context21) {
     while (1) {
       switch (_context21.prev = _context21.next) {
         case 0:
@@ -997,38 +1031,15 @@ function resetFormAfterUpdate() {
           return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
 
         case 6:
-          mensajeError.textContent = "";
-
-        case 7:
-        case "end":
-          return _context21.stop();
-      }
-    }
-  });
-}
-
-function resetFormAfterSave() {
-  var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function resetFormAfterSave$(_context22) {
-    while (1) {
-      switch (_context22.prev = _context22.next) {
-        case 0:
-          criterioBuscar = criterio.value;
-          criterioContentBuscar = criterioContent.value;
-          console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
-          console;
-          _context22.next = 6;
-          return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
-
-        case 6:
           editingStatus = false;
           editServicioId = "";
           servicioForm.reset();
           mensajeError.textContent = "";
+          fechaCreacion.value = formatearFecha(new Date());
 
-        case 10:
+        case 11:
         case "end":
-          return _context22.stop();
+          return _context21.stop();
       }
     }
   });
@@ -1108,19 +1119,6 @@ function formatearFecha(fecha) {
   return fechaFormateada;
 }
 
-function mostrarSeccion(id) {
-  var seccion1 = document.getElementById("seccion1");
-  var seccion2 = document.getElementById("seccion2");
-
-  if (id === "seccion1") {
-    seccion1.classList.add("active");
-    seccion2.classList.remove("active");
-  } else {
-    seccion1.classList.remove("active");
-    seccion2.classList.add("active");
-  }
-}
-
 btnVolver.onclick = function () {
   mostrarSeccion("seccion1");
 };
@@ -1163,9 +1161,9 @@ function anioLimites() {
 
 function vistaFactura() {
   var datos, encabezado, datosTotales;
-  return regeneratorRuntime.async(function vistaFactura$(_context23) {
+  return regeneratorRuntime.async(function vistaFactura$(_context22) {
     while (1) {
-      switch (_context23.prev = _context23.next) {
+      switch (_context22.prev = _context22.next) {
         case 0:
           datos = {
             mensaje: "Hola desde pagina1",
@@ -1181,25 +1179,56 @@ function vistaFactura() {
             recaudado: valorPendiente.textContent,
             totalFinal: valorTotal.textContent
           };
-          _context23.next = 5;
+          _context22.next = 5;
           return regeneratorRuntime.awrap(ipcRenderer.send("datos-a-pagina3", datos, encabezado, recaudaciones, datosTotales));
 
         case 5:
         case "end":
-          return _context23.stop();
+          return _context22.stop();
       }
     }
   });
+}
+
+function mostrarSeccion(id) {
+  var seccion1 = document.getElementById("seccion1");
+  var seccion2 = document.getElementById("seccion2");
+
+  if (id === "seccion1") {
+    seccion1.classList.add("active");
+    seccion2.classList.remove("active");
+  } else {
+    seccion1.classList.remove("active");
+    seccion2.classList.add("active");
+  }
 } // funciones del navbar
 
 
 var abrirInicio = function abrirInicio() {
   var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context24) {
+  return regeneratorRuntime.async(function abrirInicio$(_context23) {
+    while (1) {
+      switch (_context23.prev = _context23.next) {
+        case 0:
+          url = "src/ui/principal.html";
+          _context23.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context23.stop();
+      }
+    }
+  });
+};
+
+var abrirSocios = function abrirSocios() {
+  var url;
+  return regeneratorRuntime.async(function abrirSocios$(_context24) {
     while (1) {
       switch (_context24.prev = _context24.next) {
         case 0:
-          url = "src/ui/principal.html";
+          url = "src/ui/socios.html";
           _context24.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1211,13 +1240,13 @@ var abrirInicio = function abrirInicio() {
   });
 };
 
-var abrirSocios = function abrirSocios() {
+var abrirUsuarios = function abrirUsuarios() {
   var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context25) {
+  return regeneratorRuntime.async(function abrirUsuarios$(_context25) {
     while (1) {
       switch (_context25.prev = _context25.next) {
         case 0:
-          url = "src/ui/socios.html";
+          url = "src/ui/usuarios.html";
           _context25.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1229,13 +1258,13 @@ var abrirSocios = function abrirSocios() {
   });
 };
 
-var abrirUsuarios = function abrirUsuarios() {
+var abrirPagos = function abrirPagos() {
   var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context26) {
+  return regeneratorRuntime.async(function abrirPagos$(_context26) {
     while (1) {
       switch (_context26.prev = _context26.next) {
         case 0:
-          url = "src/ui/usuarios.html";
+          url = "src/ui/planillas.html";
           _context26.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1247,13 +1276,13 @@ var abrirUsuarios = function abrirUsuarios() {
   });
 };
 
-var abrirPagos = function abrirPagos() {
+var abrirPlanillas = function abrirPlanillas() {
   var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context27) {
+  return regeneratorRuntime.async(function abrirPlanillas$(_context27) {
     while (1) {
       switch (_context27.prev = _context27.next) {
         case 0:
-          url = "src/ui/planillas.html";
+          url = "src/ui/planillas-cuotas.html";
           _context27.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1265,13 +1294,13 @@ var abrirPagos = function abrirPagos() {
   });
 };
 
-var abrirPlanillas = function abrirPlanillas() {
+var abrirParametros = function abrirParametros() {
   var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context28) {
+  return regeneratorRuntime.async(function abrirParametros$(_context28) {
     while (1) {
       switch (_context28.prev = _context28.next) {
         case 0:
-          url = "src/ui/planillas-cuotas.html";
+          url = "src/ui/parametros.html";
           _context28.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1283,13 +1312,13 @@ var abrirPlanillas = function abrirPlanillas() {
   });
 };
 
-var abrirParametros = function abrirParametros() {
+var abrirImplementos = function abrirImplementos() {
   var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context29) {
+  return regeneratorRuntime.async(function abrirImplementos$(_context29) {
     while (1) {
       switch (_context29.prev = _context29.next) {
         case 0:
-          url = "src/ui/parametros.html";
+          url = "src/ui/implementos.html";
           _context29.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1301,13 +1330,13 @@ var abrirParametros = function abrirParametros() {
   });
 };
 
-var abrirImplementos = function abrirImplementos() {
+var abrirContratos = function abrirContratos() {
   var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context30) {
+  return regeneratorRuntime.async(function abrirContratos$(_context30) {
     while (1) {
       switch (_context30.prev = _context30.next) {
         case 0:
-          url = "src/ui/implementos.html";
+          url = "src/ui/medidores.html";
           _context30.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1319,37 +1348,19 @@ var abrirImplementos = function abrirImplementos() {
   });
 };
 
-var abrirContratos = function abrirContratos() {
+var abrirConsolidado = function abrirConsolidado() {
   var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context31) {
+  return regeneratorRuntime.async(function abrirConsolidado$(_context31) {
     while (1) {
       switch (_context31.prev = _context31.next) {
         case 0:
-          url = "src/ui/medidores.html";
+          url = "src/ui/consolidado.html";
           _context31.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
         case 3:
         case "end":
           return _context31.stop();
-      }
-    }
-  });
-};
-
-var abrirConsolidado = function abrirConsolidado() {
-  var url;
-  return regeneratorRuntime.async(function abrirConsolidado$(_context32) {
-    while (1) {
-      switch (_context32.prev = _context32.next) {
-        case 0:
-          url = "src/ui/consolidado.html";
-          _context32.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context32.stop();
       }
     }
   });

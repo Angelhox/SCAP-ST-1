@@ -1,6 +1,7 @@
 .container-servicios-list {
 
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .card-servicios {
@@ -171,6 +172,26 @@
     border-bottom: none;
 }
 
+.encabezado-bt {
+    color: white;
+    font-size: 1.1em;
+    font-weight: 700;
+    background-color: #f8c471;
+    ;
+    border: solid 3px #85C1E9;
+    border-top: none;
+    padding: .5em 1.1em .1em 1.1em;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 5px;
+
+}
+
+.encabezado-bt p {
+    margin: 0 0 0 0;
+    padding: 0;
+
+}
+
 .encabezado-form {
     position: sticky;
     top: 0;
@@ -181,9 +202,32 @@
     height: fit-content;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+
+}
+
+.encabezado-st {
+    padding: 0 0 0 0;
+    border: solid 4px #f8c471;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .btn-buscar {
+    padding: .4em;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    /* Quita el outline predeterminado */
+    transition: background-color 0.3s;
+    /* Agrega una transición suave al color de fondo */
+}
+
+.btn-gtc {
+    background-color: #85C1E9;
     padding: .4em;
     font-size: 16px;
     cursor: pointer;
@@ -199,6 +243,21 @@
     background-color: #85C1E9;
     color: white;
     /* Cambia el color de fondo al pasar el ratón por encima */
+}
+
+.btn-gtc:hover {
+    background-color: #85C1E9;
+    color: white;
+    /* Cambia el color de fondo al pasar el ratón por encima */
+}
+
+.table-st-container {
+    width: 100%;
+    padding: 0 .5em 0 .5em;
+    /* margin: 0 .5em 0 .5em; */
+    height: 50vh;
+    max-height: 50vh;
+    overflow-y: auto;
 }
 
 .btn-rd {
@@ -252,7 +311,7 @@
 }
 
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 10px;
     /* Ancho de la barra de desplazamiento*/
 }
 
@@ -262,7 +321,8 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #888;
+    /* background-color: #888;*/
+    background-color: #f8c471;
     /* Color del "pulgar" de la barra de desplazamiento */
 }
 
@@ -284,4 +344,63 @@ section.active {
     width: 100%;
     display: block;
     opacity: 1;
+}
+
+.rno-rd {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.lno-rd {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.trans {
+    color: #00000000;
+    background-color: #00000000;
+}
+
+.dialog-servicios {
+    padding: 0;
+    border: none;
+    background-color: #00000000;
+    overflow: none;
+
+}
+
+.section-dialog {
+    background-color: white;
+    padding: 0;
+    overflow: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.item-custom label {
+    font-weight: 500;
+}
+
+
+
+.err-container {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+
+
+}
+
+.err-container p {
+    margin: 0 12px;
+    color: red;
+}
+
+.swal-popup {
+    z-index: 99999;
+    /* Ajusta el valor según tus necesidades para que sea mayor que el z-index del dialog */
+}
+
+.question-contratar {
+    z-index: 99999;
 }

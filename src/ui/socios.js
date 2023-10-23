@@ -31,14 +31,14 @@ socioForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   var segundoNombreSociodf = "NA";
   var segundoApellidoSociodf = "NA";
-  var correoSociodf = "NA";
+  var correoSociodf = "actualizarCorreo@mail.com";
   var fijoSociodf = "9999999999";
   var movilSociodf = "9999999999";
   var casaSociodf = "NA";
   var barrioSociodf = "NA";
-  var principalSociodf = "NA";
-  var secundariaSociodf = "NA";
-  var parroquiaSociodf = "NA";
+  var principalSociodf = "Principal";
+  var secundariaSociodf = "Secundaria";
+  var parroquiaSociodf = "Ayora";
 
   if (socioSegundoNombre.value !== null && socioSegundoNombre.value !== "") {
     segundoNombreSociodf = socioSegundoNombre.value;
@@ -105,12 +105,12 @@ socioForm.addEventListener("submit", async (e) => {
     mensajeError.textContent =
       "Ingresa una referencia valida de máximo 45 caracteres.";
     socioReferencia.focus();
-  } else if (!validator.isEmail(socioCorreo.value)) {
-    mensajeError.textContent = "Ingresa un correo válido.";
-    socioCorreo.focus();
-  } else if (!validator.isLength(socioMovil.value, { max: 10, min: 10 })) {
-    mensajeError.textContent = "Ingresa un télefono móvil válido.";
-    socioMovil.focus();
+    // } else if (!validator.isEmail(socioCorreo.value)) {
+    //   mensajeError.textContent = "Ingresa un correo válido.";
+    //   socioCorreo.focus();
+    // } else if (!validator.isLength(socioMovil.value, { max: 10, min: 10 })) {
+    //   mensajeError.textContent = "Ingresa un télefono móvil válido.";
+    //   socioMovil.focus();
   } else {
     const newSocio = {
       primerNombre: socioPrimerNombre.value,
@@ -265,7 +265,7 @@ criterio.onchange = async () => {
     let criterioBuscar = "all";
     let criterioContentBuscar = "all";
     await getSocios(criterioBuscar, criterioContentBuscar);
-  }else{
+  } else {
     criterioContent.readOnly = false;
   }
 };
@@ -335,6 +335,7 @@ async function resetFormAfterUpdate() {
   console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
   console;
   await getSocios(criterioBuscar, criterioContentBuscar);
+  socioPrimerNombre.focus();
   mensajeError.textContent = "";
 }
 async function resetFormAfterSave() {
@@ -346,12 +347,14 @@ async function resetFormAfterSave() {
   editingStatus = false;
   editSocioId = "";
   socioForm.reset();
+  socioPrimerNombre.focus();
   mensajeError.textContent = "";
 }
 function resetForm() {
   editingStatus = false;
   editSocioId = "";
   socioForm.reset();
+  socioPrimerNombre.focus();
   mensajeError.textContent = "";
 }
 function formatearFecha(fecha) {

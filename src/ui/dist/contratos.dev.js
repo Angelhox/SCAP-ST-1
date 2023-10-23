@@ -76,6 +76,13 @@ var sinMedidor = document.getElementById("sinMedidor");
 var titleContratos = document.getElementById("title-contratos"); //Variable que indica el medidor a editar Borrar
 
 var editContratoId = ""; // ----------------------------------------------------------------
+// Variables componentes del formulario.
+// ----------------------------------------------------------------
+
+var cancelarContrato = document.getElementById("cancelar-contrato");
+var generarCodigoBt = document.getElementById("generar-codigo");
+var listaSugerencias = document.getElementById("lista-sugerencias");
+var sugerencias = []; // ----------------------------------------------------------------
 // Esta funcion obtiene los id de los servicios disponibles
 // los manipula como elementos del DOM asignandoles el evento de marcado y desmarcado
 // para validar si se ha seleccionado al menos un servicio a contratar.
@@ -96,7 +103,7 @@ function eventoServiciosId(serviciosFijos) {
                   console.log("Servicios Marcados: ", serviciosMarcados);
                   console.log("Marcado Agua: " + servicioFijo.nombre);
                 } else {
-                  inHabilitarFormMedidor();
+                  // inHabilitarFormMedidor();
                   contratoConMedidor = false;
                   var idABuscar = servicioFijo.id; //--> El ID que deseas buscar y eliminar
 
@@ -159,7 +166,7 @@ function eventoServiciosId(serviciosFijos) {
 
 
 contratoForm.addEventListener("submit", function _callee(e) {
-  var newMedidor, contratoEstadoDf, medidorDf, callePrincipalDf, calleSecundariaDf, numeroCasaDf, observacionDf, newContrato, resultContrato, result, _resultContrato, resultMedidor;
+  var newMedidor, contratoEstadoDf, medidorDf, callePrincipalDf, calleSecundariaDf, numeroCasaDf, observacionDf, _newContrato, resultContrato, _resultContrato, resultMedidor;
 
   return regeneratorRuntime.async(function _callee$(_context2) {
     while (1) {
@@ -176,7 +183,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa un número de cédula correspondiente a un socio registrado.";
           socioContratanteCedula.focus();
-          _context2.next = 123;
+          _context2.next = 95;
           break;
 
         case 8:
@@ -188,7 +195,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una fecha de contrato válida.";
           contratoFecha.focus();
-          _context2.next = 123;
+          _context2.next = 95;
           break;
 
         case 14:
@@ -203,7 +210,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   mensajeError.textContent = "Ingresa un numero de casa válido.";
           //   medidorNumeroCasa.focus();
 
-          _context2.next = 123;
+          _context2.next = 95;
           break;
 
         case 20:
@@ -221,7 +228,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   mensajeError.textContent = "Ingresa una calle secundaria válida.";
           //   medidorSecundaria.focus();
 
-          _context2.next = 123;
+          _context2.next = 95;
           break;
 
         case 26:
@@ -233,7 +240,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una referencia válida.";
           medidorReferencia.focus();
-          _context2.next = 123;
+          _context2.next = 95;
           break;
 
         case 32:
@@ -245,7 +252,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una fecha de instalación válida.";
           medidorInstalacion.focus();
-          _context2.next = 123;
+          _context2.next = 95;
           break;
 
         case 38:
@@ -262,37 +269,21 @@ contratoForm.addEventListener("submit", function _callee(e) {
           // ) {
           //   mensajeError.textContent = "Ingresa una observación válida.";
           //   medidorObservacion.focus();
+          // } else if (serviciosDisponiblesAContratar.length === 0) {
+          //   errorContainer.style.color = "red";
+          //   mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
+          // } else if (serviciosMarcados.length === 0) {
+          //   errorContainer.style.color = "red";
+          //   mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
 
-          _context2.next = 123;
+          _context2.next = 95;
           break;
 
         case 44:
-          if (!(serviciosDisponiblesAContratar.length === 0)) {
-            _context2.next = 49;
-            break;
-          }
-
-          errorContainer.style.color = "red";
-          mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
-          _context2.next = 123;
-          break;
-
-        case 49:
-          if (!(serviciosMarcados.length === 0)) {
-            _context2.next = 54;
-            break;
-          }
-
-          errorContainer.style.color = "red";
-          mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
-          _context2.next = 123;
-          break;
-
-        case 54:
           console.log("Servicios a contratar: " + serviciosDisponiblesAContratar);
 
           if (!(!socioContratanteId == "")) {
-            _context2.next = 122;
+            _context2.next = 94;
             break;
           }
 
@@ -339,7 +330,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
             // referencia: medidorReferencia.value,
             contratosId: contratoId
           };
-          newContrato = {
+          _newContrato = {
             fecha: contratoFecha.value,
             estado: contratoEstadoDf,
             codigo: contratoCodigo.value,
@@ -354,114 +345,136 @@ contratoForm.addEventListener("submit", function _callee(e) {
           };
 
           if (editingStatus) {
-            _context2.next = 95;
+            _context2.next = 76;
             break;
           }
 
-          _context2.prev = 71;
-          _context2.next = 74;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("createContrato", newContrato, numero, sectorId));
+          _context2.prev = 61;
+          _context2.next = 64;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("createContrato", _newContrato, numero, sectorId));
 
-        case 74:
+        case 64:
           resultContrato = _context2.sent;
           console.log("Muestro resultado de insertar contrato: ", resultContrato);
           contratoId = resultContrato.id;
           console.log("Muestro id resultado de insertar contrato: ", contratoId);
+          editContrato(contratoId); // if (!contratoId == "" || !contratoId == undefined) {
+          //   await contratarServicios(
+          //     serviciosDisponiblesAContratar,
+          //     contratoId
+          //   );
+          //   // if (contratoConMedidor) {
+          //   //   console.log("vamos a crear un medidor");
+          //   //   newMedidor.contratosId = contratoId;
+          //   //   const result = await ipcRenderer.invoke(
+          //   //     "createMedidor",
+          //   //     newMedidor
+          //   //   );
+          //   //   console.log(result);
+          //   // }
+          // }
 
-          if (!(!contratoId == "" || !contratoId == undefined)) {
-            _context2.next = 88;
-            break;
-          }
-
-          _context2.next = 81;
-          return regeneratorRuntime.awrap(contratarServicios(serviciosDisponiblesAContratar, contratoId));
-
-        case 81:
-          if (!contratoConMedidor) {
-            _context2.next = 88;
-            break;
-          }
-
-          console.log("vamos a crear un medidor");
-          newMedidor.contratosId = contratoId;
-          _context2.next = 86;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("createMedidor", newMedidor));
-
-        case 86:
-          result = _context2.sent;
-          console.log(result);
-
-        case 88:
-          _context2.next = 93;
+          _context2.next = 74;
           break;
 
-        case 90:
-          _context2.prev = 90;
-          _context2.t0 = _context2["catch"](71);
+        case 71:
+          _context2.prev = 71;
+          _context2.t0 = _context2["catch"](61);
           console.log("Error al registrar el contrato: ", _context2.t0);
 
-        case 93:
-          _context2.next = 114;
+        case 74:
+          _context2.next = 92;
           break;
 
-        case 95:
+        case 76:
           console.log("Editing contrato with electron");
           newMedidor.contratosId = editContratoId;
-          _context2.prev = 97;
-          _context2.next = 100;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, newContrato));
+          _context2.prev = 78;
+          _context2.next = 81;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, _newContrato));
 
-        case 100:
+        case 81:
           _resultContrato = _context2.sent;
 
           if (!contratoConMedidor) {
-            _context2.next = 105;
+            _context2.next = 86;
             break;
           }
 
-          _context2.next = 104;
+          _context2.next = 85;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", editContratoId, newMedidor));
 
-        case 104:
+        case 85:
           resultMedidor = _context2.sent;
 
-        case 105:
-          contratarServicios(serviciosDisponiblesAContratar, editContratoId);
+        case 86:
+          // contratarServicios(serviciosDisponiblesAContratar, editContratoId);
           console.log(_resultContrato);
-          _context2.next = 112;
+          _context2.next = 92;
           break;
 
-        case 109:
-          _context2.prev = 109;
-          _context2.t1 = _context2["catch"](97);
+        case 89:
+          _context2.prev = 89;
+          _context2.t1 = _context2["catch"](78);
           console.log("Error al editar el contrato: ", _context2.t1);
 
-        case 112:
-          editingStatus = false;
-          editContratoId = "";
-
-        case 114:
-          getContratos();
-          contratoId = "";
-          editContratoId = "";
-          contratoConMedidor = false;
-          contratoForm.reset();
-          socioContratanteCedula.focus();
-          _context2.next = 123;
+        case 92:
+          _context2.next = 95;
           break;
 
-        case 122:
+        case 94:
           console.log("Socio not found");
 
-        case 123:
+        case 95:
         case "end":
           return _context2.stop();
       }
     }
-  }, null, null, [[71, 90], [97, 109]]);
+  }, null, null, [[61, 71], [78, 89]]);
 }); // ----------------------------------------------------------------
-// Funcion que recibe los id de servicios a contratar y los relaciona con el id del contrato
+// Funcion que recibe el id del servicio a contratar y los relaciona con el id del contrato
+// Registra un servicio contratado a la vez.
 // ----------------------------------------------------------------
+
+function contratarServicio(servicioAContratar, contratoId) {
+  var adquiridoSn, resultServiciosContratados;
+  return regeneratorRuntime.async(function contratarServicio$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          console.log("Contratando Servicios para: " + contratoId + "|" + servicioAContratar);
+          _context3.prev = 1;
+          adquiridoSn = "Innactivo";
+
+          if (document.getElementById(servicioAContratar).checked) {
+            adquiridoSn = "Activo";
+          }
+
+          _context3.next = 6;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("createServicioFijoContratado", servicioAContratar, contratoId, 1, adquiridoSn));
+
+        case 6:
+          resultServiciosContratados = _context3.sent;
+          console.log("Resultado de contratar servicios: ", resultServiciosContratados);
+          _context3.next = 13;
+          break;
+
+        case 10:
+          _context3.prev = 10;
+          _context3.t0 = _context3["catch"](1);
+          console.log(_context3.t0);
+
+        case 13:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  }, null, null, [[1, 10]]);
+} // ----------------------------------------------------------------
+// Funcion que recibe los id de servicios a contratar y los relaciona con el id del contrato
+// Registra varios servicios contratados a la vez
+// ----------------------------------------------------------------
+
 
 function contratarServicios(serviciosAContratar, contratoId) {
   console.log("Contratando Servicios para: " + contratoId);
@@ -470,9 +483,9 @@ function contratarServicios(serviciosAContratar, contratoId) {
   try {
     serviciosAContratar.forEach(function _callee2(servicioAContratar) {
       var adquiridoSn, resultServiciosContratados;
-      return regeneratorRuntime.async(function _callee2$(_context3) {
+      return regeneratorRuntime.async(function _callee2$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               adquiridoSn = "";
 
@@ -482,18 +495,18 @@ function contratarServicios(serviciosAContratar, contratoId) {
                 adquiridoSn = "Innactivo";
               }
 
-              _context3.next = 4;
+              _context4.next = 4;
               return regeneratorRuntime.awrap(ipcRenderer.invoke("createServiciosContratados", servicioAContratar, contratoId, 1, adquiridoSn));
 
             case 4:
-              resultServiciosContratados = _context3.sent;
+              resultServiciosContratados = _context4.sent;
               console.log("Resultado de contratar servicios: ", resultServiciosContratados);
               conteoRegistros = conteoRegistros - 1;
               console.log("conteo: " + conteoRegistros);
 
             case 8:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
       });
@@ -555,7 +568,7 @@ function renderContratosConMedidor(datosContratos) {
     divCol.className = " col-xl-6 col-lg-6 col-md-6 col-sm-12 px-1"; // Crea el div con la clase "card" y estilos
 
     var divCard = document.createElement("div");
-    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card";
+    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 card";
     divCard.style.padding = "0.3em";
     divCard.style.width = "100%";
     divCard.style.backgroundColor = "#d6eaf8"; // Crea el div del encabezado con la clase "card-header" y estilos
@@ -585,8 +598,8 @@ function renderContratosConMedidor(datosContratos) {
     pText3.className = "mp-0 fs-5";
     pText3.textContent = "Socio:";
     var pTrans2 = document.createElement("p");
-    pTrans2.classList.Name = "trans mp-0";
     pTrans2.textContent = "-";
+    pTrans2.className = "trans mp-0";
     var pText4 = document.createElement("p");
     pText4.className = "mp-0 mt-1";
     pText4.style.fontSize = "1em";
@@ -995,7 +1008,7 @@ function renderContratosSinMedidor(datosContratosSinMedidor) {
 function renderServiciosContratados(serviciosContratados) {
   serviciosContratadosList.innerHTML = "";
   serviciosContratados.forEach(function (servicioContratado) {
-    serviciosContratadosList.innerHTML += "\n     \n    <div class=\"col-12 text-center \">\n    <div class=\"card card-fondo card-espacios\" style=\"height: 12rem\">\n      <div class=\"card-zona-img\"></div>\n      <div class=\"card-body col-12 card-contenido\">\n        <div class=\"col-12\">\n          <h5 class=\"card-title\">".concat(servicioContratado.nombre, "</h5>\n        </div>\n        <div class=\"col-12 card-zona-desc-ct\">\n          <p class=\"card-text\">\n            ").concat(servicioContratado.descripcion, "\n          </p>\n        </div>\n        <div\n          class=\"col-12 d-flex justify-content-center align-items-center\"\n        ></div>\n      </div>\n    </div>\n  </div>\n      ");
+    serviciosContratadosList.innerHTML += "\n     \n    <div class=\"col-12 text-center  my-1\">\n    <div class=\"card card-fondo card-espacios mx-2\" style=\"height: 12rem; width:100%\">\n      <div class=\"card-zona-img\"></div>\n      <div class=\"card-body col-12 card-contenido\">\n        <div class=\"col-12\">\n          <h5 class=\"card-title\">".concat(servicioContratado.nombre, "</h5>\n        </div>\n        <div class=\"col-12 card-zona-desc-ct\">\n          <p class=\"card-text\">\n            ").concat(servicioContratado.descripcion, "\n          </p>\n        </div>\n        <div\n          class=\"col-12 d-flex justify-content-center align-items-center\"\n        ></div>\n      </div>\n    </div>\n  </div>\n      ");
   });
   console.log(serviciosDisponiblesAContratar[0]);
 } // ----------------------------------------------------------------
@@ -1004,9 +1017,10 @@ function renderServiciosContratados(serviciosContratados) {
 
 
 function renderServiciosDisponibles(serviciosDisponibles) {
+  serviciosDisponiblesAContratar = [];
   servicosDisponiblesList.innerHTML = "";
 
-  for (var i = 0; i < serviciosDisponibles.length; i++) {
+  var _loop = function _loop(i) {
     console.log("Servicios: ", serviciosDisponibles[i]); //serviciosContratados.forEach((servicioContratado) => {
 
     serviciosDisponiblesAContratar.push(serviciosDisponibles[i].id);
@@ -1025,30 +1039,196 @@ function renderServiciosDisponibles(serviciosDisponibles) {
     var description = document.createElement("p");
     description.classList.add("card-text");
     description.textContent = serviciosDisponibles[i].descripcion;
+    var divValue = document.createElement("div");
+    var divRowBtn = document.createElement("div");
+    divRowBtn.className = "row";
+    divValue.className = "col-4 mp-0 text-center";
+    var pValue = document.createElement("p");
+    pValue.className = "mp-0 value-disponibles";
+    pValue.textContent = "$" + parseFloat(serviciosDisponibles[i].valor).toFixed(2);
+    divValue.appendChild(pValue);
     var checkboxDiv = document.createElement("div");
-    checkboxDiv.classList.add("col-12", "d-flex", "justify-content-center", "align-items-center");
+    checkboxDiv.classList.add("col-8", "d-flex", "justify-content-center", "align-items-center");
     var checkbox = document.createElement("input"); //checkbox.checked = "false";
 
     checkbox.type = "checkbox";
     checkbox.classList.add("btn-check"); //checkbox.name = "options-outlined";
 
-    checkbox.id = serviciosDisponibles[i].id; // checkbox.autocomplete = "off";
-
+    checkbox.id = serviciosDisponibles[i].id;
+    checkbox.autocomplete = "off";
     checkbox.checked = false;
+
+    checkbox.onclick = function () {
+      if (serviciosDisponibles[i].nombre === "Agua Potable") {
+        habilitarFormMedidor();
+
+        if (validator.isEmpty(medidorInstalacion.value)) {
+          errorContainer.style.color = "red";
+          mensajeError.textContent = "Debes ingresar una fecha de instalacion válida.";
+          medidorInstalacion.focus();
+          checkbox.checked = false;
+        } else if (validator.isEmpty(medidorMarca.value)) {
+          errorContainer.style.color = "red";
+          mensajeError.textContent = "Debes ingresar una marca valida para el medidor.";
+          medidorMarca.focus();
+          checkbox.checked = false;
+        } else {
+          Swal.fire({
+            title: "¿Quieres contratar este servicio para este contrato?",
+            text: "El valor se cargara en la planilla a partir del mes próximo.",
+            icon: "question",
+            iconColor: "#f8c471",
+            showCancelButton: true,
+            confirmButtonColor: "#2874A6",
+            cancelButtonColor: "#EC7063 ",
+            confirmButtonText: "Sí, continuar",
+            cancelButtonText: "Cancelar"
+          }).then(function _callee3(result) {
+            var observacionDf, resultContrato, _result;
+
+            return regeneratorRuntime.async(function _callee3$(_context5) {
+              while (1) {
+                switch (_context5.prev = _context5.next) {
+                  case 0:
+                    if (!result.isConfirmed) {
+                      _context5.next = 20;
+                      break;
+                    }
+
+                    // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                    // checkbox.checked = true;
+                    observacionDf = "SN";
+
+                    if (!validator.isEmpty(medidorObservacion.value)) {
+                      observacionDf = medidorObservacion.value;
+                    }
+
+                    newContrato = {
+                      medidorSn: "Si"
+                    };
+                    newMedidor = {
+                      codigo: contratoCodigo.value,
+                      fechaInstalacion: medidorInstalacion.value,
+                      marca: medidorMarca.value,
+                      observacion: observacionDf,
+                      // barrio: medidorBarrio.value,
+                      // callePrincipal: medidorPrincipal.value,
+                      // calleSecundaria: medidorSecundaria.value,
+                      // numeroCasa: medidorNumeroCasa.value,
+                      // referencia: medidorReferencia.value,
+                      contratosId: editContratoId
+                    };
+                    _context5.next = 7;
+                    return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, newContrato));
+
+                  case 7:
+                    resultContrato = _context5.sent;
+                    console.log("vamos a crear un medidor");
+                    _context5.next = 11;
+                    return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", editContratoId, newMedidor));
+
+                  case 11:
+                    _result = _context5.sent;
+                    console.log("Resultado del medidor: " + _result);
+
+                    if (_result.id !== undefined) {
+                      console.log("Muestro result del medior: " + _result.id);
+                      contratarServicio(serviciosDisponibles[i].id, editContratoId);
+                    }
+
+                    _context5.next = 16;
+                    return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                  case 16:
+                    _context5.next = 18;
+                    return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                  case 18:
+                    _context5.next = 22;
+                    break;
+
+                  case 20:
+                    checkbox.checked = false;
+                    inHabilitarFormMedidor();
+
+                  case 22:
+                  case "end":
+                    return _context5.stop();
+                }
+              }
+            });
+          });
+        }
+      } else {
+        Swal.fire({
+          title: "¿Quieres contratar este servicio para este contrato?",
+          text: "El valor se cargara en la planilla a partir del mes próximo.",
+          icon: "question",
+          iconColor: "#f8c471",
+          showCancelButton: true,
+          confirmButtonColor: "#2874A6",
+          cancelButtonColor: "#EC7063 ",
+          confirmButtonText: "Sí, continuar",
+          cancelButtonText: "Cancelar"
+        }).then(function _callee4(result) {
+          return regeneratorRuntime.async(function _callee4$(_context6) {
+            while (1) {
+              switch (_context6.prev = _context6.next) {
+                case 0:
+                  if (!result.isConfirmed) {
+                    _context6.next = 8;
+                    break;
+                  }
+
+                  // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                  // checkbox.checked = true;
+                  contratarServicio(serviciosDisponibles[i].id, editContratoId);
+                  _context6.next = 4;
+                  return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                case 4:
+                  _context6.next = 6;
+                  return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                case 6:
+                  _context6.next = 9;
+                  break;
+
+                case 8:
+                  checkbox.checked = false;
+
+                case 9:
+                case "end":
+                  return _context6.stop();
+              }
+            }
+          });
+        });
+      }
+    };
+
     var label = document.createElement("label");
-    label.style.width = "40%";
+    label.style.width = "100%";
     label.classList.add("btn", "btn-outline-warning");
     label.setAttribute("for", serviciosDisponibles[i].id);
-    label.textContent = "Adquirido";
+    label.textContent = "Contratar";
     checkboxDiv.appendChild(checkbox);
     checkboxDiv.appendChild(label);
+    divRowBtn.appendChild(divValue);
+    divRowBtn.appendChild(checkboxDiv);
     cardBody.appendChild(title);
     cardBody.appendChild(description);
-    cardBody.appendChild(checkboxDiv);
+    cardBody.appendChild(divRowBtn); // cardBody.appendChild(divValue);
+    // cardBody.appendChild(checkboxDiv);
+
     card.appendChild(cardImage);
     card.appendChild(cardBody);
     cardContainer.appendChild(card);
     servicosDisponiblesList.appendChild(cardContainer);
+  };
+
+  for (var i = 0; i < serviciosDisponibles.length; i++) {
+    _loop(i);
   }
 
   marcarServiciosContratados();
@@ -1059,8 +1239,84 @@ function marcarServiciosContratados() {
   if (serviciosEditar !== null) {
     console.log("Marcando servicios: " + serviciosEditar);
 
+    var _loop2 = function _loop2(i) {
+      var checkContratados = document.getElementById(serviciosEditar[i].serviciosId);
+      checkContratados.checked = true;
+
+      checkContratados.onclick = function () {
+        // checkContratados.checked = false;
+        Swal.fire({
+          title: "¿Quieres quitar este servicio de este contrato?",
+          text: "El valor no se cargara en la planilla a partir del mes próximo.",
+          icon: "question",
+          iconColor: "#f8c471",
+          showCancelButton: true,
+          confirmButtonColor: "#2874A6",
+          cancelButtonColor: "#EC7063 ",
+          confirmButtonText: "Sí, continuar",
+          cancelButtonText: "Cancelar"
+        }).then(function _callee5(result) {
+          var _newContrato2, resultContrato;
+
+          return regeneratorRuntime.async(function _callee5$(_context7) {
+            while (1) {
+              switch (_context7.prev = _context7.next) {
+                case 0:
+                  if (!result.isConfirmed) {
+                    _context7.next = 16;
+                    break;
+                  }
+
+                  if (!(serviciosEditar[i].nombre === "Agua Potable")) {
+                    _context7.next = 9;
+                    break;
+                  }
+
+                  _newContrato2 = {
+                    medidorSn: "No"
+                  };
+                  _context7.next = 5;
+                  return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, _newContrato2));
+
+                case 5:
+                  resultContrato = _context7.sent;
+                  contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
+                  _context7.next = 10;
+                  break;
+
+                case 9:
+                  contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
+
+                case 10:
+                  _context7.next = 12;
+                  return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                case 12:
+                  _context7.next = 14;
+                  return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                case 14:
+                  _context7.next = 17;
+                  break;
+
+                case 16:
+                  checkContratados.checked = true;
+
+                case 17:
+                case "end":
+                  return _context7.stop();
+              }
+            }
+          });
+        });
+      };
+
+      var labelElement = document.querySelector('label[for="' + serviciosEditar[i].serviciosId + '"]');
+      labelElement.textContent = "Contratado";
+    };
+
     for (var i = 0; i < serviciosEditar.length; i++) {
-      document.getElementById(serviciosEditar[i].serviciosId).checked = true;
+      _loop2(i);
     }
   }
 } // ----------------------------------------------------------------
@@ -1071,24 +1327,24 @@ function marcarServiciosContratados() {
 
 var detallesContratos = function detallesContratos(id) {
   var serviciosContratos;
-  return regeneratorRuntime.async(function detallesContratos$(_context4) {
+  return regeneratorRuntime.async(function detallesContratos$(_context8) {
     while (1) {
-      switch (_context4.prev = _context4.next) {
+      switch (_context8.prev = _context8.next) {
         case 0:
           console.log("Detallles de : " + id);
           contratoForm.reset();
-          _context4.next = 4;
+          _context8.next = 4;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getServiciosContratadosById", id));
 
         case 4:
-          serviciosContratos = _context4.sent;
+          serviciosContratos = _context8.sent;
           renderServiciosContratados(serviciosContratos);
           console.log(serviciosContratos);
-          return _context4.abrupt("return", serviciosContratos);
+          return _context8.abrupt("return", serviciosContratos);
 
         case 8:
         case "end":
-          return _context4.stop();
+          return _context8.stop();
       }
     }
   });
@@ -1100,106 +1356,121 @@ var detallesContratos = function detallesContratos(id) {
 
 var editContrato = function editContrato(id) {
   var contrato, conMedidor;
-  return regeneratorRuntime.async(function editContrato$(_context5) {
+  return regeneratorRuntime.async(function editContrato$(_context9) {
     while (1) {
-      switch (_context5.prev = _context5.next) {
+      switch (_context9.prev = _context9.next) {
         case 0:
           contratoForm.reset();
-          _context5.next = 3;
+          getServiciosDisponibles();
+          _context9.next = 4;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosContratosById", id));
 
-        case 3:
-          contrato = _context5.sent;
+        case 4:
+          contrato = _context9.sent;
           console.log("Recibido: " + contrato);
           conMedidor = contrato.medidorSn;
 
-          if (conMedidor == "Si") {
-            console.log("conMedidor");
-            habilitarFormMedidor();
-            contratoFecha.value = formatearFecha(contrato.fecha);
-            socioContratanteCedula.value = contrato.cedulaPasaporte;
-            socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
-            socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre;
-            contratoCodigo.value = contrato.codigo;
-            contratoConMedidor = true; //medidorCodigo.value = contrato.codigoMedidor;
+          if (!(conMedidor == "Si")) {
+            _context9.next = 38;
+            break;
+          }
 
+          contratoConMedidor = true;
+          console.log("conMedidor");
+          _context9.next = 12;
+          return regeneratorRuntime.awrap(habilitarFormMedidor());
+
+        case 12:
+          contratoFecha.value = formatearFecha(contrato.fecha);
+          socioContratanteCedula.value = contrato.cedulaPasaporte;
+          socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
+          socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre;
+          contratoCodigo.value = contrato.codigo;
+          contratoConMedidor = true; //medidorCodigo.value = contrato.codigoMedidor;
+
+          medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
+          medidorMarca.value = contrato.marca;
+          medidorObservacion.value = contrato.observacion;
+          medidorBarrio.value = contrato.barrio;
+          medidorPrincipal.value = contrato.callePrincipal;
+          medidorSecundaria.value = contrato.calleSecundaria;
+          medidorNumeroCasa.value = contrato.numeroCasa;
+          medidorReferencia.value = contrato.referencia; // Permitimos editar los datos del medidor
+          // medidorCodigo.disabled = false;
+
+          medidorInstalacion.readOnly = true;
+          medidorInstalacion.disabled = false;
+          medidorMarca.disabled = false;
+          medidorObservacion.disabled = false; // Inhabilitamos los campos que no se deben editar
+
+          contratoFecha.readOnly = true;
+          socioContratanteCedula.readOnly = true;
+          socioContratanteApellido.readOnly = true;
+          socioContratanteNombre.readOnly = true;
+          generarCodigoBt.disabled = true; // ~~~~~~~~~~~~~~~~
+
+          editContratoId = contrato.id;
+          _context9.next = 58;
+          break;
+
+        case 38:
+          console.log("sinMedidor");
+          contratoConMedidor = false;
+          inHabilitarFormMedidor();
+          contratoCodigo.value = contrato.codigo;
+          contratoFecha.value = formatearFecha(contrato.fecha);
+          socioContratanteCedula.value = contrato.cedulaPasaporte;
+          socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
+          socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre; // if (medidor.pagoRecoleccionDesechos == "Si") {
+          //   contratoPagoRecoleccion.checked = true;
+          // } else {
+          //   contratoPagoRecoleccion.checked = false;
+          // }
+          // if (medidor.pagoAlcanterillado == "Si") {
+          //   contratoPagoAlcanterillado.checked = true;
+          // } else {
+          //   contratoPagoAlcanterillado.checked = false;
+          // }
+          // if (medidor.pagoEscrituras == "Si") {
+          //   contratoPagoEscrituras.checked = true;
+          // } else {
+          //   contratoPagoEscrituras.checked = false;
+          // }
+          // if (medidor.pagoAguaPotable == "Si") {
+          //   contratoPagoAguaPotable.checked = true;
+          // } else {
+          //   contratoPagoAguaPotable.checked = false;
+          // }
+          // medidorCodigo.value = medidor.codigo;
+          // medidorInstalacion.value = formatearFecha(medidor.fechaInstalacion);
+          // medidoresDisponibles.selectedIndex = 0;
+          // medidorMarca.value = medidor.marca;
+          // medidorBarrio.value = medidor.barrio;
+          // medidorObservacion.value = medidor.observacion;
+
+          medidorBarrio.value = contrato.barrio;
+          medidorPrincipal.value = contrato.callePrincipal;
+          medidorSecundaria.value = contrato.calleSecundaria;
+          medidorNumeroCasa.value = contrato.numeroCasa;
+          medidorReferencia.value = contrato.referencia; // Permitimos editar los datos del medidor
+          // medidorCodigo.disabled = false;
+          // Inhabilitamos los campos que no se deben editar
+
+          if (contrato.codigoMedidor != undefined) {
             medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
             medidorMarca.value = contrato.marca;
             medidorObservacion.value = contrato.observacion;
-            medidorBarrio.value = contrato.barrio;
-            medidorPrincipal.value = contrato.callePrincipal;
-            medidorSecundaria.value = contrato.calleSecundaria;
-            medidorNumeroCasa.value = contrato.numeroCasa;
-            medidorReferencia.value = contrato.referencia; // Permitimos editar los datos del medidor
-            // medidorCodigo.disabled = false;
-
-            medidorInstalacion.readOnly = true;
-            medidorInstalacion.disabled = false;
-            medidorMarca.disabled = false;
-            medidorObservacion.disabled = false; // Inhabilitamos los campos que no se deben editar
-
-            contratoFecha.readOnly = true;
-            socioContratanteCedula.readOnly = true;
-            socioContratanteApellido.readOnly = true;
-            socioContratanteNombre.readOnly = true; // ~~~~~~~~~~~~~~~~
-
-            editContratoId = contrato.id;
-          } else {
-            console.log("sinMedidor");
-            inHabilitarFormMedidor();
-            contratoCodigo.value = contrato.codigo;
-            contratoFecha.value = formatearFecha(contrato.fecha);
-            socioContratanteCedula.value = contrato.cedulaPasaporte;
-            socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
-            socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre; // if (medidor.pagoRecoleccionDesechos == "Si") {
-            //   contratoPagoRecoleccion.checked = true;
-            // } else {
-            //   contratoPagoRecoleccion.checked = false;
-            // }
-            // if (medidor.pagoAlcanterillado == "Si") {
-            //   contratoPagoAlcanterillado.checked = true;
-            // } else {
-            //   contratoPagoAlcanterillado.checked = false;
-            // }
-            // if (medidor.pagoEscrituras == "Si") {
-            //   contratoPagoEscrituras.checked = true;
-            // } else {
-            //   contratoPagoEscrituras.checked = false;
-            // }
-            // if (medidor.pagoAguaPotable == "Si") {
-            //   contratoPagoAguaPotable.checked = true;
-            // } else {
-            //   contratoPagoAguaPotable.checked = false;
-            // }
-            // medidorCodigo.value = medidor.codigo;
-            // medidorInstalacion.value = formatearFecha(medidor.fechaInstalacion);
-            // medidoresDisponibles.selectedIndex = 0;
-            // medidorMarca.value = medidor.marca;
-            // medidorBarrio.value = medidor.barrio;
-            // medidorObservacion.value = medidor.observacion;
-
-            medidorBarrio.value = contrato.barrio;
-            medidorPrincipal.value = contrato.callePrincipal;
-            medidorSecundaria.value = contrato.calleSecundaria;
-            medidorNumeroCasa.value = contrato.numeroCasa;
-            medidorReferencia.value = contrato.referencia; // Permitimos editar los datos del medidor
-            // medidorCodigo.disabled = false;
-            // Inhabilitamos los campos que no se deben editar
-
-            if (contrato.codigoMedidor != undefined) {
-              medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
-              medidorMarca.value = contrato.marca;
-              medidorObservacion.value = contrato.observacion;
-            }
-
-            contratoFecha.readOnly = true;
-            socioContratanteCedula.readOnly = true;
-            socioContratanteApellido.readOnly = true;
-            socioContratanteNombre.readOnly = true; // ~~~~~~~~~~~~~~~~
-
-            editContratoId = contrato.id;
           }
 
+          contratoFecha.readOnly = true;
+          socioContratanteCedula.readOnly = true;
+          socioContratanteApellido.readOnly = true;
+          socioContratanteNombre.readOnly = true;
+          generarCodigoBt.disabled = true; // ~~~~~~~~~~~~~~~~
+
+          editContratoId = contrato.id;
+
+        case 58:
           socioContratanteId = contrato.sociosId;
           editingStatus = true;
           console.log(contrato);
@@ -1209,9 +1480,9 @@ var editContrato = function editContrato(id) {
           seccion2.classList.remove("active");
           seccion1.classList.add("active");
 
-        case 15:
+        case 66:
         case "end":
-          return _context5.stop();
+          return _context9.stop();
       }
     }
   });
@@ -1222,29 +1493,29 @@ var editContrato = function editContrato(id) {
 
 
 function editarServiciosContratados(id) {
-  return regeneratorRuntime.async(function editarServiciosContratados$(_context6) {
+  return regeneratorRuntime.async(function editarServiciosContratados$(_context10) {
     while (1) {
-      switch (_context6.prev = _context6.next) {
+      switch (_context10.prev = _context10.next) {
         case 0:
-          _context6.prev = 0;
-          _context6.next = 3;
+          _context10.prev = 0;
+          _context10.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getServiciosContratadosById", id));
 
         case 3:
-          serviciosEditar = _context6.sent;
+          serviciosEditar = _context10.sent;
           //serviciosContratadosList.push(serviciosContratados.serviciosFijosId);
           console.log("Servicios a editar: ", serviciosEditar);
-          _context6.next = 10;
+          _context10.next = 10;
           break;
 
         case 7:
-          _context6.prev = 7;
-          _context6.t0 = _context6["catch"](0);
-          console.log("Error al cargar los servicios contratados para " + id + " : " + _context6.t0);
+          _context10.prev = 7;
+          _context10.t0 = _context10["catch"](0);
+          console.log("Error al cargar los servicios contratados para " + id + " : " + _context10.t0);
 
         case 10:
         case "end":
-          return _context6.stop();
+          return _context10.stop();
       }
     }
   }, null, null, [[0, 7]]);
@@ -1255,29 +1526,29 @@ function editarServiciosContratados(id) {
 
 var deleteMedidor = function deleteMedidor(id) {
   var response, result;
-  return regeneratorRuntime.async(function deleteMedidor$(_context7) {
+  return regeneratorRuntime.async(function deleteMedidor$(_context11) {
     while (1) {
-      switch (_context7.prev = _context7.next) {
+      switch (_context11.prev = _context11.next) {
         case 0:
           response = confirm("Estas seguro de eliminar este medidor?");
 
           if (!response) {
-            _context7.next = 8;
+            _context11.next = 8;
             break;
           }
 
           console.log("id from medidores.js");
-          _context7.next = 5;
+          _context11.next = 5;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("deleteMedidor", id));
 
         case 5:
-          result = _context7.sent;
+          result = _context11.sent;
           console.log("Resultado medidores.js", result);
           getContratos();
 
         case 8:
         case "end":
-          return _context7.stop();
+          return _context11.stop();
       }
     }
   });
@@ -1287,21 +1558,21 @@ var deleteMedidor = function deleteMedidor(id) {
 
 
 var getContratos = function getContratos() {
-  return regeneratorRuntime.async(function getContratos$(_context8) {
+  return regeneratorRuntime.async(function getContratos$(_context12) {
     while (1) {
-      switch (_context8.prev = _context8.next) {
+      switch (_context12.prev = _context12.next) {
         case 0:
-          _context8.next = 2;
+          _context12.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosConMedidor"));
 
         case 2:
-          datosContratos = _context8.sent;
+          datosContratos = _context12.sent;
           console.log(datosContratos);
           renderContratosConMedidor(datosContratos);
 
         case 5:
         case "end":
-          return _context8.stop();
+          return _context12.stop();
       }
     }
   });
@@ -1311,21 +1582,21 @@ var getContratos = function getContratos() {
 
 
 var getContratosSinMedidor = function getContratosSinMedidor() {
-  return regeneratorRuntime.async(function getContratosSinMedidor$(_context9) {
+  return regeneratorRuntime.async(function getContratosSinMedidor$(_context13) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context13.prev = _context13.next) {
         case 0:
-          _context9.next = 2;
+          _context13.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosSinMedidor"));
 
         case 2:
-          datosContratosSinMedidor = _context9.sent;
+          datosContratosSinMedidor = _context13.sent;
           console.log("Here: ", datosContratosSinMedidor);
           renderContratosSinMedidor(datosContratosSinMedidor);
 
         case 5:
         case "end":
-          return _context9.stop();
+          return _context13.stop();
       }
     }
   });
@@ -1335,22 +1606,22 @@ var getContratosSinMedidor = function getContratosSinMedidor() {
 
 
 var getServiciosDisponibles = function getServiciosDisponibles() {
-  return regeneratorRuntime.async(function getServiciosDisponibles$(_context10) {
+  return regeneratorRuntime.async(function getServiciosDisponibles$(_context14) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context14.prev = _context14.next) {
         case 0:
-          _context10.next = 2;
+          _context14.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getServiciosDisponibles"));
 
         case 2:
-          serviciosDisponibles = _context10.sent;
+          serviciosDisponibles = _context14.sent;
           console.log(serviciosDisponibles);
           renderServiciosDisponibles(serviciosDisponibles);
           eventoServiciosId(serviciosDisponibles);
 
         case 6:
         case "end":
-          return _context10.stop();
+          return _context14.stop();
       }
     }
   });
@@ -1360,24 +1631,20 @@ var getServiciosDisponibles = function getServiciosDisponibles() {
 
 
 function init() {
-  return regeneratorRuntime.async(function init$(_context11) {
+  return regeneratorRuntime.async(function init$(_context15) {
     while (1) {
-      switch (_context11.prev = _context11.next) {
+      switch (_context15.prev = _context15.next) {
         case 0:
-          _context11.next = 2;
+          _context15.next = 2;
           return regeneratorRuntime.awrap(getContratos());
 
         case 2:
-          _context11.next = 4;
+          _context15.next = 4;
           return regeneratorRuntime.awrap(getContratosSinMedidor());
 
         case 4:
-          _context11.next = 6;
-          return regeneratorRuntime.awrap(getServiciosDisponibles());
-
-        case 6:
         case "end":
-          return _context11.stop();
+          return _context15.stop();
       }
     }
   });
@@ -1393,26 +1660,26 @@ function formatearFecha(fecha) {
 } // ----------------------------------------------------------------
 // Cargar datos de los socios registrados
 // ----------------------------------------------------------------
-
-
-var inputSugerencias = document.getElementById("cedulaSocioContratante");
-var listaSugerencias = document.getElementById("lista-sugerencias");
-var sugerencias = []; // ----------------------------------------------------------------
+// var inputSugerencias = document.getElementById("cedulaSocioContratante");
+// var listaSugerencias = document.getElementById("lista-sugerencias");
+// var sugerencias = [];
+// ----------------------------------------------------------------
 // Obtener las sugerencias desde la base de datos
 // ----------------------------------------------------------------
 
+
 function obtenerSugerencias() {
   var cedulasSugerencias;
-  return regeneratorRuntime.async(function obtenerSugerencias$(_context12) {
+  return regeneratorRuntime.async(function obtenerSugerencias$(_context16) {
     while (1) {
-      switch (_context12.prev = _context12.next) {
+      switch (_context16.prev = _context16.next) {
         case 0:
-          _context12.prev = 0;
-          _context12.next = 3;
+          _context16.prev = 0;
+          _context16.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getSocios"));
 
         case 3:
-          cedulasSugerencias = _context12.sent;
+          cedulasSugerencias = _context16.sent;
           sugerencias = cedulasSugerencias.map(function (objeto) {
             return objeto; // objeto.cedulaPasaporte +
             // " " +
@@ -1424,37 +1691,73 @@ function obtenerSugerencias() {
             // " " +
             // objeto.segundoApellido
           });
-          _context12.next = 10;
+          _context16.next = 10;
           break;
 
         case 7:
-          _context12.prev = 7;
-          _context12.t0 = _context12["catch"](0);
-          console.error("Error al obtener las sugerencias:", _context12.t0);
+          _context16.prev = 7;
+          _context16.t0 = _context16["catch"](0);
+          console.error("Error al obtener las sugerencias:", _context16.t0);
 
         case 10:
         case "end":
-          return _context12.stop();
+          return _context16.stop();
       }
     }
   }, null, null, [[0, 7]]);
 }
 
-inputSugerencias.addEventListener("input", function () {
-  var textoIngresado = inputSugerencias.value;
+socioContratanteCedula.addEventListener("input", function () {
+  socioContratanteNombre.value = "";
+  socioContratanteApellido.value = "";
+  var textoIngresado = socioContratanteCedula.value;
   var sugerenciasFiltradas = sugerencias.filter(function (sugerencia) {
     return sugerencia.cedulaPasaporte.startsWith(textoIngresado);
   });
-  mostrarSugerencias(sugerenciasFiltradas);
+
+  if (socioContratanteCedula.value !== "") {
+    mostrarSugerencias(sugerenciasFiltradas);
+  } else {
+    listaSugerencias.style.display = "none";
+  }
+});
+socioContratanteApellido.addEventListener("input", function () {
+  socioContratanteNombre.value = "";
+  socioContratanteCedula.value = "";
+  var textoIngresado = socioContratanteApellido.value;
+  var sugerenciasFiltradas = sugerencias.filter(function (sugerencia) {
+    return sugerencia.primerApellido.startsWith(textoIngresado), sugerencia.segundoApellido.startsWith(textoIngresado);
+  });
+
+  if (socioContratanteApellido.value !== "") {
+    mostrarSugerencias(sugerenciasFiltradas);
+  } else {
+    listaSugerencias.style.display = "none";
+  }
+});
+socioContratanteNombre.addEventListener("input", function () {
+  socioContratanteApellido.value = "";
+  socioContratanteCedula.value = "";
+  var textoIngresado = socioContratanteNombre.value;
+  var sugerenciasFiltradas = sugerencias.filter(function (sugerencia) {
+    return sugerencia.primerNombre.startsWith(textoIngresado), sugerencia.segundoNombre.startsWith(textoIngresado);
+  });
+
+  if (socioContratanteNombre.value !== "") {
+    mostrarSugerencias(sugerenciasFiltradas);
+  } else {
+    listaSugerencias.style.display = "none";
+  }
 });
 
 function mostrarSugerencias(sugerencias) {
   listaSugerencias.innerHTML = "";
+  listaSugerencias.style.display = "block";
   sugerencias.forEach(function (sugerencia) {
     var li = document.createElement("li");
-    li.textContent = sugerencia.cedulaPasaporte + " (" + sugerencia.primerNombre + " " + sugerencia.primerApellido + " " + sugerencia.segundoApellido + ")";
+    li.textContent = sugerencia.cedulaPasaporte + " (" + sugerencia.primerNombre + " " + sugerencia.segundoNombre + " " + sugerencia.primerApellido + " " + sugerencia.segundoApellido + ")";
     li.addEventListener("click", function () {
-      inputSugerencias.value = sugerencia.cedulaPasaporte;
+      socioContratanteCedula.value = sugerencia.cedulaPasaporte;
       obtenerDatosSocioContratante(sugerencia.cedulaPasaporte);
       listaSugerencias.innerHTML = "";
     });
@@ -1478,16 +1781,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var obtenerDatosSocioContratante = function obtenerDatosSocioContratante(cedula) {
   var socioContratante;
-  return regeneratorRuntime.async(function obtenerDatosSocioContratante$(_context13) {
+  return regeneratorRuntime.async(function obtenerDatosSocioContratante$(_context17) {
     while (1) {
-      switch (_context13.prev = _context13.next) {
+      switch (_context17.prev = _context17.next) {
         case 0:
           console.log("Se llamo a la carga de datos del contratante", cedula);
-          _context13.next = 3;
+          _context17.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratanteByCedula", cedula));
 
         case 3:
-          socioContratante = _context13.sent;
+          socioContratante = _context17.sent;
           socioContratanteNombre.value = socioContratante.primerNombre + " " + socioContratante.segundoNombre;
           socioContratanteApellido.value = socioContratante.primerApellido + " " + socioContratante.segundoApellido;
           socioContratanteId = socioContratante.id;
@@ -1496,7 +1799,7 @@ var obtenerDatosSocioContratante = function obtenerDatosSocioContratante(cedula)
 
         case 9:
         case "end":
-          return _context13.stop();
+          return _context17.stop();
       }
     }
   });
@@ -1507,21 +1810,21 @@ var obtenerDatosSocioContratante = function obtenerDatosSocioContratante(cedula)
 
 var verificarContratosAnteriores = function verificarContratosAnteriores(cedula) {
   var contratos;
-  return regeneratorRuntime.async(function verificarContratosAnteriores$(_context14) {
+  return regeneratorRuntime.async(function verificarContratosAnteriores$(_context18) {
     while (1) {
-      switch (_context14.prev = _context14.next) {
+      switch (_context18.prev = _context18.next) {
         case 0:
           console.log("Se llamo a la verificacion de contratos", cedula);
-          _context14.next = 3;
+          _context18.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosAnterioresByCedula", cedula));
 
         case 3:
-          contratos = _context14.sent;
+          contratos = _context18.sent;
           console.log(contratos);
 
         case 5:
         case "end":
-          return _context14.stop();
+          return _context18.stop();
       }
     }
   });
@@ -1541,7 +1844,9 @@ ipcRenderer.on("showAlertMedidoresExistentes", function (event, message) {
 // ----------------------------------------------------------------
 
 function habilitarFormMedidor() {
+  console.log("Habilitando form medidor");
   fechaInstalacion.disabled = false;
+  fechaInstalacion.readOnly = false;
   medidorMarca.disabled = false; // (medidorNumeroCasa.disabled = false), (medidorBarrio.disabled = false);
   // medidorPrincipal.disabled = false;
   // medidorSecundaria.disabled = false;
@@ -1595,17 +1900,17 @@ function inHabilitarFormMedidor() {
 
 function generarCodigo() {
   var codigoGenerado, barrio, sectores, selectElement, numeroContrato, select, codigoInput;
-  return regeneratorRuntime.async(function generarCodigo$(_context15) {
+  return regeneratorRuntime.async(function generarCodigo$(_context19) {
     while (1) {
-      switch (_context15.prev = _context15.next) {
+      switch (_context19.prev = _context19.next) {
         case 0:
           codigoGenerado = "error";
           barrio = "No seleccionado";
-          _context15.next = 4;
+          _context19.next = 4;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getSectores"));
 
         case 4:
-          sectores = _context15.sent;
+          sectores = _context19.sent;
           selectElement = document.createElement("select");
           selectElement.id = "sectorNombre";
           selectElement.classList.add("form-select"); // Itera sobre la lista de sectores y agrega opciones al select
@@ -1673,7 +1978,7 @@ function generarCodigo() {
 
         case 18:
         case "end":
-          return _context15.stop();
+          return _context19.stop();
       }
     }
   });
@@ -1708,6 +2013,130 @@ medidorSinMedidor.onchange = function () {
     conMedidor.classList.add("innactive-list");
     titleContratos.innerHTML = "Contratos sin medidor" + '<i class="fs-1 fa-solid fa-file-signature mx-2 my-2"></i>';
   }
+};
+
+ipcRenderer.on("Notificar", function (event, response) {
+  if (response.title === "Borrado!") {
+    resetForm();
+  } else if (response.title === "Actualizado!") {
+    resetFormAfterUpdate();
+  } else if (response.title === "Guardado!") {
+    resetFormAfterSave();
+  }
+
+  console.log("Response: " + response);
+
+  if (response.success) {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "success",
+      confirmButtonColor: "#f8c471"
+    });
+  } else {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "error",
+      confirmButtonColor: "#f8c471"
+    });
+  }
+});
+
+function resetFormAfterUpdate() {
+  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context20) {
+    while (1) {
+      switch (_context20.prev = _context20.next) {
+        case 0:
+          _context20.next = 2;
+          return regeneratorRuntime.awrap(getContratos());
+
+        case 2:
+          _context20.next = 4;
+          return regeneratorRuntime.awrap(getContratosSinMedidor());
+
+        case 4:
+          mensajeError.textContent = "";
+          errorContainer.style.color = "white";
+
+        case 6:
+        case "end":
+          return _context20.stop();
+      }
+    }
+  });
+}
+
+function resetFormAfterSave() {
+  return regeneratorRuntime.async(function resetFormAfterSave$(_context21) {
+    while (1) {
+      switch (_context21.prev = _context21.next) {
+        case 0:
+          _context21.next = 2;
+          return regeneratorRuntime.awrap(getContratos());
+
+        case 2:
+          _context21.next = 4;
+          return regeneratorRuntime.awrap(getContratosSinMedidor());
+
+        case 4:
+          // editingStatus = false;
+          // editContratoId = "";
+          // contratoForm.reset();
+          mensajeError.textContent = "";
+          errorContainer.style.color = "white"; // fechaCreacion.value = formatearFecha(new Date());
+
+        case 6:
+        case "end":
+          return _context21.stop();
+      }
+    }
+  });
+}
+
+function resetForm() {
+  editingStatus = false;
+  editContratoId = "";
+  contratoForm.reset();
+  mensajeError.textContent = "";
+  inHabilitarFormMedidor();
+  ocultarServiciosDisponibles();
+  habilitarNuevoContrato();
+  errorContainer.style.color = "white";
+  contratoFecha.value = formatearFecha(new Date());
+}
+
+function habilitarNuevoContrato() {
+  socioContratanteCedula.readOnly = false;
+  socioContratanteApellido.readOnly = false;
+  socioContratanteNombre.readOnly = false;
+  generarCodigoBt.disabled = false;
+  contratoFecha.readOnly = false;
+  listaSugerencias.style.display = "none";
+}
+
+function ocultarServiciosDisponibles() {
+  servicosDisponiblesList.innerHTML = "";
+  var divNoServiciosContainer = document.createElement("div");
+  divNoServiciosContainer.className = "col-12 text-center d-flex justify-content-center align-items-center";
+  var divNoServiciosText = document.createElement("div");
+  var noServiciosTitle = document.createElement("h3");
+  noServiciosTitle.className = "text-secondary";
+  noServiciosTitle.textContent = "Registra el contrato para " + "poder acceder a los servicios disponibles";
+  var noServiciosText = document.createElement("p");
+  noServiciosText.innerHTML = '<i class="text-secondary fs-1 fa-solid fa-gears"></i>';
+  divNoServiciosText.appendChild(noServiciosTitle);
+  divNoServiciosText.appendChild(noServiciosText);
+  divNoServiciosContainer.appendChild(divNoServiciosText);
+  servicosDisponiblesList.appendChild(divNoServiciosContainer);
+}
+
+generarCodigoBt.onclick = function () {
+  generarCodigo();
+};
+
+cancelarContrato.onclick = function () {
+  resetForm();
 }; // ----------------------------------------------------------------
 // Transicion entre las secciones de la vista
 // ----------------------------------------------------------------
@@ -1721,6 +2150,7 @@ btnSeccion1.addEventListener("click", function () {
   console.log("btn1");
   seccion2.classList.remove("active");
   seccion1.classList.add("active");
+  resetForm();
 });
 btnSeccion2.addEventListener("click", function () {
   console.log("btn2");
@@ -1732,119 +2162,11 @@ btnSeccion2.addEventListener("click", function () {
 
 var abrirInicio = function abrirInicio() {
   var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context16) {
-    while (1) {
-      switch (_context16.prev = _context16.next) {
-        case 0:
-          url = "src/ui/principal.html";
-          _context16.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context16.stop();
-      }
-    }
-  });
-};
-
-var abrirSocios = function abrirSocios() {
-  var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context17) {
-    while (1) {
-      switch (_context17.prev = _context17.next) {
-        case 0:
-          url = "src/ui/socios.html";
-          _context17.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context17.stop();
-      }
-    }
-  });
-};
-
-var abrirUsuarios = function abrirUsuarios() {
-  var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context18) {
-    while (1) {
-      switch (_context18.prev = _context18.next) {
-        case 0:
-          url = "src/ui/usuarios.html";
-          _context18.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context18.stop();
-      }
-    }
-  });
-};
-
-var abrirPagos = function abrirPagos() {
-  var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context19) {
-    while (1) {
-      switch (_context19.prev = _context19.next) {
-        case 0:
-          url = "src/ui/planillas.html";
-          _context19.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context19.stop();
-      }
-    }
-  });
-};
-
-var abrirPlanillas = function abrirPlanillas() {
-  var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context20) {
-    while (1) {
-      switch (_context20.prev = _context20.next) {
-        case 0:
-          url = "src/ui/planillas.html";
-          _context20.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context20.stop();
-      }
-    }
-  });
-};
-
-var abrirParametros = function abrirParametros() {
-  var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context21) {
-    while (1) {
-      switch (_context21.prev = _context21.next) {
-        case 0:
-          url = "src/ui/parametros.html";
-          _context21.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context21.stop();
-      }
-    }
-  });
-};
-
-var abrirImplementos = function abrirImplementos() {
-  var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context22) {
+  return regeneratorRuntime.async(function abrirInicio$(_context22) {
     while (1) {
       switch (_context22.prev = _context22.next) {
         case 0:
-          url = "src/ui/implementos.html";
+          url = "src/ui/principal.html";
           _context22.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1856,19 +2178,127 @@ var abrirImplementos = function abrirImplementos() {
   });
 };
 
-var abrirContratos = function abrirContratos() {
+var abrirSocios = function abrirSocios() {
   var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context23) {
+  return regeneratorRuntime.async(function abrirSocios$(_context23) {
     while (1) {
       switch (_context23.prev = _context23.next) {
         case 0:
-          url = "src/ui/medidores.html";
+          url = "src/ui/socios.html";
           _context23.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
         case 3:
         case "end":
           return _context23.stop();
+      }
+    }
+  });
+};
+
+var abrirUsuarios = function abrirUsuarios() {
+  var url;
+  return regeneratorRuntime.async(function abrirUsuarios$(_context24) {
+    while (1) {
+      switch (_context24.prev = _context24.next) {
+        case 0:
+          url = "src/ui/usuarios.html";
+          _context24.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context24.stop();
+      }
+    }
+  });
+};
+
+var abrirPagos = function abrirPagos() {
+  var url;
+  return regeneratorRuntime.async(function abrirPagos$(_context25) {
+    while (1) {
+      switch (_context25.prev = _context25.next) {
+        case 0:
+          url = "src/ui/planillas.html";
+          _context25.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context25.stop();
+      }
+    }
+  });
+};
+
+var abrirPlanillas = function abrirPlanillas() {
+  var url;
+  return regeneratorRuntime.async(function abrirPlanillas$(_context26) {
+    while (1) {
+      switch (_context26.prev = _context26.next) {
+        case 0:
+          url = "src/ui/planillas.html";
+          _context26.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context26.stop();
+      }
+    }
+  });
+};
+
+var abrirParametros = function abrirParametros() {
+  var url;
+  return regeneratorRuntime.async(function abrirParametros$(_context27) {
+    while (1) {
+      switch (_context27.prev = _context27.next) {
+        case 0:
+          url = "src/ui/parametros.html";
+          _context27.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context27.stop();
+      }
+    }
+  });
+};
+
+var abrirImplementos = function abrirImplementos() {
+  var url;
+  return regeneratorRuntime.async(function abrirImplementos$(_context28) {
+    while (1) {
+      switch (_context28.prev = _context28.next) {
+        case 0:
+          url = "src/ui/implementos.html";
+          _context28.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context28.stop();
+      }
+    }
+  });
+};
+
+var abrirContratos = function abrirContratos() {
+  var url;
+  return regeneratorRuntime.async(function abrirContratos$(_context29) {
+    while (1) {
+      switch (_context29.prev = _context29.next) {
+        case 0:
+          url = "src/ui/medidores.html";
+          _context29.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context29.stop();
       }
     }
   });

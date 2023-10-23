@@ -32,6 +32,27 @@ section.active {
     border-bottom: none;
 }
 
+.encabezado-form {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-top: -5rem;
+    padding: 1em 1em 1em 1em;
+    max-width: 100%;
+    height: fit-content;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.encabezado-st {
+    padding: 0 0 1em 0;
+    border: solid 4px #f8c471;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.title-item{
+font-weight: 500;
+}
 
 .card-fondo {
     height: 18rem;
@@ -83,7 +104,7 @@ section.active {
 }
 
 .contenedor-servicios-contratados {
-    height: 60vh;
+    height: 55vh;
     overflow-y: auto;
 }
 
@@ -285,7 +306,7 @@ section.active {
 
 .active-list {
 
-    height: 60vh;
+    height: 64vh;
     overflow-y: auto;
     overflow-x: auto;
     /* padding: 10px; */
@@ -300,4 +321,28 @@ section.active {
     /* padding: 10px; */
     display: none;
 
+}
+::-webkit-scrollbar {
+    width: 10px;
+    /* Ancho de la barra de desplazamiento*/
+}
+
+::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    /* Color de fondo de la pista de desplazamiento */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #f8c471;;
+    /* Color del "pulgar" de la barra de desplazamiento */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+    /* Cambia el color del "pulgar" al pasar el ratón por encima */
+}
+.value-disponibles{
+    font-size: 1.2em;
+    font-weight: 500;
+    
 }

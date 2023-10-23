@@ -1156,27 +1156,159 @@ ipcMain.handle("createCuotas", async (event, cuota) => {
     console.log(error);
   }
 });
-ipcMain.handle("createSercicioContratado", async (event, contratar) => {
+ipcMain.handle("createServicioContratado", async (event, contratar) => {
   try {
     const conn = await getConnection();
     console.log("Recibido: ", contratar);
-    const resultServicio = await conn.query(
-      "INSERT INTO serviciosContratados set ?;",
-      contratar
+    const contratadoExiste = await conn.query(
+      "SELECT count(id) as existe FROM serviciosContratados WHERE " +
+        "serviciosId= " +
+        contratar.serviciosId +
+        " AND " +
+        "contratosId= " +
+        contratar.contratosId +
+        ";"
     );
-    contratar.id = resultServicio.insertId;
-    console.log(resultServicio);
-    event.sender.send("Notificar", {
-      success: true,
-      title: "Guardado!",
-      message: "Contratado.",
-    });
-    return resultServicio;
+    if (!contratadoExiste[0].existe > 0) {
+      const resultServicio = await conn.query(
+        "INSERT INTO serviciosContratados set ?;",
+        contratar
+      );
+      console.log(resultServicio);
+      event.sender.send("Notificar", {
+        success: true,
+        title: "Guardado!",
+        message: "Contratado.",
+      });
+      contratar.id = resultServicio.insertId;
+      return resultServicio;
+    } else {
+      event.sender.send("Notificar", {
+        success: false,
+        title: "Error!",
+        message: "El servicio ya ha sido registrado en este contrato.",
+      });
+    }
   } catch (error) {
     event.sender.send("Notificar", {
       success: false,
       title: "Error!",
       message: "Ha ocurrido un error al contratar.",
+    });
+    console.log(error);
+  }
+});
+ipcMain.handle("deleteContratadoDetalle", async (event, descontratar) => {
+  let canceladoSn = false;
+  let cancelados = 0;
+
+  try {
+    const conn = await getConnection();
+    console.log("Recibido: ", descontratar);
+    const detallesServicio = await conn.query(
+      "SELECT * FROM detallesServicio WHERE serviciosContratadosId =" +
+        descontratar +
+        ";"
+    );
+
+    if (detallesServicio.length > 0) {
+      console.log("Array con datos.");
+      const canceladoExiste = detallesServicio.find(
+        (cancelado) => cancelado.estado === "Cancelado"
+      );
+
+      if (canceladoExiste) {
+        console.log("Se encontró un detalle cancelado:", canceladoExiste);
+
+        event.sender.send("Notificar", {
+          success: false,
+          title: "Error!",
+          message:
+            "Este servicio ya ha sido cancelado por lo que no puedes eliminarlo.",
+        });
+      } else {
+        console.log("Ningún detalle cancelado fue encontrado.");
+        detallesServicio.forEach(async (detalleServicio) => {
+          const resultDetalle = await conn.query(
+            "DELETE FROM detallesServicio WHERE id=" + detalleServicio.id + ";"
+          );
+
+          console.log(resultDetalle);
+        });
+        const resultContratado = await conn.query(
+          "DELETE FROM serviciosContratados WHERE id=" + descontratar + ";"
+        );
+        event.sender.send("Notificar", {
+          success: true,
+          title: "Borrado!",
+          message: "Se ha eliminado este servicio para este contrato.",
+        });
+        return resultContratado;
+      }
+    } else {
+      console.log("Array sin datos");
+      const resultContratado = await conn.query(
+        "DELETE FROM serviciosContratados WHERE id= " + descontratar + ";"
+      );
+      console.log(resultContratado);
+      event.sender.send("Notificar", {
+        success: true,
+        title: "Borrado!",
+        message: "Se ha eliminado este servicio para este contrato.",
+      });
+      return resultContratado;
+    }
+
+    //   }
+    // }
+    // // const detalleExiste = await conn.query(
+    // //   "SELECT count(id) as existe,estado FROM detallesServicio WHERE " +
+    // //     "id= " +
+    // //     descontratar.id +
+    // //     ";"
+    // // );
+    // // if (!contratadoExiste[0].existe > 0) {
+    // //   if (
+    // //     contratadoExiste[0].estado !== null &&
+    // //     contratadoExiste[0].estado == "Por cancelar"
+    // //   ) {
+    // //     canceladoSn = true;
+    // //     const resultDetalle = await conn.query(
+    // //       "DELETE FROM detallesServicio WHERE id= ",
+    // //       descontratar.id
+    // //     );
+    // //     const resultContratado = await conn.query(
+    // //       "DELETE FROM serviciosContratados WHERE id= ",
+    // //       descontratar.serviciosContratadosId
+    // //     );
+    //     console.log(resultServicio);
+    // event.sender.send("Notificar", {
+    //   success: true,
+    //   title: "Borrado!",
+    //   message: "Se ha eliminado este servicio para este contrato.",
+    // });
+    //     return resultContratado;
+    // } else {
+    //   event.sender.send("Notificar", {
+    //     success: false,
+    //     title: "Error!",
+    //     message:
+    //       "Este servicio ya ha sido cancelado por lo que no puedes eliminarlo.",
+    //   });
+    // }
+    // } else {
+    //   event.sender.send("Notificar", {
+    //     success: false,
+    //     title: "Error!",
+    //     message:
+    //       "El servicio ya ha sido eliminado o no esta registrado en este contrato.",
+    //   });
+    // }
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al descontratar el servicio.",
     });
     console.log(error);
   }
@@ -1225,7 +1357,34 @@ ipcMain.handle("deleteCuotas", async (event, id) => {
     console.log(error);
   }
 });
-
+ipcMain.handle(
+  "getContratadoByServicioContrato",
+  async (event, contratoId, servicioId) => {
+    try {
+      const conn = await getConnection();
+      const result = await conn.query(
+        "SELECT * FROM viewServiciosContratados WHERE " +
+          "serviciosId=" +
+          servicioId +
+          " AND id=" +
+          contratoId +
+          " ;"
+      );
+      return result[0];
+    } catch (error) {
+      console.log("Error :" + error);
+    }
+  }
+);
+// ----------------------------------------------------------------
+//   funciones de los Descuentos
+// ----------------------------------------------------------------
+ipcMain.handle("getDescuentos", async () => {
+  const conn = await getConnection();
+  const results = conn.query("SELECT * FROM tiposDescuento;");
+  console.log(results);
+  return results;
+});
 // ----------------------------------------------------------------
 //   funciones de los Medidores
 // ----------------------------------------------------------------
@@ -1249,23 +1408,24 @@ ipcMain.handle("getMedidorDisponibleById", async (event, id) => {
   console.log(result[0]);
   return result[0];
 });
-ipcMain.handle("createMedidor", async (event, medidor) => {
-  try {
-    const conn = await getConnection();
-    console.log("Recibido: ", medidor);
-    //   product.price = parseFloat(product.price);
-    const result = await conn.query("Insert into medidores set ?", medidor);
-    console.log(result);
-    new Notification({
-      title: "Electrom Mysql",
-      body: "New medidor saved succesfully",
-    }).show();
-    medidor.id = result.insertId;
-    return medidor;
-  } catch (error) {
-    console.log(error);
-  }
-});
+// No estamos usando esta función.
+// ipcMain.handle("createMedidor", async (event, medidor) => {
+//   try {
+//     const conn = await getConnection();
+//     console.log("Recibido: ", medidor);
+//     //   product.price = parseFloat(product.price);
+//     const result = await conn.query("Insert into medidores set ?", medidor);
+//     console.log(result);
+//     new Notification({
+//       title: "Electrom Mysql",
+//       body: "New medidor saved succesfully",
+//     }).show();
+//     medidor.id = result.insertId;
+//     return medidor;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 ipcMain.handle("getMedidorById", async (event, id) => {
   const conn = await getConnection();
   const result = await conn.query("Select * from medidores where id = ?", id);
@@ -1439,16 +1599,27 @@ ipcMain.handle("createContrato", async (event, contrato, numero, sectorId) => {
     const result = await conn.query("Insert into contratos set ?", contrato);
     sumarSociosSectores(numero, sectorId);
     console.log(result);
-    new Notification({
-      title: "Registró guardado",
-      body: "Se registró un nuevo contrato con éxito",
-    }).show();
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Guardado!",
+      message: "Se ha registrado el nuevo contrato.",
+    });
+    // new Notification({
+    //   title: "Registró guardado",
+    //   body: "Se registró un nuevo contrato con éxito",
+    // }).show();
     contrato.id = result.insertId;
     return contrato;
   } catch (error) {
     console.log(error);
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al registrar el contrato.",
+    });
   }
 });
+
 async function sumarSociosSectores(numero, sectorId) {
   console.log("Recibido sectores: " + numero + " " + sectorId);
   try {
@@ -1460,7 +1631,7 @@ async function sumarSociosSectores(numero, sectorId) {
     console.log(result);
     new Notification({
       title: "Registró guardado",
-      body: "Se registró un nuevo sector con éxito",
+      body: "Se registró un nuevo usuario para sectores",
     }).show();
     return result;
   } catch (error) {
@@ -1476,46 +1647,66 @@ ipcMain.handle("updateContrato", async (event, id, contrato) => {
       contrato,
       id,
     ]);
-  } catch (e) {
-    console.log(e);
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Actualizado!",
+      message: "Se han actualizado el registro del contrato.",
+      contratoId: id,
+    });
+    return result;
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al actualizar el contrato.",
+    });
+    console.log(error);
   }
-  console.log(result);
-  return result;
 });
+
 ipcMain.handle("updateMedidor", async (event, id, medidor) => {
-  const conn = await getConnection();
   try {
+    const conn = await getConnection();
     var medidorExistente = await conn.query(
       "SELECT id FROM medidores  WHERE contratosId=" + id + ";"
     );
-    console.log("resultado de buscar el medidor: " + medidorExistente[0]);
-    if (medidorExistente[0] != undefined) {
+    if (medidorExistente[0] !== undefined) {
+      console.log("resultado de buscar el medidor: " + medidorExistente[0]);
       console.log("ejecutando if");
       var result = await conn.query("UPDATE medidores set ? where id = ?", [
         medidor,
         medidorExistente[0].id,
       ]);
-      new Notification({
-        title: "SCAP Santo Domingo No.1",
-        body: "El medidor " + medidor.codigo + " se há actualizado :)",
-      }).show();
+
+      event.sender.send("Notificar", {
+        success: true,
+        title: "Actualizado!",
+        message: "Se han actualizado el registro del contrato.",
+        contratoId: id,
+      });
+      console.log(result);
+      return medidorExistente[0];
     } else {
       console.log("ejecutando else: ", medidor);
       result = await conn.query("INSERT INTO medidores set ?", medidor);
-      new Notification({
-        title: "SCAP Santo Domingo No.1",
-        body: "El medidor " + medidor.codigo + " se ha registrado :)",
-      }).show();
+      event.sender.send("Notificar", {
+        success: true,
+        title: "Guardado!",
+        message: "Se han actualizado el registro del contrato.",
+        contratoId: id,
+      });
+      medidor.id = result.insertId;
+      console.log(result);
+      return medidor;
     }
-  } catch (e) {
-    new Notification({
-      title: "SCAP Santo Domingo No.1",
-      body: "Ha ocurrido un error en la actualización :(",
-    }).show();
-    console.log("Error al actualizar el medidor: ", e);
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al actualizar el medidor.",
+    });
+    console.log("Error al actualizar el medidor: ", error);
   }
-  console.log(result);
-  return result;
 });
 
 ipcMain.handle(
@@ -1544,6 +1735,95 @@ ipcMain.handle(
       resultContratarServicio.id = resultContratarServicio.insertId;
       return resultContratarServicio;
     } catch (error) {
+      console.log(error);
+    }
+  }
+);
+ipcMain.handle(
+  "createServicioFijoContratado",
+  async (event, servicioId, contratoId, descuentosId, adquiridoSn) => {
+    let servicioValorPagos = 0;
+    let servicioValor = 0;
+    let servicioNumPagos = 1;
+    let valorDescuento = 0;
+    try {
+      const conn = await getConnection();
+      console.log("Recibido: ", servicioId);
+      // Verificamos si existe el servicio en servicios contratados del contrato.
+      const datosServicio = await conn.query(
+        "SELECT * from servicios WHERE id=" + servicioId + ";"
+      );
+      const datosDescuento = await conn.query(
+        "SELECT * FROM tiposDescuento WHERE id=" + descuentosId + ";"
+      );
+      if (datosServicio[0].id !== undefined) {
+        console.log("Si hay datos: " + datosServicio[0].id);
+        servicioValorPagos = datosServicio[0].valorPagos;
+        servicioValor = datosServicio[0].valor;
+        servicioNumPagos = datosServicio[0].numeroPagos;
+      }
+      if (datosDescuento[0].id !== undefined) {
+        console.log("Si hay descuento: " + datosDescuento[0].valor);
+        valorDescuento = datosDescuento[0].valor;
+      }
+      const contratadoExiste = await conn.query(
+        "SELECT * from serviciosContratados WHERE serviciosId=" +
+          servicioId +
+          " AND contratosId=" +
+          contratoId +
+          ";"
+      );
+      const newContratado = {
+        estado: adquiridoSn,
+        descuentosId: descuentosId,
+        valorPagosindividual: servicioValorPagos,
+        valorIndividual: servicioValor,
+        numeroPagosindividual: servicioNumPagos,
+        descuentoValor: valorDescuento,
+      };
+      if (contratadoExiste[0].id !== undefined) {
+        // Si existe el servicio contratado
+        // if (contratadoExiste[0].estado !== adquiridoSn) {
+        // Realizar la actualizacion solo si los valores son distintos
+        // averiguar el uso de librerias para comparar objetos.
+        const resultServicioContratado = await conn.query(
+          "UPDATE serviciosContratados SET ?" +
+            " WHERE " +
+            "serviciosId=? AND contratosId=? ;",
+          [newContratado, servicioId, contratoId]
+        );
+        event.sender.send("Notificar", {
+          success: true,
+          title: "Actualizado!",
+          message: "Se han actualizado los servicios contratados.",
+          contratoId: contratoId,
+        });
+        console.log("Contratado actualizado: " + resultServicioContratado);
+        return resultServicioContratado;
+
+        // }
+      } else {
+        newContratado.serviciosId = servicioId;
+        newContratado.contratosId = contratoId;
+        const resultServicioContratado = await conn.query(
+          "INSERT INTO serviciosContratados SET ?" + ";",
+          newContratado
+        );
+        event.sender.send("Notificar", {
+          success: true,
+          title: "Actualizado!",
+          message: "Se han actualizado los servicios contratados.",
+          contratoId: contratoId,
+        });
+        console.log("Contratado creado: " + resultServicioContratado);
+        return resultServicioContratado;
+      }
+    } catch (error) {
+      event.sender.send("Notificar", {
+        success: false,
+        title: "Error!",
+        message: "Ha ocurrido un error al registrar los servicios contratados.",
+      });
       console.log(error);
     }
   }
@@ -1707,29 +1987,26 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
       let valorPagos = 0.0;
       let total = 0.0;
       // El descuento esta en veremos :(
-      if (servicioContratado.valoresDistintos === "Si") {
-        if (serviciosContratado.aplazableSn === "Si") {
-          total = servicioContratado.valorIndividual;
-          valorPagos =
-            servicioContratados.valorPagosindividual -
-            servicioContratado.valorDescuento;
-        } else {
-          total = servicioContratado.valorIndividual;
-          valorPagos =
-            servicioContratado.valorIndividual -
-            servicioContratado.valorDescuento;
-        }
+      // if (servicioContratado.valoresDistintos === "Si") {
+      if (servicioContratado.aplazableSn === "Si") {
+        total = servicioContratado.valorIndividual;
+        valorPagos = total = servicioContratado.valorIndividual;
+        valorPagos = servicioContratado.valorPagosindividual;
       } else {
-        if (servicioContratado.aplazableSn === "Si") {
-          total = servicioContratado.valor;
-          valorPagos =
-            servicioContratado.valorPagos - servicioContratado.valorDescuento;
-        } else {
-          total = servicioContratado.valor;
-          valorPagos =
-            servicioContratado.valorPagos - servicioContratado.valorDescuento;
-        }
+        total = servicioContratado.valorIndividual;
+        valorPagos = servicioContratado.valorPagosindividual;
       }
+      // } else {
+      // if (servicioContratado.aplazableSn === "Si") {
+      //   total = servicioContratado.valor;
+      //   valorPagos =
+      //     servicioContratado.valorPagos - servicioContratado.valorDescuento;
+      // } else {
+      //   total = servicioContratado.valor;
+      //   valorPagos =
+      //     servicioContratado.valorPagos - servicioContratado.valorDescuento;
+      // }
+      // }
 
       const newDetalleServicios = {
         serviciosContratadosId: servicioContratado.id,
@@ -1746,16 +2023,25 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
         "INSERT INTO detallesServicio set ?",
         newDetalleServicios
       );
-      if (!servicioContratado.tipo == "Servicio fijo") {
+      console.log("servicioContratado.tipo: ", servicioContratado.tipo);
+      if (servicioContratado.tipo !== "Servicio fijo") {
+        console.log("entrando a cambiar estado");
         const modificaEstado = await conn.query(
           "UPDATE serviciosContratados SET estado='Aplicado' WHERE serviciosContratados.id=" +
             servicioContratado.id +
             ";"
         );
-      }
 
-      console.log("Resultado de crear planillas: " + resultadoDetalleServicio);
-      return resultadoDetalleServicio;
+        console.log(
+          "Resultado de crear planillas: " + resultadoDetalleServicio
+        );
+        return resultadoDetalleServicio;
+      } else {
+        console.log(
+          "Resultado de crear planillas: " + resultadoDetalleServicio
+        );
+        return resultadoDetalleServicio;
+      }
     }
   });
 }
@@ -2042,7 +2328,10 @@ ipcMain.handle(
         serviciosCancelar
       );
       serviciosCancelar.forEach(async (servicioCancelar) => {
-        let abono = parseFloat(servicioCancelar.abono).toFixed(2);
+        let abono = 0;
+        if (servicioCancelar.abono !== null) {
+          abono = parseFloat(servicioCancelar.abono).toFixed(2);
+        }
         await conn.query(
           "UPDATE detallesServicio set estado='Cancelado',abono=" +
             abono +

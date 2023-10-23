@@ -37,9 +37,7 @@ var serviciosFijosList = document.getElementById("serviciosFijos");
 var otrosServiciosList = document.getElementById("otrosServicios");
 var otrosAplazablesList = document.getElementById("otrosAplazables");
 var mesBusqueda = document.getElementById("mesBusqueda");
-var anioBusqueda = document.getElementById("anioBusqueda");
-var errortextAbono = document.getElementById("errorTextAbono");
-var errContainer = document.getElementById("err-container"); // ----------------------------------------------------------------
+var anioBusqueda = document.getElementById("anioBusqueda"); // ----------------------------------------------------------------
 // Variables del los totales de la planilla
 // ----------------------------------------------------------------
 
@@ -52,6 +50,8 @@ var valorTotalDescuento = document.getElementById("valorTotalDescuento");
 var valorTotalPagar = document.getElementById("valorTotalPagar"); // Variables del dialogo de los servicios
 
 var dialogServicios = document.getElementById("formServicios");
+var errortextAbono = document.getElementById("errorTextAbono");
+var errContainer = document.getElementById("err-container");
 var servicioDg = document.getElementById("title-dg");
 var descripcionDg = document.getElementById("descripcion-dg");
 var detallesDg = document.getElementById("detalles-dg");
@@ -174,19 +174,30 @@ planillaForm.addEventListener("submit", function _callee(e) {
 function renderPlanillas(datosPlanillas) {
   planillasList.innerHTML = "";
   datosPlanillas.forEach(function _callee2(datosPlanilla) {
-    var cardDiv, headerDiv, contratoDiv, contratoP, contratoValor, canceladoDiv, canceladoP, canceladoValor, bodyDiv, socioDiv, socioH5, socioP, fechaEmisionDiv, fechaEmisionP, fechaEmisionSp, fechaEmisionValor, serviciosDiv, serviciosP, serviciosTituloP, listaServiciosDiv, listaUl, datosServicios, valorAguaPotable, totalPagar, consumoDiv, consumoP, tarifaDiv, tarifaP, valorDiv, valorP, consumoValor, tarifaValor, valorValor, _consumoValor, _tarifaValor, _valorValor, footerDiv, totalDiv, totalP, totalValor, button, buttonIcon;
+    var divContainer, cardDiv, headerDiv, contratoDiv, contratoP, contratoValor, canceladoDiv, canceladoP, canceladoValor, bodyDiv, socioDiv, socioH5, socioP, fechaEmisionDiv, fechaEmisionP, fechaEmisionSp, fechaEmisionValor, serviciosDiv, serviciosP, serviciosTituloP, listaServiciosDiv, listaUl, datosServicios, valorAguaPotable, totalPagar, consumoDiv, consumoP, tarifaDiv, tarifaP, valorDiv, valorP, consumoValor, tarifaValor, valorValor, _consumoValor, _tarifaValor, _valorValor, footerDiv, totalDiv, totalP, totalValor, button, buttonIcon;
 
     return regeneratorRuntime.async(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
             // Crear el elemento div principal con las clases y el estilo
+            divContainer = document.createElement("div");
+            divContainer.className = "col-xl-6 col-lg-12 col-md-12 col-sm-12 px-1";
+            divContainer.style.height = "fit-content";
+            divContainer.style.maxHeight = "fit-content"; // divContainer.style.backgroundColor = "black";
+
             cardDiv = document.createElement("div");
-            cardDiv.className = "col-6 mx-1 card mb-3 border-info card-planilla";
-            cardDiv.style.maxWidth = "48%"; // Crear el elemento div para el encabezado de la tarjeta con la clase y el estilo
+            cardDiv.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card ";
+            cardDiv.style.backgroundColor = "red";
+            cardDiv.style.width = "100%"; // cardDiv.style.maxWidth = "100%";
+
+            cardDiv.style.padding = "0.3em";
+            cardDiv.style.backgroundColor = "#d6eaf8";
+            cardDiv.style.height = "fit-content";
+            cardDiv.style.maxHeight = "fit-content"; // Crear el elemento div para el encabezado de la tarjeta con la clase y el estilo
 
             headerDiv = document.createElement("div");
-            headerDiv.className = "card-header row d-flex ";
+            headerDiv.className = "card-header d-flex ";
             headerDiv.style.backgroundColor = "#85c1e9"; // Crear el elemento div para la información del contrato
 
             contratoDiv = document.createElement("div");
@@ -209,7 +220,8 @@ function renderPlanillas(datosPlanillas) {
             headerDiv.appendChild(canceladoDiv); // Crear el elemento div para el cuerpo de la tarjeta
 
             bodyDiv = document.createElement("div");
-            bodyDiv.className = "card-body cuerpo"; // Crear el elemento div para el título del socio
+            bodyDiv.className = "card-body cuerpo";
+            bodyDiv.style.backgroundColor = "white"; // Crear el elemento div para el título del socio
 
             socioDiv = document.createElement("div");
             socioDiv.className = "card-title d-flex titulo-socio";
@@ -248,10 +260,10 @@ function renderPlanillas(datosPlanillas) {
             listaUl = document.createElement("ul");
             listaUl.className = "list-group list-group-flush"; //Consulta los servicios a cancelar de acuerdo al id del contrato
 
-            _context2.next = 57;
+            _context2.next = 67;
             return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosServiciosByContratoId", datosPlanilla.contratosId, formatearFecha(datosPlanilla.fechaEmision), "all"));
 
-          case 57:
+          case 67:
             datosServicios = _context2.sent;
             console.log("Servicios encontrados: " + datosServicios); // Crear elementos para los detalles de servicios (Consumo, Tarifa, Valor)
 
@@ -317,7 +329,7 @@ function renderPlanillas(datosPlanillas) {
             console.log("valor agua: " + valorAguaPotable);
 
             if (!(valorAguaPotable === null || valorAguaPotable === undefined || valorAguaPotable === "null")) {
-              _context2.next = 88;
+              _context2.next = 98;
               break;
             }
 
@@ -331,14 +343,14 @@ function renderPlanillas(datosPlanillas) {
             valorValor = document.createTextNode("NA");
             valorDiv.appendChild(valorP);
             valorDiv.appendChild(valorValor);
-            _context2.next = 101;
+            _context2.next = 111;
             break;
 
-          case 88:
-            _context2.next = 90;
+          case 98:
+            _context2.next = 100;
             return regeneratorRuntime.awrap(getDatosLecturas(datosPlanilla.contratosId, formatearFecha(datosPlanilla.fechaEmision)));
 
-          case 90:
+          case 100:
             lectura = _context2.sent;
             console.log("Datos Lecturas: ", lectura);
             _consumoValor = document.createTextNode(lectura[0].lecturaActual - lectura[0].lecturaAnterior);
@@ -355,13 +367,14 @@ function renderPlanillas(datosPlanillas) {
             valorDiv.appendChild(valorP);
             valorDiv.appendChild(_valorValor);
 
-          case 101:
+          case 111:
             // --->
             bodyDiv.appendChild(serviciosDiv);
             bodyDiv.appendChild(listaServiciosDiv); // Crear el elemento para el pie de la tarjeta
 
             footerDiv = document.createElement("div");
-            footerDiv.className = "card-footer row d-flex"; // Crear elemento para el total
+            footerDiv.className = "card-footer row d-flex";
+            footerDiv.style.border = "none"; // Crear elemento para el total
 
             totalDiv = document.createElement("div");
             totalDiv.className = "col-6 titulo-detalles d-flex";
@@ -390,12 +403,13 @@ function renderPlanillas(datosPlanillas) {
             cardDiv.appendChild(bodyDiv); // cardDiv.appendChild(serviciosDiv);
             // cardDiv.appendChild(listaServiciosDiv);
 
-            cardDiv.appendChild(footerDiv); // Agregar la tarjeta al documento (por ejemplo, al elemento con el id "planillasList")
+            cardDiv.appendChild(footerDiv);
+            divContainer.appendChild(cardDiv); // Agregar la tarjeta al documento (por ejemplo, al elemento con el id "planillasList")
             // const planillasList = document.getElementById("planillasList");
 
-            planillasList.appendChild(cardDiv);
+            planillasList.appendChild(divContainer);
 
-          case 124:
+          case 136:
           case "end":
             return _context2.stop();
         }

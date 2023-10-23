@@ -208,12 +208,12 @@
           <!-- Tabla de listado de usuarios -->
           <!-- <div class="container-servicios"> -->
           <div
-            class="row d-flex justify-content-center container-servicios-list mp-0"
+            class="row  justify-content-between align-items-start container-servicios-list mp-0"
             id="servicios"
-            style="overflow-y: auto; height: 100%; max-height: 100%"
+            style="overflow-y: auto; overflow-x: hidden; height: 100%; max-height: 100%;padding: 1em 1em 0 .5em;"
           >
             <div class="col-6 card mb-3 card-servicios" style="max-width: 100%">
-              <div class="row g-0">
+              <div class="row ">
                 <div
                   class="col-2 d-flex justify-content-center align-items-center container-img"
                 >
@@ -732,24 +732,121 @@
               </table>
             </div>
             <div class="col-12 d-flex justify-content-end">
-              <button onclick="vistaFactura()" id="btnReporte" class="btn-gtc" style="width: 50%">
+              <button
+                onclick="vistaFactura()"
+                id="btnReporte"
+                class="btn-gtc"
+                style="width: 50%"
+              >
                 <i class="fs-4 fa-solid fa-print mx-1"></i>Reporte
               </button>
             </div>
           </div>
-          <!-- <div class="col-12 d-flex justify-content-end">
-            <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
-            <button
-              type="button"
-              onclick="resetForm()"
-              class="btn btn-danger rounded-2"
-            >
-              Cancelar
-            </button>
-          </div> -->
         </div>
       </div>
     </section>
+    <dialog id="formServicios" class="dialog-servicios">
+      <section
+        style="width: 90vh; height: fit-content"
+        class="active section-dialog"
+      >
+        <div class="row container-fluid" style="margin: 0; padding: 0">
+          <div class="col-12 encabezado-servicios">
+            <div
+              class="col-12 mp-0 d-flex flex-column align-items-center justify-content-end"
+            >
+              <p class="fs-1 mp-0" id="title-dg">
+                Fiestas de San Pedro
+                <i class="fs-1 fa-solid fa-gears mx-2 my-2"></i>
+              </p>
+            </div>
+          </div>
+          <div
+            class="col-12 d-flex justify-content-between align-items-center encabezado-bt"
+          >
+            <div class="d-flex align-items-baseline mp-0">
+              <!-- <p class="servicio-title mp-0" id="servicio-tit">Agua Potable</p>
+            <p class="trans">-</p> -->
+
+              <p class="mp-0" id="descripcion-dg">
+                Servicio de agua potable para la comuniad
+              </p>
+            </div>
+
+            <p class="" id="detalles-dg">Servicio fijo | No aplazable</p>
+            <!-- <p id="servicio-val">Valor: $2.50</p> -->
+          </div>
+          <div class="col-12" style="overflow: none">
+            <div class="row justify-content-between text-center">
+              <div class="col-4 my-2 item-custom">
+                <label for="subtotal" class="fs-5">Subtotal:</label>
+                <p id="subtotal-dg">10.25</p>
+              </div>
+              <div class="col-4 my-2 item-custom">
+                <label for="subtotal" class="fs-5">Descuento:</label>
+                <p id="descuento-dg">1.50</p>
+              </div>
+              <div class="col-4 my-2 item-custom">
+                <label for="subtotal" class="fs-5">Total:</label>
+                <p id="total-dg">8.75</p>
+              </div>
+              <div class="col-4 my-2 item-custom">
+                <label for="subtotal" class="fs-5">Numero de Pagos:</label>
+                <p id="numPagos-dg">3</p>
+              </div>
+              <div class="col-4 my-2 item-custom">
+                <label for="subtotal" class="fs-5">Cancelados:</label>
+                <p id="cancelados-dg">1</p>
+              </div>
+              <div class="col-4 my-2 item-custom">
+                <label for="subtotal" class="fs-5">Pendientes:</label>
+                <p id="pendientes-dg">2</p>
+              </div>
+              <div class="col-4 my-2 item-custom">
+                <label for="subtotal" class="fs-5">Saldo:</label>
+                <p id="saldo-dg">2.75</p>
+              </div>
+
+              <div class="col-4 my-2 item-custom">
+                <label for="subtotal" class="fs-5">Abonado:</label>
+                <p id="abonado-dg">6.00</p>
+              </div>
+              <div class="col-4 my-1 item-custom">
+                <label for="subtotal" class="fs-5">Abonar:</label>
+                <input
+                  id="abonar-dg"
+                  readonly
+                  type="number"
+                  step="any"
+                  class="form-control text-center"
+                  placeholder="$0.0"
+                />
+              </div>
+              <div class="col-12 err-container" id="err-container">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <p id="errorTextAbono">Error</p>
+              </div>
+              <div
+                class="col-12 d-flex align-items-center justify-content-center my-4"
+              >
+                <button class="btn btn-success mx-1" id="btnGuardar-dg">
+                  Guardar
+                </button>
+                <button class="btn btn-success mx-1" id="btnAdministrar-dg">
+                  Administrar
+                </button>
+                <button
+                  class="btn btn-danger mx-1"
+                  onclick="CerrarFormServicios()"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </dialog>
   </body>
   <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="../../node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
