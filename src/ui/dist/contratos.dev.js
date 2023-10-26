@@ -166,7 +166,7 @@ function eventoServiciosId(serviciosFijos) {
 
 
 contratoForm.addEventListener("submit", function _callee(e) {
-  var newMedidor, contratoEstadoDf, medidorDf, callePrincipalDf, calleSecundariaDf, numeroCasaDf, observacionDf, _newContrato, resultContrato, _resultContrato, resultMedidor;
+  var newMedidor, contratoEstadoDf, medidorDf, callePrincipalDf, calleSecundariaDf, numeroCasaDf, observacionDf, _newContrato, fakeMedidor, resultContrato, result, _resultContrato, resultMedidor;
 
   return regeneratorRuntime.async(function _callee$(_context2) {
     while (1) {
@@ -183,7 +183,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa un número de cédula correspondiente a un socio registrado.";
           socioContratanteCedula.focus();
-          _context2.next = 95;
+          _context2.next = 101;
           break;
 
         case 8:
@@ -195,7 +195,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una fecha de contrato válida.";
           contratoFecha.focus();
-          _context2.next = 95;
+          _context2.next = 101;
           break;
 
         case 14:
@@ -210,7 +210,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   mensajeError.textContent = "Ingresa un numero de casa válido.";
           //   medidorNumeroCasa.focus();
 
-          _context2.next = 95;
+          _context2.next = 101;
           break;
 
         case 20:
@@ -228,7 +228,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   mensajeError.textContent = "Ingresa una calle secundaria válida.";
           //   medidorSecundaria.focus();
 
-          _context2.next = 95;
+          _context2.next = 101;
           break;
 
         case 26:
@@ -240,7 +240,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una referencia válida.";
           medidorReferencia.focus();
-          _context2.next = 95;
+          _context2.next = 101;
           break;
 
         case 32:
@@ -252,7 +252,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una fecha de instalación válida.";
           medidorInstalacion.focus();
-          _context2.next = 95;
+          _context2.next = 101;
           break;
 
         case 38:
@@ -276,14 +276,14 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   errorContainer.style.color = "red";
           //   mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
 
-          _context2.next = 95;
+          _context2.next = 101;
           break;
 
         case 44:
           console.log("Servicios a contratar: " + serviciosDisponiblesAContratar);
 
           if (!(!socioContratanteId == "")) {
-            _context2.next = 94;
+            _context2.next = 100;
             break;
           }
 
@@ -343,21 +343,34 @@ contratoForm.addEventListener("submit", function _callee(e) {
             referencia: medidorReferencia.value // contratosId: contratoId,
 
           };
+          fakeMedidor = {
+            codigo: contratoCodigo.value,
+            fechaInstalacion: null,
+            marca: "NA",
+            observacion: "NA"
+          };
 
           if (editingStatus) {
-            _context2.next = 76;
+            _context2.next = 82;
             break;
           }
 
-          _context2.prev = 61;
-          _context2.next = 64;
+          _context2.prev = 62;
+          _context2.next = 65;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("createContrato", _newContrato, numero, sectorId));
 
-        case 64:
+        case 65:
           resultContrato = _context2.sent;
           console.log("Muestro resultado de insertar contrato: ", resultContrato);
           contratoId = resultContrato.id;
           console.log("Muestro id resultado de insertar contrato: ", contratoId);
+          fakeMedidor.contratosId = contratoId;
+          _context2.next = 72;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", contratoId, fakeMedidor));
+
+        case 72:
+          result = _context2.sent;
+          console.log("resultado de crearMedidor: ", result);
           editContrato(contratoId); // if (!contratoId == "" || !contratoId == undefined) {
           //   await contratarServicios(
           //     serviciosDisponiblesAContratar,
@@ -374,63 +387,63 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   // }
           // }
 
-          _context2.next = 74;
+          _context2.next = 80;
           break;
 
-        case 71:
-          _context2.prev = 71;
-          _context2.t0 = _context2["catch"](61);
+        case 77:
+          _context2.prev = 77;
+          _context2.t0 = _context2["catch"](62);
           console.log("Error al registrar el contrato: ", _context2.t0);
 
-        case 74:
-          _context2.next = 92;
+        case 80:
+          _context2.next = 98;
           break;
 
-        case 76:
+        case 82:
           console.log("Editing contrato with electron");
           newMedidor.contratosId = editContratoId;
-          _context2.prev = 78;
-          _context2.next = 81;
+          _context2.prev = 84;
+          _context2.next = 87;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, _newContrato));
 
-        case 81:
+        case 87:
           _resultContrato = _context2.sent;
 
           if (!contratoConMedidor) {
-            _context2.next = 86;
+            _context2.next = 92;
             break;
           }
 
-          _context2.next = 85;
+          _context2.next = 91;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", editContratoId, newMedidor));
 
-        case 85:
+        case 91:
           resultMedidor = _context2.sent;
 
-        case 86:
+        case 92:
           // contratarServicios(serviciosDisponiblesAContratar, editContratoId);
           console.log(_resultContrato);
-          _context2.next = 92;
+          _context2.next = 98;
           break;
-
-        case 89:
-          _context2.prev = 89;
-          _context2.t1 = _context2["catch"](78);
-          console.log("Error al editar el contrato: ", _context2.t1);
-
-        case 92:
-          _context2.next = 95;
-          break;
-
-        case 94:
-          console.log("Socio not found");
 
         case 95:
+          _context2.prev = 95;
+          _context2.t1 = _context2["catch"](84);
+          console.log("Error al editar el contrato: ", _context2.t1);
+
+        case 98:
+          _context2.next = 101;
+          break;
+
+        case 100:
+          console.log("Socio not found");
+
+        case 101:
         case "end":
           return _context2.stop();
       }
     }
-  }, null, null, [[61, 71], [78, 89]]);
+  }, null, null, [[62, 77], [84, 95]]);
 }); // ----------------------------------------------------------------
 // Funcion que recibe el id del servicio a contratar y los relaciona con el id del contrato
 // Registra un servicio contratado a la vez.
@@ -568,7 +581,7 @@ function renderContratosConMedidor(datosContratos) {
     divCol.className = " col-xl-6 col-lg-6 col-md-6 col-sm-12 px-1"; // Crea el div con la clase "card" y estilos
 
     var divCard = document.createElement("div");
-    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 card";
+    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card";
     divCard.style.padding = "0.3em";
     divCard.style.width = "100%";
     divCard.style.backgroundColor = "#d6eaf8"; // Crea el div del encabezado con la clase "card-header" y estilos
@@ -1175,29 +1188,16 @@ function renderServiciosDisponibles(serviciosDisponibles) {
             while (1) {
               switch (_context6.prev = _context6.next) {
                 case 0:
-                  if (!result.isConfirmed) {
-                    _context6.next = 8;
-                    break;
+                  if (result.isConfirmed) {
+                    // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                    // checkbox.checked = true;
+                    contratarServicio(serviciosDisponibles[i].id, editContratoId); // await editContrato(editContratoId);
+                    // await editContrato(editContratoId);
+                  } else {
+                    checkbox.checked = false;
                   }
 
-                  // Aquí puedes realizar la acción que desees cuando el usuario confirme.
-                  // checkbox.checked = true;
-                  contratarServicio(serviciosDisponibles[i].id, editContratoId);
-                  _context6.next = 4;
-                  return regeneratorRuntime.awrap(editContrato(editContratoId));
-
-                case 4:
-                  _context6.next = 6;
-                  return regeneratorRuntime.awrap(editContrato(editContratoId));
-
-                case 6:
-                  _context6.next = 9;
-                  break;
-
-                case 8:
-                  checkbox.checked = false;
-
-                case 9:
+                case 1:
                 case "end":
                   return _context6.stop();
               }

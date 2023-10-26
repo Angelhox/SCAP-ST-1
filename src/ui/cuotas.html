@@ -281,63 +281,83 @@
               style="color: red; font-size: 200; height: 20px"
             ></div>
             <!-- <input type="text" class="form-control my-2" placeholder="Id" /> -->
-            <label for="sector">Fecha de creación</label>
-            <input
-              type="date"
-              class="form-control my-2"
-              placeholder="Fecha de creación"
-              id="fechacreacion"
-            />
-            <label for="nombre">Nombre de la cuota</label>
+            <div class="row">
+              <div class="col-12">
+                <label for="sector">Fecha de creación</label>
+                <input
+                  type="date"
+                  class="form-control my-2"
+                  placeholder="Fecha de creación"
+                  id="fechacreacion"
+                />
+              </div>
+              <div class="col-12">
+                <label for="nombre">Nombre de la cuota</label>
 
-            <input
-              type="text"
-              class="form-control my-2"
-              placeholder="Nombre del servicio"
-              id="nombre"
-            />
-            <label for="sector">Descripción de la cuota</label>
+                <input
+                  type="text"
+                  class="form-control my-2"
+                  placeholder="Nombre del servicio"
+                  id="nombre"
+                />
+              </div>
+              <div class="col-12">
+                <label for="sector">Descripción de la cuota</label>
 
-            <input
-              type="text"
-              class="form-control my-2"
-              placeholder="Descripcion del servicio"
-              id="descripcion"
-            />
+                <input
+                  type="text"
+                  class="form-control my-2"
+                  placeholder="Descripcion del servicio"
+                  id="descripcion"
+                />
+              </div>
+              <div class="col-6">
+                <label for="sector">Valor de la cuota</label>
+                <input
+                  type="number"
+                  step="any"
+                  class="form-control my-2"
+                  placeholder="Valor"
+                  id="valor"
+                />
+              </div>
+              <div class="col-6">
+                <label for="aplazablesn">Forma de pago</label>
+                <div class="col-12 my-2">
+                  <div class="input-group">
+                    <button class="boton-info">
+                      <i class="fas fa-info-circle"></i>
+                      <span class="informacion">
+                        <p class="mp-0">
+                          Por contrato: El valor se aplicara a cada contrato.
+                        </p>
+                        <p class="mp-0">
+                          Por socio: Si el usuario presenta dos contratos, el
+                          valor se aplicara solo al contrato principal.
+                        </p>
+                      </span>
+                    </button>
+                    <select class="form-select" id="individualSn">
+                      <option value="Si" selected>Por contrato</option>
+                      <option value="No">Por socio</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <select id="aplazablesn" class="form-select mt-3 mb-2">
+                  <option value="No" selected>No aplazable</option>
+                  <option value="Si">Aplazable</option>
+                </select>
+              </div>
 
-            <label for="sector">Valor de la cuota</label>
-            <input
-              type="number"
-              step="any"
-              class="form-control my-2"
-              placeholder="Valor"
-              id="valor"
-            />
-            <label for="aplazablesn">Forma de pago</label>
-            <div class="col-12 my-2">
-              <div class="input-group">
-                <button class="boton-info">
-                  <i class="fas fa-info-circle"></i>
-                  <span class="informacion">
-                    <p class="mp-0">
-                      Por contrato: El valor se aplicara a cada contrato.
-                    </p>
-                    <p class="mp-0">
-                      Por socio: Si el usuario presenta dos contratos, el valor
-                      se aplicara solo al contrato principal.
-                    </p>
-                  </span>
-                </button>
-                <select class="form-select" id="individualSn">
-                  <option value="Si" selected>Por contrato</option>
-                  <option value="No">Por socio</option>
+              <div class="col-6">
+                <select id="distintosSn" class="form-select mt-3 mb-2">
+                  <option value="No">Valores generales</option>
+                  <option value="Si" selected>Valores distintos</option>
                 </select>
               </div>
             </div>
-            <select id="aplazablesn" class="form-select mt-3 mb-2">
-              <option value="No" selected>No aplazable</option>
-              <option value="Si">Aplazable</option>
-            </select>
 
             <div class="row" id="aplazable-options" style="display: flex">
               <div class="col-6">
@@ -780,12 +800,7 @@
               </table>
             </div>
             <div class="col-12 d-flex justify-content-end">
-              <button
-                onclick="vistaFactura()"
-                id="btnReporte"
-                class="mb-2 btn-gtc"
-                style="width: 50%"
-              >
+              <button id="btnReporte" class="mb-2 btn-gtc" style="width: 50%">
                 <i class="fs-4 fa-solid fa-print mx-1"></i>Reporte
               </button>
             </div>
@@ -850,7 +865,9 @@
                 >
                 <!-- <p id="subtotal-dg">10.25</p> -->
                 <input
-                  type="text"
+                  readonly
+                  step="any"
+                  type="number"
                   class="text-center form-control"
                   style="border: none"
                   id="subtotal-dg"
@@ -884,7 +901,9 @@
       <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 my-2 item-custom"> -->
                   <div class="col-4 mp-0">
                     <input
-                      type="text"
+                      readonly
+                      type="number"
+                      step="any"
                       class="mp-0 text-center form-control"
                       style="
                         border-top-left-radius: 0;
@@ -899,7 +918,9 @@
                 <label for="subtotal" class="fs-5">Total:</label>
                 <!-- <p id="total-dg">8.75</p> -->
                 <input
-                  type="text"
+                  type="number"
+                  readonly
+                  step="any"
                   class="text-center form-control"
                   style="border: none"
                   id="total-dg"
@@ -927,7 +948,9 @@
                 <label for="subtotal" class="fs-5">Valor Cuota:</label>
                 <!-- <p id="valorPagos-dg">6.00</p> -->
                 <input
-                  type="text"
+                  readonly
+                  type="number"
+                  step="any"
                   class="text-center form-control"
                   id="valorPagos-dg"
                   style="border: none"

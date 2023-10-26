@@ -65,7 +65,13 @@ var saldoDg = document.getElementById("saldo-dg");
 var abonadoDg = document.getElementById("abonado-dg");
 var abonarDg = document.getElementById("abonar-dg");
 var guardarDg = document.getElementById("btnGuardar-dg");
-var administrarDg = document.getElementById("btnAdministrar-dg"); // const socioNombre = document.getElementById("nombrecompleto");
+var administrarDg = document.getElementById("btnAdministrar-dg"); //----------------------------------------------------------------
+// Variables de los elementos de la pagina
+
+var mostrarLecturas = document.getElementById("mostrar-lecturas");
+var contenedorLecturas = document.getElementById("contenedor-lecturas");
+var collapse = document.getElementById("collapse");
+var calcularConsumoBt = document.getElementById("calcular-consumo"); // const socioNombre = document.getElementById("nombrecompleto");
 // const medidorCodigo = document.getElementById("codigo");
 // const medidorMarca = document.getElementById("marca");
 // const medidorBarrio = document.getElementById("barrio");
@@ -77,11 +83,11 @@ var administrarDg = document.getElementById("btnAdministrar-dg"); // const socio
 
 var planillas = [];
 var editingStatus = false;
+var planillaMedidorSn = false;
 var editPlanillaId = "";
 var editDetalleId = "";
 planillaForm.addEventListener("submit", function _callee(e) {
-  var newPlanilla, newDetalleServicio, result, _result, resultDetalle;
-
+  var newPlanilla, newDetalleServicio, result, resultDetalle;
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -103,40 +109,47 @@ planillaForm.addEventListener("submit", function _callee(e) {
           };
 
           if (editingStatus) {
-            _context.next = 10;
+            _context.next = 7;
             break;
           }
 
-          _context.next = 6;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("createPlanilla"));
-
-        case 6:
-          result = _context.sent;
-          console.log(result);
-          _context.next = 20;
+          // const result = await ipcRenderer.invoke("createPlanilla");
+          // console.log(result);
+          console.log("Can not create planilla");
+          _context.next = 21;
           break;
 
-        case 10:
+        case 7:
+          if (planillaMedidorSn) {
+            _context.next = 11;
+            break;
+          }
+
+          console.log("Guardado :) ");
+          _context.next = 21;
+          break;
+
+        case 11:
           console.log("Editing planilla with electron");
-          _context.next = 13;
+          _context.next = 14;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updatePlanilla", editPlanillaId, newPlanilla));
 
-        case 13:
-          _result = _context.sent;
-          _context.next = 16;
+        case 14:
+          result = _context.sent;
+          _context.next = 17;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateDetalle", editDetalleId, newDetalleServicio));
 
-        case 16:
+        case 17:
           resultDetalle = _context.sent;
           editingStatus = false;
           editPlanillaId = "";
-          console.log(_result, resultDetalle);
+          console.log(result, resultDetalle);
 
-        case 20:
+        case 21:
           getPlanillas();
           planillaForm.reset(); //medidorCodigo.focus();
 
-        case 22:
+        case 23:
         case "end":
           return _context.stop();
       }
@@ -212,8 +225,8 @@ function renderPlanillas(datosPlanillas) {
             canceladoDiv.className = "d-flex col-6 titulo-detalles header-planilla positive justify-content-end";
             canceladoP = document.createElement("p");
             canceladoP.textContent = "Cancelado: ";
-            canceladoValor = document.createTextNode(datosPlanilla.estado);
-            canceladoDiv.appendChild(canceladoP);
+            canceladoValor = document.createTextNode(datosPlanilla.estado); // canceladoDiv.appendChild(canceladoP);
+
             canceladoDiv.appendChild(canceladoValor); // Agregar los elementos de contrato y cancelado al encabezado
 
             headerDiv.appendChild(contratoDiv);
@@ -260,10 +273,10 @@ function renderPlanillas(datosPlanillas) {
             listaUl = document.createElement("ul");
             listaUl.className = "list-group list-group-flush"; //Consulta los servicios a cancelar de acuerdo al id del contrato
 
-            _context2.next = 67;
+            _context2.next = 66;
             return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosServiciosByContratoId", datosPlanilla.contratosId, formatearFecha(datosPlanilla.fechaEmision), "all"));
 
-          case 67:
+          case 66:
             datosServicios = _context2.sent;
             console.log("Servicios encontrados: " + datosServicios); // Crear elementos para los detalles de servicios (Consumo, Tarifa, Valor)
 
@@ -293,7 +306,8 @@ function renderPlanillas(datosPlanillas) {
                   alcantarilladoLi.className = "titulo-detalles d-flex detalles";
                   var alcantarilladoP = document.createElement("p");
                   alcantarilladoP.textContent = datosServicio.nombre + ": ";
-                  var alcantarilladoValor = document.createTextNode(datosServicio.abono);
+                  var alcantarilladoValor = document.createTextNode( // en esta parte esta seliendo null
+                  datosServicio.abono);
                   totalPagar += datosServicio.abono;
                   alcantarilladoLi.appendChild(alcantarilladoP);
                   alcantarilladoLi.appendChild(alcantarilladoValor);
@@ -333,6 +347,7 @@ function renderPlanillas(datosPlanillas) {
               break;
             }
 
+            console.log("Valor de agua= " + valorAguaPotable);
             console.log("Asignando NA");
             consumoValor = document.createTextNode("NA");
             consumoDiv.appendChild(consumoP);
@@ -464,22 +479,55 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
           planillaEstado.textContent = planilla[0].estado;
           socioNombres.textContent = planilla[0].nombre;
           socioCedula.textContent = planilla[0].cedulaPasaporte; // ----------------------------------------------------------------
-          // Datos del consumo de agua potable de la planilla
 
-          lecturaActual.value = planilla[0].lecturaActual;
-          lecturaAnterior.value = planilla[0].lecturaAnterior;
-          valorConsumo.value = planilla[0].valor;
-          console.log("total consumo: ", totalConsumo);
-          totalConsumo += planilla[0].valor;
-          console.log("total consumo: ", totalConsumo);
-          console.log(planilla[0]);
+          if (planilla[0].medidorSn !== "No") {
+            planillaMedidorSn = true;
+            lecturaActual.value = planilla[0].lecturaActual;
+            lecturaAnterior.value = planilla[0].lecturaAnterior;
+            valorConsumo.value = planilla[0].valor;
+            console.log("total consumo: ", totalConsumo);
+            totalConsumo += planilla[0].valor;
+            console.log("total consumo: ", totalConsumo);
+            console.log(planilla[0]);
+            calcularConsumo();
+            calcularConsumoBt.disabled = false;
+            mostrarLecturas.disabled = false;
+            mostrarLecturas.innerHTML = "";
+            mostrarLecturas.innerHTML = "Servicio de agua potable" + '<i id="collapse" class="fs-3 fa-solid fa-caret-up"></i>';
+            contenedorLecturas.style.display = "flex";
+            collapse.classList.remove("fa-caret-down");
+            collapse.classList.add("fa-caret-up");
+          } else {
+            planillaMedidorSn = false;
+            lecturaActual.value = "";
+            lecturaActual.placeHolder = "NA";
+            lecturaAnterior.value = "";
+            lecturaAnterior.placeHolder = "NA";
+            valorConsumo.value = "";
+            valorConsumo.placeHolder = "NA";
+            tarifaConsumo.value = "";
+            calcularConsumo;
+            console.log("total consumo: ", totalConsumo); // totalConsumo += planilla[0].valor;
+
+            console.log("total consumo: ", totalConsumo);
+            console.log(planilla[0]);
+            calcularConsumoBt.disabled = true;
+            mostrarLecturas.disabled = true;
+            mostrarLecturas.innerHTML = "";
+            mostrarLecturas.innerHTML = "No aplica servicio de agua potable" + '<i id="collapse" class="fs-3 fa-solid fa-caret-down"></i>';
+            contenedorLecturas.style.display = "none";
+            collapse.classList.add("fa-caret-down");
+            collapse.classList.remove("fa-caret-up");
+          } // Datos del consumo de agua potable de la planilla
+
+
           serviciosFijosList.innerHTML = "";
           otrosServiciosList.innerHTML = "";
           otrosAplazablesList.innerHTML = "";
-          _context4.next = 26;
+          _context4.next = 20;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosServiciosByContratoId", contratoId, formatearFecha(fechaEmision), "fijos"));
 
-        case 26:
+        case 20:
           serviciosFijos = _context4.sent;
 
           if (serviciosFijos[0] !== undefined) {
@@ -488,10 +536,10 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
             serviciosFijosList.innerHTML = "";
           }
 
-          _context4.next = 30;
+          _context4.next = 24;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosServiciosByContratoId", contratoId, formatearFecha(fechaEmision), "otros"));
 
-        case 30:
+        case 24:
           otrosServicios = _context4.sent;
 
           if (otrosServicios[0] !== undefined) {
@@ -500,10 +548,9 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
             otrosServiciosList.innerHTML = "";
           }
 
-          calcularConsumo();
           valorTotalPagar.value = totalFinal + totalConsumo;
 
-        case 34:
+        case 27:
         case "end":
           return _context4.stop();
       }
@@ -1036,6 +1083,22 @@ var detallesServiciodg = function detallesServiciodg(servicio) {
       }
     }
   });
+};
+
+calcularConsumoBt.onclick = function () {
+  recalcularConsumo();
+};
+
+mostrarLecturas.onclick = function () {
+  if (contenedorLecturas.style.display == "none") {
+    collapse.classList.remove("fa-caret-down");
+    collapse.classList.add("fa-caret-up");
+    contenedorLecturas.style.display = "flex";
+  } else {
+    contenedorLecturas.style.display = "none";
+    collapse.classList.add("fa-caret-down");
+    collapse.classList.remove("fa-caret-up");
+  }
 };
 
 var administrarServiciosdg = function administrarServiciosdg(id) {

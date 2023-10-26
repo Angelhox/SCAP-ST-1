@@ -274,7 +274,12 @@ contratoForm.addEventListener("submit", async (e) => {
         referencia: medidorReferencia.value,
         // contratosId: contratoId,
       };
-
+      const fakeMedidor = {
+        codigo: contratoCodigo.value,
+        fechaInstalacion: null,
+        marca: "NA",
+        observacion: "NA",
+      };
       if (!editingStatus) {
         try {
           const resultContrato = await ipcRenderer.invoke(
@@ -292,6 +297,14 @@ contratoForm.addEventListener("submit", async (e) => {
             "Muestro id resultado de insertar contrato: ",
             contratoId
           );
+
+          fakeMedidor.contratosId = contratoId;
+          const result = await ipcRenderer.invoke(
+            "updateMedidor",
+            contratoId,
+            fakeMedidor
+          );
+          console.log("resultado de crearMedidor: ", result);
           editContrato(contratoId);
           // if (!contratoId == "" || !contratoId == undefined) {
           //   await contratarServicios(
@@ -464,7 +477,7 @@ function renderContratosConMedidor(datosContratos) {
     divCol.className = " col-xl-6 col-lg-6 col-md-6 col-sm-12 px-1";
     // Crea el div con la clase "card" y estilos
     const divCard = document.createElement("div");
-    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 card";
+    divCard.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card";
     divCard.style.padding = "0.3em";
     divCard.style.width = "100%";
     divCard.style.backgroundColor = "#d6eaf8";
@@ -1126,8 +1139,8 @@ function renderServiciosDisponibles(serviciosDisponibles) {
             // Aquí puedes realizar la acción que desees cuando el usuario confirme.
             // checkbox.checked = true;
             contratarServicio(serviciosDisponibles[i].id, editContratoId);
-            await editContrato(editContratoId);
-            await editContrato(editContratoId);
+            // await editContrato(editContratoId);
+            // await editContrato(editContratoId);
           } else {
             checkbox.checked = false;
           }

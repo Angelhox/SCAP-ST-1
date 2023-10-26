@@ -22,6 +22,7 @@ var buscarServicios = document.getElementById("buscarServicios");
 var criterio = document.getElementById("criterio");
 var criterioContent = document.getElementById("criterio-content");
 var servicioAplazableSn = document.getElementById("aplazablesn");
+var valoresDistintos = document.getElementById("distintosSn");
 var aplazableOptions = document.getElementById("aplazable-options");
 var numeroPagos = document.getElementById("numero-pagos");
 var valorPagos = document.getElementById("valor-pagos");
@@ -91,6 +92,7 @@ var usuarios = [];
 var valorIndividual = 0.0;
 var editingStatus = false;
 var editServicioId = "";
+var valoresDistintosDf = "No";
 servicioForm.addEventListener("submit", function _callee2(e) {
   var newCuota, result;
   return regeneratorRuntime.async(function _callee2$(_context2) {
@@ -106,7 +108,7 @@ servicioForm.addEventListener("submit", function _callee2(e) {
 
           mensajeError.textContent = "El nombre del servicio es obligatorio.";
           servicioNombre.focus();
-          _context2.next = 25;
+          _context2.next = 26;
           break;
 
         case 6:
@@ -121,7 +123,7 @@ servicioForm.addEventListener("submit", function _callee2(e) {
           //   servicioTipo.focus();
           // }
 
-          _context2.next = 25;
+          _context2.next = 26;
           break;
 
         case 11:
@@ -132,10 +134,14 @@ servicioForm.addEventListener("submit", function _callee2(e) {
 
           mensajeError.textContent = "El valor el servicio es obligatorio.";
           servicioValor.focus();
-          _context2.next = 25;
+          _context2.next = 26;
           break;
 
         case 16:
+          if (valoresDistintos.value !== null) {
+            valoresDistintosDf = valoresDistintos.value;
+          }
+
           newCuota = {
             fechaCreacion: formatearFecha(new Date()),
             nombre: servicioNombre.value,
@@ -146,24 +152,24 @@ servicioForm.addEventListener("submit", function _callee2(e) {
             numeroPagos: numeroPagos.value,
             valorPagos: valorPagos.value,
             individualSn: servicioIndividualSn.value,
-            valoresDistintosSn: "No"
+            valoresDistintosSn: valoresDistintosDf
           };
 
           if (editingStatus) {
-            _context2.next = 24;
+            _context2.next = 25;
             break;
           }
 
-          _context2.next = 20;
+          _context2.next = 21;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("createCuotas", newCuota));
 
-        case 20:
+        case 21:
           result = _context2.sent;
           console.log(result);
-          _context2.next = 25;
+          _context2.next = 26;
           break;
 
-        case 24:
+        case 25:
           Swal.fire({
             title: "¿Quieres guardar los cambios?",
             text: "No podrás deshacer esta acción.",
@@ -202,7 +208,7 @@ servicioForm.addEventListener("submit", function _callee2(e) {
             });
           });
 
-        case 25:
+        case 26:
         case "end":
           return _context2.stop();
       }
@@ -510,49 +516,24 @@ function renderUsuarios(usuarios, servicio) {
       }
     }
   });
-}
-
-var contratar = function contratar() {
-  return regeneratorRuntime.async(function contratar$(_context6) {
-    while (1) {
-      switch (_context6.prev = _context6.next) {
-        case 0:
-          porContratar.forEach(function _callee4(contratando) {
-            var contratado;
-            return regeneratorRuntime.async(function _callee4$(_context5) {
-              while (1) {
-                switch (_context5.prev = _context5.next) {
-                  case 0:
-                    newServicioContratado = {
-                      fechaEmision: formatearFecha(new Date()),
-                      estado: "Sin aplicar",
-                      serviciosId: editServicioId,
-                      contratosId: contratando,
-                      descuentosId: 1,
-                      valorIndividual: valorIndividual
-                    };
-                    _context5.next = 3;
-                    return regeneratorRuntime.awrap(ipcRenderer.invoke("createSercicioContratado", newServicioContratado));
-
-                  case 3:
-                    contratado = _context5.sent;
-                    return _context5.abrupt("return", contratado);
-
-                  case 5:
-                  case "end":
-                    return _context5.stop();
-                }
-              }
-            });
-          });
-
-        case 1:
-        case "end":
-          return _context6.stop();
-      }
-    }
-  });
-}; // function renderServicios(servicios) {
+} // const contratar = async () => {
+//   porContratar.forEach(async (contratando) => {
+//     newServicioContratado = {
+//       fechaEmision: formatearFecha(new Date()),
+//       estado: "Sin aplicar",
+//       serviciosId: editServicioId,
+//       contratosId: contratando,
+//       descuentosId: 1,
+//       valorIndividual: valorIndividual,
+//     };
+//     const contratado = await ipcRenderer.invoke(
+//       "createSercicioContratado",
+//       newServicioContratado
+//     );
+//     return contratado;
+//   });
+// };
+// function renderServicios(servicios) {
 //   serviciosList.innerHTML = "";
 //   servicios.forEach((servicio) => {
 //     serviciosList.innerHTML += `
@@ -578,15 +559,15 @@ var contratar = function contratar() {
 
 var editServicio = function editServicio(id) {
   var servicio;
-  return regeneratorRuntime.async(function editServicio$(_context7) {
+  return regeneratorRuntime.async(function editServicio$(_context5) {
     while (1) {
-      switch (_context7.prev = _context7.next) {
+      switch (_context5.prev = _context5.next) {
         case 0:
-          _context7.next = 2;
+          _context5.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getCuotasById", id));
 
         case 2:
-          servicio = _context7.sent;
+          servicio = _context5.sent;
           servicioCreacion.value = formatearFecha(servicio.fechaCreacion);
           servicioNombre.value = servicio.nombre;
           servicioDescripcion.value = servicio.descripcion;
@@ -617,16 +598,16 @@ var editServicio = function editServicio(id) {
 
         case 15:
         case "end":
-          return _context7.stop();
+          return _context5.stop();
       }
     }
   });
 };
 
 var deleteServicio = function deleteServicio(id, servicioNombre) {
-  return regeneratorRuntime.async(function deleteServicio$(_context9) {
+  return regeneratorRuntime.async(function deleteServicio$(_context7) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context7.prev = _context7.next) {
         case 0:
           Swal.fire({
             title: "¿Quieres borrar el servicio  " + servicioNombre + " ?",
@@ -638,31 +619,31 @@ var deleteServicio = function deleteServicio(id, servicioNombre) {
             cancelButtonColor: "#EC7063 ",
             confirmButtonText: "Sí, continuar",
             cancelButtonText: "Cancelar"
-          }).then(function _callee5(result) {
+          }).then(function _callee4(result) {
             var _result2;
 
-            return regeneratorRuntime.async(function _callee5$(_context8) {
+            return regeneratorRuntime.async(function _callee4$(_context6) {
               while (1) {
-                switch (_context8.prev = _context8.next) {
+                switch (_context6.prev = _context6.next) {
                   case 0:
                     if (!result.isConfirmed) {
-                      _context8.next = 6;
+                      _context6.next = 6;
                       break;
                     }
 
                     // Aquí puedes realizar la acción que desees cuando el usuario confirme.
                     console.log("id from parametros.js"); // Eliminamos el registro de la tabla servicios de tipo ocacional.
 
-                    _context8.next = 4;
+                    _context6.next = 4;
                     return regeneratorRuntime.awrap(ipcRenderer.invoke("deleteCuotas", id));
 
                   case 4:
-                    _result2 = _context8.sent;
+                    _result2 = _context6.sent;
                     console.log("Resultado parametros.js", _result2);
 
                   case 6:
                   case "end":
-                    return _context8.stop();
+                    return _context6.stop();
                 }
               }
             });
@@ -670,7 +651,7 @@ var deleteServicio = function deleteServicio(id, servicioNombre) {
 
         case 1:
         case "end":
-          return _context9.stop();
+          return _context7.stop();
       }
     }
   });
@@ -681,15 +662,15 @@ var deleteServicio = function deleteServicio(id, servicioNombre) {
 
 var mostrarEstadisticas = function mostrarEstadisticas(servicioId) {
   var servicio, aplazableSnText, criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function mostrarEstadisticas$(_context10) {
+  return regeneratorRuntime.async(function mostrarEstadisticas$(_context8) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context8.prev = _context8.next) {
         case 0:
-          _context10.next = 2;
+          _context8.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getCuotasById", servicioId));
 
         case 2:
-          servicio = _context10.sent;
+          servicio = _context8.sent;
           console.log("Estadisticas: " + servicio);
           servicioTit.textContent = servicio.nombre;
           servicioDesc.textContent = "(" + servicio.descripcion + ")";
@@ -706,16 +687,16 @@ var mostrarEstadisticas = function mostrarEstadisticas(servicioId) {
           console.log(servicio);
           criterioBuscar = "all";
           criterioContentBuscar = "all";
-          _context10.next = 17;
+          _context8.next = 17;
           return regeneratorRuntime.awrap(getBeneficiarios(criterioBuscar, criterioContentBuscar, servicio));
 
         case 17:
-          _context10.next = 19;
+          _context8.next = 19;
           return regeneratorRuntime.awrap(getRecaudaciones(servicioId));
 
         case 19:
         case "end":
-          return _context10.stop();
+          return _context8.stop();
       }
     }
   });
@@ -724,10 +705,11 @@ var mostrarEstadisticas = function mostrarEstadisticas(servicioId) {
 var getRecaudaciones = function getRecaudaciones() {
   var valoresRecaudados, valoresPendientes, valoresTotales, fechaDesde, fechaHasta, anioD, mesD, anioH, mesH, diaD, diaH, _diaD, _diaD2;
 
-  return regeneratorRuntime.async(function getRecaudaciones$(_context11) {
+  return regeneratorRuntime.async(function getRecaudaciones$(_context9) {
     while (1) {
-      switch (_context11.prev = _context11.next) {
+      switch (_context9.prev = _context9.next) {
         case 0:
+          console.log("Mostrando recaudaciones");
           valoresRecaudados = 0.0;
           valoresPendientes = 0.0;
           valoresTotales = 0.0;
@@ -763,11 +745,11 @@ var getRecaudaciones = function getRecaudaciones() {
             fechaHasta = formatearFecha(_diaD2.ultimoDia);
           }
 
-          _context11.next = 13;
+          _context9.next = 14;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getRecaudaciones", editServicioId, fechaDesde, fechaHasta));
 
-        case 13:
-          recaudaciones = _context11.sent;
+        case 14:
+          recaudaciones = _context9.sent;
           console.log("Recaudaciones: ", recaudaciones);
           recaudacionesList.innerHTML = "";
           recaudaciones.forEach(function (recaudacion) {
@@ -790,7 +772,49 @@ var getRecaudaciones = function getRecaudaciones() {
           valorRecaudado.textContent = valoresRecaudados.toFixed(2);
           valorTotal.textContent = valoresTotales.toFixed(2);
 
-        case 20:
+        case 21:
+        case "end":
+          return _context9.stop();
+      }
+    }
+  });
+};
+
+var getBeneficiarios = function getBeneficiarios(criterio, criterioContent, servicio) {
+  return regeneratorRuntime.async(function getBeneficiarios$(_context10) {
+    while (1) {
+      switch (_context10.prev = _context10.next) {
+        case 0:
+          _context10.next = 2;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratos", criterio, criterioContent));
+
+        case 2:
+          usuarios = _context10.sent;
+          console.log("Beneficiarios: ", usuarios);
+          renderUsuarios(usuarios, servicio);
+
+        case 5:
+        case "end":
+          return _context10.stop();
+      }
+    }
+  });
+};
+
+var getServicios = function getServicios() {
+  return regeneratorRuntime.async(function getServicios$(_context11) {
+    while (1) {
+      switch (_context11.prev = _context11.next) {
+        case 0:
+          _context11.next = 2;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("getCuotas"));
+
+        case 2:
+          cuotas = _context11.sent;
+          console.log(cuotas);
+          renderCuotas(cuotas);
+
+        case 5:
         case "end":
           return _context11.stop();
       }
@@ -798,20 +822,36 @@ var getRecaudaciones = function getRecaudaciones() {
   });
 };
 
-var getBeneficiarios = function getBeneficiarios(criterio, criterioContent, servicio) {
-  return regeneratorRuntime.async(function getBeneficiarios$(_context12) {
+criterio.onchange = function _callee5() {
+  var criterioSeleccionado, criterioBuscar, criterioContentBuscar;
+  return regeneratorRuntime.async(function _callee5$(_context12) {
     while (1) {
       switch (_context12.prev = _context12.next) {
         case 0:
-          _context12.next = 2;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratos", criterio, criterioContent));
+          criterioSeleccionado = criterio.value;
+          console.log("Seleccionado: ", criterioSeleccionado);
 
-        case 2:
-          usuarios = _context12.sent;
-          console.log("Beneficiarios: ", usuarios);
-          renderUsuarios(usuarios, servicio);
+          if (!(criterioSeleccionado === "all")) {
+            _context12.next = 11;
+            break;
+          }
 
-        case 5:
+          // criterioContent.textContent = "";
+          criterioContent.value = "";
+          criterioContent.readOnly = true;
+          criterioBuscar = "all";
+          criterioContentBuscar = "all";
+          _context12.next = 9;
+          return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
+
+        case 9:
+          _context12.next = 12;
+          break;
+
+        case 11:
+          criterioContent.readOnly = false;
+
+        case 12:
         case "end":
           return _context12.stop();
       }
@@ -819,18 +859,17 @@ var getBeneficiarios = function getBeneficiarios(criterio, criterioContent, serv
   });
 };
 
-var getServicios = function getServicios() {
-  return regeneratorRuntime.async(function getServicios$(_context13) {
+buscarServicios.onclick = function _callee6() {
+  var criterioBuscar, criterioContentBuscar;
+  return regeneratorRuntime.async(function _callee6$(_context13) {
     while (1) {
       switch (_context13.prev = _context13.next) {
         case 0:
-          _context13.next = 2;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("getCuotas"));
-
-        case 2:
-          cuotas = _context13.sent;
-          console.log(cuotas);
-          renderCuotas(cuotas);
+          criterioBuscar = criterio.value;
+          criterioContentBuscar = criterioContent.value;
+          console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
+          _context13.next = 5;
+          return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
 
         case 5:
         case "end":
@@ -840,13 +879,13 @@ var getServicios = function getServicios() {
   });
 };
 
-criterio.onchange = function _callee6() {
+criterioBn.onchange = function _callee7() {
   var criterioSeleccionado, criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function _callee6$(_context14) {
+  return regeneratorRuntime.async(function _callee7$(_context14) {
     while (1) {
       switch (_context14.prev = _context14.next) {
         case 0:
-          criterioSeleccionado = criterio.value;
+          criterioSeleccionado = criterioBn.value;
           console.log("Seleccionado: ", criterioSeleccionado);
 
           if (!(criterioSeleccionado === "all")) {
@@ -855,19 +894,19 @@ criterio.onchange = function _callee6() {
           }
 
           // criterioContent.textContent = "";
-          criterioContent.value = "";
-          criterioContent.readOnly = true;
+          criterioContentBn.value = "";
+          criterioContentBn.readOnly = true;
           criterioBuscar = "all";
           criterioContentBuscar = "all";
           _context14.next = 9;
-          return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
+          return regeneratorRuntime.awrap(getBeneficiarios(criterioBuscar, criterioContentBuscar, editServicioId));
 
         case 9:
           _context14.next = 12;
           break;
 
         case 11:
-          criterioContent.readOnly = false;
+          criterioContentBn.readOnly = false;
 
         case 12:
         case "end":
@@ -877,17 +916,17 @@ criterio.onchange = function _callee6() {
   });
 };
 
-buscarServicios.onclick = function _callee7() {
+buscarBeneficiarios.onclick = function _callee8() {
   var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function _callee7$(_context15) {
+  return regeneratorRuntime.async(function _callee8$(_context15) {
     while (1) {
       switch (_context15.prev = _context15.next) {
         case 0:
-          criterioBuscar = criterio.value;
-          criterioContentBuscar = criterioContent.value;
+          criterioBuscar = criterioBn.value;
+          criterioContentBuscar = criterioContentBn.value;
           console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
           _context15.next = 5;
-          return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
+          return regeneratorRuntime.awrap(getBeneficiarios(criterioBuscar, criterioContentBuscar, editServicioId));
 
         case 5:
         case "end":
@@ -897,82 +936,25 @@ buscarServicios.onclick = function _callee7() {
   });
 };
 
-criterioBn.onchange = function _callee8() {
-  var criterioSeleccionado, criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function _callee8$(_context16) {
+criterioSt.onchange = function _callee9() {
+  var criterioSeleccionado;
+  return regeneratorRuntime.async(function _callee9$(_context16) {
     while (1) {
       switch (_context16.prev = _context16.next) {
-        case 0:
-          criterioSeleccionado = criterioBn.value;
-          console.log("Seleccionado: ", criterioSeleccionado);
-
-          if (!(criterioSeleccionado === "all")) {
-            _context16.next = 11;
-            break;
-          }
-
-          // criterioContent.textContent = "";
-          criterioContentBn.value = "";
-          criterioContentBn.readOnly = true;
-          criterioBuscar = "all";
-          criterioContentBuscar = "all";
-          _context16.next = 9;
-          return regeneratorRuntime.awrap(getBeneficiarios(criterioBuscar, criterioContentBuscar, editServicioId));
-
-        case 9:
-          _context16.next = 12;
-          break;
-
-        case 11:
-          criterioContentBn.readOnly = false;
-
-        case 12:
-        case "end":
-          return _context16.stop();
-      }
-    }
-  });
-};
-
-buscarBeneficiarios.onclick = function _callee9() {
-  var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function _callee9$(_context17) {
-    while (1) {
-      switch (_context17.prev = _context17.next) {
-        case 0:
-          criterioBuscar = criterioBn.value;
-          criterioContentBuscar = criterioContentBn.value;
-          console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
-          _context17.next = 5;
-          return regeneratorRuntime.awrap(getBeneficiarios(criterioBuscar, criterioContentBuscar, editServicioId));
-
-        case 5:
-        case "end":
-          return _context17.stop();
-      }
-    }
-  });
-};
-
-criterioSt.onchange = function _callee10() {
-  var criterioSeleccionado;
-  return regeneratorRuntime.async(function _callee10$(_context18) {
-    while (1) {
-      switch (_context18.prev = _context18.next) {
         case 0:
           criterioSeleccionado = criterioSt.value;
           console.log("Seleccionado: ", criterioSeleccionado);
 
           if (!(criterioSeleccionado === "all")) {
-            _context18.next = 7;
+            _context16.next = 7;
             break;
           }
 
-          _context18.next = 5;
+          _context16.next = 5;
           return regeneratorRuntime.awrap(getRecaudaciones());
 
         case 5:
-          _context18.next = 8;
+          _context16.next = 8;
           break;
 
         case 7:
@@ -991,23 +973,23 @@ criterioSt.onchange = function _callee10() {
 
         case 8:
         case "end":
-          return _context18.stop();
+          return _context16.stop();
       }
     }
   });
 };
 
-buscarRecaudaciones.onclick = function _callee11() {
-  return regeneratorRuntime.async(function _callee11$(_context19) {
+buscarRecaudaciones.onclick = function _callee10() {
+  return regeneratorRuntime.async(function _callee10$(_context17) {
     while (1) {
-      switch (_context19.prev = _context19.next) {
+      switch (_context17.prev = _context17.next) {
         case 0:
-          _context19.next = 2;
+          _context17.next = 2;
           return regeneratorRuntime.awrap(getRecaudaciones());
 
         case 2:
         case "end":
-          return _context19.stop();
+          return _context17.stop();
       }
     }
   });
@@ -1015,9 +997,9 @@ buscarRecaudaciones.onclick = function _callee11() {
 
 function init() {
   var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function init$(_context20) {
+  return regeneratorRuntime.async(function init$(_context18) {
     while (1) {
-      switch (_context20.prev = _context20.next) {
+      switch (_context18.prev = _context18.next) {
         case 0:
           servicioCreacion.value = formatearFecha(new Date());
           mesActual();
@@ -1026,12 +1008,12 @@ function init() {
           anioLimites();
           criterioBuscar = "all";
           criterioContentBuscar = "all";
-          _context20.next = 9;
+          _context18.next = 9;
           return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
 
         case 9:
         case "end":
-          return _context20.stop();
+          return _context18.stop();
       }
     }
   });
@@ -1065,17 +1047,17 @@ servicioAplazableSn.onchange = function () {
   }
 };
 
-ipcRenderer.on("datos-a-ocacionales", function _callee12() {
+ipcRenderer.on("datos-a-ocacionales", function _callee11() {
   var datos;
-  return regeneratorRuntime.async(function _callee12$(_context21) {
+  return regeneratorRuntime.async(function _callee11$(_context19) {
     while (1) {
-      switch (_context21.prev = _context21.next) {
+      switch (_context19.prev = _context19.next) {
         case 0:
-          _context21.next = 2;
+          _context19.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("pido-datos"));
 
         case 2:
-          datos = _context21.sent;
+          datos = _context19.sent;
           console.log("Estos: " + datos.id);
           mostrarEstadisticas(datos.id);
           mostrarSeccion("seccion2"); // console.log("Id recibido: " + servicioRv.id);
@@ -1084,59 +1066,56 @@ ipcRenderer.on("datos-a-ocacionales", function _callee12() {
 
         case 6:
         case "end":
-          return _context21.stop();
+          return _context19.stop();
       }
     }
   });
-});
-ipcRenderer.on("Notificar", function (event, response) {
-  if (response.title === "Borrado!") {
-    resetFormAfterSave();
-  } else if (response.title === "Actualizado!") {
-    resetFormAfterUpdate();
-  } else if (response.title === "Guardado!") {
-    resetFormAfterSave();
-  }
-
-  console.log("Response: " + response);
-
-  if (response.success) {
-    Swal.fire({
-      title: response.title,
-      text: response.message,
-      icon: "success",
-      confirmButtonColor: "#f8c471"
-    });
-  } else {
-    Swal.fire({
-      title: response.title,
-      text: response.message,
-      icon: "error",
-      confirmButtonColor: "#f8c471"
-    });
-  }
-});
+}); // ipcRenderer.on("Notificar", (event, response) => {
+//   if (response.title === "Borrado!") {
+//     resetFormAfterSave();
+//   } else if (response.title === "Actualizado!") {
+//     resetFormAfterUpdate();
+//   } else if (response.title === "Guardado!") {
+//     resetFormAfterSave();
+//   }
+//   console.log("Response: " + response);
+//   if (response.success) {
+//     Swal.fire({
+//       title: response.title,
+//       text: response.message,
+//       icon: "success",
+//       confirmButtonColor: "#f8c471",
+//     });
+//   } else {
+//     Swal.fire({
+//       title: response.title,
+//       text: response.message,
+//       icon: "error",
+//       confirmButtonColor: "#f8c471",
+//     });
+//   }
+// });
 
 function resetFormAfterUpdate() {
   var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context22) {
+  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context20) {
     while (1) {
-      switch (_context22.prev = _context22.next) {
+      switch (_context20.prev = _context20.next) {
         case 0:
           criterioBuscar = criterio.value;
           criterioContentBuscar = criterioContent.value;
           console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
           console;
-          _context22.next = 6;
+          _context20.next = 6;
           return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
 
         case 6:
           mensajeError.textContent = "";
-          fechaCreacion.value = formatearFecha(new Date());
+          servicioCreacion.value = formatearFecha(new Date());
 
         case 8:
         case "end":
-          return _context22.stop();
+          return _context20.stop();
       }
     }
   });
@@ -1144,15 +1123,15 @@ function resetFormAfterUpdate() {
 
 function resetFormAfterSave() {
   var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function resetFormAfterSave$(_context23) {
+  return regeneratorRuntime.async(function resetFormAfterSave$(_context21) {
     while (1) {
-      switch (_context23.prev = _context23.next) {
+      switch (_context21.prev = _context21.next) {
         case 0:
           criterioBuscar = criterio.value;
           criterioContentBuscar = criterioContent.value;
           console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
           console;
-          _context23.next = 6;
+          _context21.next = 6;
           return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
 
         case 6:
@@ -1164,7 +1143,7 @@ function resetFormAfterSave() {
 
         case 11:
         case "end":
-          return _context23.stop();
+          return _context21.stop();
       }
     }
   });
@@ -1275,12 +1254,44 @@ function anioLimites() {
   }
 }
 
-function vistaFactura() {
-  var datos, encabezado, datosTotales;
-  return regeneratorRuntime.async(function vistaFactura$(_context24) {
+btnReporte.onclick = function () {
+  Swal.fire({
+    title: "Selecciona una acción",
+    icon: "info",
+    html: "\n      <button class=\"swal2-confirm swal2-styled\" id=\"reporteGeneral\" onclick=\"vistaFactura('general')\">General</button>\n      <button class=\"swal2-confirm swal2-styled\" id=\"reporteCancelados\" onclick=\"vistaFactura('cancelados')\">Cancelados</button>\n      <button class=\"swal2-confirm swal2-styled\" id=\"reporteSinCancelar\" onclick=\"vistaFactura('sinCancelar')\">Sin cancelar</button>\n\n    ",
+    showCloseButton: true,
+    allowOutsideClick: false,
+    showConfirmButton: false
+  }).then(function (result) {
+    if (result.isConfirmed) {// if (result.dismiss === Swal.DismissReason.close) {
+      //   // El botón de cierre (X) fue presionado
+      //   Swal.fire("Operación cancelada", "", "error");
+      // } else if (result.target.id === "accion1") {
+      //   // El botón "Acción 1" fue presionado
+      //   Swal.fire("Acción 1 realizada", "", "success");
+      // } else if (result.target.id === "accion2") {
+      //   // El botón "Acción 2" fue presionado
+      //   Swal.fire("Acción 2 realizada", "", "success");
+      // } else if (result.target.id === "accion3") {
+      //   // El botón "Acción 3" fue presionado
+      //   Swal.fire("Acción 3 realizada", "", "success");
+      // }
+    } else {
+      // El botón "Cancelar" fue presionado
+      Swal.fire("Reporte cancelado", "", "success");
+    }
+  });
+};
+
+function vistaFactura(tipo) {
+  var recaudacionesReporte, datos, encabezado, datosTotales;
+  return regeneratorRuntime.async(function vistaFactura$(_context22) {
     while (1) {
-      switch (_context24.prev = _context24.next) {
+      switch (_context22.prev = _context22.next) {
         case 0:
+          recaudacionesReporte = []; // Supongamos que tienes un arreglo de objetos
+          // Define la condición de filtro (por ejemplo, objetos con id mayor que 2)
+
           datos = {
             mensaje: "Hola desde pagina1",
             otroDato: 12345
@@ -1295,12 +1306,31 @@ function vistaFactura() {
             recaudado: valorPendiente.textContent,
             totalFinal: valorTotal.textContent
           };
-          _context24.next = 5;
-          return regeneratorRuntime.awrap(ipcRenderer.send("datos-a-pagina3", datos, encabezado, recaudaciones, datosTotales));
 
-        case 5:
+          if (tipo == "cancelados") {
+            recaudacionesReporte = [];
+            recaudacionesReporte = recaudaciones.filter(function (recaudacion) {
+              return recaudacion.detalleEstado == "Cancelado";
+            });
+            console.log("rp: Cancelados ", recaudacionesReporte);
+          } else if (tipo == "sinCancelar") {
+            recaudacionesReporte = [];
+            recaudacionesReporte = recaudaciones.filter(function (recaudacion) {
+              return recaudacion.detalleEstado == "Por cancelar";
+            });
+            console.log("rp Sin cancelar: ", recaudacionesReporte);
+          } else {
+            recaudacionesReporte = [];
+            recaudacionesReporte = recaudaciones;
+            console.log("rp general: ", recaudacionesReporte);
+          }
+
+          _context22.next = 7;
+          return regeneratorRuntime.awrap(ipcRenderer.send("datos-a-pagina3", datos, encabezado, recaudacionesReporte, datosTotales));
+
+        case 7:
         case "end":
-          return _context24.stop();
+          return _context22.stop();
       }
     }
   });
@@ -1321,15 +1351,15 @@ function mostrarSeccion(id) {
 
 function cargarDescuentosList() {
   var descuentosDisponibles;
-  return regeneratorRuntime.async(function cargarDescuentosList$(_context25) {
+  return regeneratorRuntime.async(function cargarDescuentosList$(_context23) {
     while (1) {
-      switch (_context25.prev = _context25.next) {
+      switch (_context23.prev = _context23.next) {
         case 0:
-          _context25.next = 2;
+          _context23.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDescuentos"));
 
         case 2:
-          descuentosDisponibles = _context25.sent;
+          descuentosDisponibles = _context23.sent;
           descuentoDg.innerHTML = "";
           descuentosDisponibles.forEach(function (descuentoDisponible) {
             var option = document.createElement("option");
@@ -1341,26 +1371,25 @@ function cargarDescuentosList() {
 
         case 5:
         case "end":
-          return _context25.stop();
+          return _context23.stop();
       }
     }
   });
 }
 
 var servicioOpcionesdg = function servicioOpcionesdg(usuario, servicio) {
-  var presubtotal, subtotal, total, porcentaje, descuento, aplazable, cancelados, pendientes, valorCancelado, valorPago, valorAbonar, valorSaldo, numeroPagosDf, servicioContratado, descuentoSeleccionado, valorSeleccionado, valorPagoSeleccionado, servicioDetalles, totalCalculado;
-  return regeneratorRuntime.async(function servicioOpcionesdg$(_context28) {
+  var subtotal, total, porcentaje, descuento, aplazable, cancelados, pendientes, valorCancelado, valorPago, valorSaldo, numeroPagosDf, descuentoDf, editableSn, servicioContratado, servicioDetalles, descuentoSeleccionado, valorSeleccionado, valorPagoSeleccionado;
+  return regeneratorRuntime.async(function servicioOpcionesdg$(_context26) {
     while (1) {
-      switch (_context28.prev = _context28.next) {
+      switch (_context26.prev = _context26.next) {
         case 0:
-          _context28.next = 2;
+          _context26.next = 2;
           return regeneratorRuntime.awrap(cargarDescuentosList());
 
         case 2:
           errortextAbono.textContent = "Error";
           errContainer.style.display = "none";
           abonarDg.readOnly = true;
-          presubtotal = 0;
           subtotal = 0;
           total = 0;
           porcentaje = 0;
@@ -1370,129 +1399,129 @@ var servicioOpcionesdg = function servicioOpcionesdg(usuario, servicio) {
           pendientes = 0;
           valorCancelado = 0;
           valorPago = 0;
-          valorAbonar = 0;
           valorSaldo = 0;
-          numeroPagosDf = 1; // funciones de los descuentos al seleccionarlos
+          numeroPagosDf = 1;
+          descuentoDf = 1;
+          editableSn = false; // Datos del servicio independientes
 
-          console.log("Contratado?: " + servicio.id, usuario.contratosId);
-          _context28.next = 21;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratadoByServicioContrato", usuario.contratosId, servicio.id));
-
-        case 21:
-          servicioContratado = _context28.sent;
-          // console.log("Servicio al Dg: " + servicio.contratadosId);
           servicioDg.textContent = servicio.nombre;
           descripcionDg.textContent = servicio.descripcion;
+          detallesDg.textContent = servicio.tipo + " | " + aplazable;
+          servicioValorDg.textContent = "Valor: $" + servicio.valor;
 
           if (servicioDg.aplazableSn === "Si") {
             aplazable = "Aplazable";
+          } // Verifico si el servicio ha sido contratado
+
+
+          console.log("Contratado?: " + servicio.id, usuario.contratosId);
+          _context26.next = 26;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratadoByServicioContrato", servicio.id, usuario.contratosId));
+
+        case 26:
+          servicioContratado = _context26.sent;
+
+          if (!(servicioContratado[0] !== undefined)) {
+            _context26.next = 51;
+            break;
           }
 
-          detallesDg.textContent = servicio.tipo + " | " + aplazable;
-          servicioValorDg.textContent = "Valor: $" + servicio.valor;
-          console.log("Valores distintos: " + servicio.valoresDistintosSn); // ----------------------------------------------------------------
-          // Independientemente de ser valores distintos o no
+          console.log("El servicio ha sido contratado: " + servicioContratado[0]); // Si el servicio ya ha sido contratado
 
-          if (servicio.valor !== null) {
-            subtotal = parseFloat(servicio.valor).toFixed(2);
+          if (servicioContratado[0].valorIndividual !== null) {
+            subtotal = servicioContratado[0].valorIndividual;
           }
 
           subtotalDg.value = subtotal;
-          descuentoDg.value = 1;
-          descuentoSeleccionado = descuentoDg.options[descuentoDg.selectedIndex];
-          valorSeleccionado = descuentoSeleccionado.getAttribute("value-descuento");
-          console.log("Atributo seleccionado:", valorSeleccionado);
-          porcentaje = parseInt(valorSeleccionado) / 100;
-          console.log("Porcentaje: " + subtotal, porcentaje);
-          descuento = subtotal * porcentaje;
-          descuentoValDg.value = parseFloat(descuento).toFixed(2);
-          total = servicio.valor - descuento;
-          totalDg.value = parseFloat(total).toFixed(2);
 
-          if (servicio.numeroPagos !== null) {
-            numeroPagosDf = servicio.numeroPagos;
+          if (servicioContratado[0].descuentosId !== null) {
+            descuentoDf = servicioContratado[0].descuentosId;
+          }
+
+          descuentoDg.value = descuentoDf;
+
+          if (servicioContratado[0].valorDescuento !== null) {
+            descuento = servicioContratado[0].valorDescuento;
+          } // el valor del descuento es el que ya esta guardado.
+
+
+          descuentoValDg.value = descuento;
+
+          if (servicioContratado[0].numeroPagosIndividual !== null) {
+            numeroPagosDf = servicioContratado[0].numeroPagosIndividual;
           }
 
           numPagosDg.value = numeroPagosDf;
-          valorPagoSeleccionado = numPagosDg.options[numPagosDg.selectedIndex].value;
-          console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
-          valorPago = total / valorPagoSeleccionado;
-          valPagosDg.value = parseFloat(valorPago).toFixed(2);
 
-          subtotalDg.oninput = function () {
-            if (subtotalDg.value !== "") {
-              subtotal = subtotalDg.value;
-              var _descuentoSeleccionado = descuentoDg.options[descuentoDg.selectedIndex];
+          if (servicioContratado[0].valorPagosIndividual !== null) {
+            valorPago = servicioContratado[0].valorPagosIndividual;
+          } // el valor de los pagos es el que ya esta guardado.
 
-              var _valorSeleccionado = _descuentoSeleccionado.getAttribute("value-descuento");
 
-              console.log("Atributo seleccionado:", _valorSeleccionado);
-              porcentaje = parseInt(_valorSeleccionado) / 100;
-              console.log("Porcentaje: " + subtotal, porcentaje);
-              descuento = subtotal * porcentaje;
-              descuentoValDg.value = parseFloat(descuento).toFixed(2); // total = servicio.valor - descuento;
+          valPagosDg.value = valorPago;
+          total = subtotal - descuento;
+          totalDg.value = total; // Si esta contratado pero, esta cancelado ?
 
-              total = subtotal - descuento;
-              totalDg.value = parseFloat(total).toFixed(2); //Incluimos la programacion del select numPagos
+          _context26.next = 43;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("getDetallesByContratadoId", servicioContratado[0].serviciosContratadosId));
 
-              if (total !== 0) {
-                var _valorPagoSeleccionado = numPagosDg.options[numPagosDg.selectedIndex].value;
-                console.log("Valor pagos seleccionado:", _valorPagoSeleccionado);
-                valorPago = total / _valorPagoSeleccionado;
-              } else {
-                numPagosDg.value = 1;
-                var _valorPagoSeleccionado2 = numPagosDg.options[numPagosDg.selectedIndex].value;
-                console.log("Valor pagos seleccionado:", _valorPagoSeleccionado2);
-                valorPago = total / _valorPagoSeleccionado2;
+        case 43:
+          servicioDetalles = _context26.sent;
+
+          if (servicioDetalles.length > 0) {
+            console.log("Existe el detalle de servicios: ", servicioDetalles);
+            servicioDetalles.forEach(function (servicioDetalle) {
+              console.log("Detalles: " + servicioDetalle.estado);
+
+              if (servicioDetalle.estado === "Cancelado") {
+                cancelados++;
+                valorCancelado += servicioDetalle.abono;
               }
 
-              valPagosDg.value = parseFloat(valorPago).toFixed(2);
-            } else {
-              subtotal = servicio.valor;
-              var _descuentoSeleccionado2 = descuentoDg.options[descuentoDg.selectedIndex];
-
-              var _valorSeleccionado2 = _descuentoSeleccionado2.getAttribute("value-descuento");
-
-              console.log("Atributo seleccionado:", _valorSeleccionado2);
-              porcentaje = parseInt(_valorSeleccionado2) / 100;
-              console.log("Porcentaje: " + subtotal, porcentaje);
-              descuento = subtotal * porcentaje;
-              descuentoValDg.value = parseFloat(descuento).toFixed(2); // total = servicio.valor - descuento;
-
-              total = subtotal - descuento;
-              totalDg.value = parseFloat(total).toFixed(2); //Incluimos la programacion del select numPagos
-
-              if (total !== 0) {
-                numPagosDg.disabled = false;
-                var _valorPagoSeleccionado3 = numPagosDg.options[numPagosDg.selectedIndex].value;
-                console.log("Valor pagos seleccionado:", _valorPagoSeleccionado3);
-                valorPago = total / _valorPagoSeleccionado3;
-              } else {
-                numPagosDg.value = 1;
-                numPagosDg.disabled = true;
-                var _valorPagoSeleccionado4 = numPagosDg.options[numPagosDg.selectedIndex].value;
-                console.log("Valor pagos seleccionado:", _valorPagoSeleccionado4);
-                valorPago = total / _valorPagoSeleccionado4;
+              if (cancelados > 0) {
+                editableSn = false;
+                descuentoDg.disabled = false;
               }
+            }); //Cambiar valor or valorIndividual
 
-              valPagosDg.value = parseFloat(valorPago).toFixed(2);
-            }
-          };
+            contratarDg.textContent = "Descontratar";
 
-          numPagosDg.onchange = function () {
-            if (total !== 0) {
-              var _valorPagoSeleccionado5 = numPagosDg.options[numPagosDg.selectedIndex].value;
-              console.log("Valor pagos seleccionado:", _valorPagoSeleccionado5);
-              valorPago = total / _valorPagoSeleccionado5;
-            } else {
-              numPagosDg.value = 1;
-              var _valorPagoSeleccionado6 = numPagosDg.options[numPagosDg.selectedIndex].value;
-              console.log("Valor pagos seleccionado:", _valorPagoSeleccionado6);
-              valorPago = total / _valorPagoSeleccionado6;
-            }
+            contratarDg.onclick = function _callee12() {
+              return regeneratorRuntime.async(function _callee12$(_context24) {
+                while (1) {
+                  switch (_context24.prev = _context24.next) {
+                    case 0:
+                      _context24.next = 2;
+                      return regeneratorRuntime.awrap(desContratarServicio(servicioContratado[0].serviciosContratadosId, usuario, servicio));
 
-            valPagosDg.value = parseFloat(valorPago).toFixed(2);
-          };
+                    case 2:
+                    case "end":
+                      return _context24.stop();
+                  }
+                }
+              });
+            };
+          }
+
+          canceladosDg.textContent = cancelados;
+          pendientesDg.textContent = numeroPagosDf - cancelados;
+          abonadoDg.textContent = valorCancelado;
+          saldoDg.textContent = total - valorCancelado;
+          _context26.next = 79;
+          break;
+
+        case 51:
+          // En caso de que el servicio no este contratado cargamos los valores
+          // por defecto del servicio.
+          if (servicio.valor !== null) {
+            subtotal = servicio.valor;
+          }
+
+          subtotalDg.value = subtotal;
+          descuentoDg.value = descuentoDf;
+          descuentoDg.disabled = false;
+          descuentoValDg.value = descuento; //----------------------------------------------------------------
+          // funcion del select descuentos
 
           descuentoDg.onchange = function () {
             var descuentoSeleccionado = descuentoDg.options[descuentoDg.selectedIndex];
@@ -1508,151 +1537,198 @@ var servicioOpcionesdg = function servicioOpcionesdg(usuario, servicio) {
 
             if (total !== 0) {
               numPagosDg.disabled = false;
-              var _valorPagoSeleccionado7 = numPagosDg.options[numPagosDg.selectedIndex].value;
-              console.log("Valor pagos seleccionado:", _valorPagoSeleccionado7);
-              valorPago = total / _valorPagoSeleccionado7;
+              var _valorPagoSeleccionado = numPagosDg.options[numPagosDg.selectedIndex].value;
+              console.log("Valor pagos seleccionado:", _valorPagoSeleccionado);
+              valorPago = total / _valorPagoSeleccionado;
             } else {
               numPagosDg.value = 1;
               numPagosDg.disabled = true;
-              var _valorPagoSeleccionado8 = numPagosDg.options[numPagosDg.selectedIndex].value;
-              console.log("Valor pagos seleccionado:", _valorPagoSeleccionado8);
-              valorPago = total / _valorPagoSeleccionado8;
+              var _valorPagoSeleccionado2 = numPagosDg.options[numPagosDg.selectedIndex].value;
+              console.log("Valor pagos seleccionado:", _valorPagoSeleccionado2);
+              valorPago = total / _valorPagoSeleccionado2;
             }
 
             valPagosDg.value = parseFloat(valorPago).toFixed(2);
-          }; // ----------------------------------------------------------------
-
-
-          if (servicio.valoresDistintosSn == "Si") {
-            subtotalText.textContent = "Subtotal(Individual)";
-          } else {
-            subtotalText.textContent = "Subtotal(General)"; // subtotalDg.readOnly = true;
-
-            totalDg.readOnly = true;
-            valPagosDg.readOnly = true;
-          }
-
-          if (!(servicioContratado !== undefined)) {
-            _context28.next = 72;
-            break;
-          }
-
-          _context28.next = 53;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("getDetallesByContratadoId", servicioContratado.serviciosContratadosId));
-
-        case 53:
-          servicioDetalles = _context28.sent;
-          subtotalDg.textContent = servicioContratado.valorIndividual.toFixed(2);
-          descuentoDg.textContent = servicioContratado.valorDescuento.toFixed(2);
-          totalCalculado = servicioContratado.valorIndividual;
-          servicios.valorDescuento;
-          totalDg.textContent = parseFloat(totalCalculado).toFixed(2);
-          console.log("Numero Pagos: " + servicioContratado.numeroPagosIndividual);
-
-          if (servicioDetalles.length > 0) {
-            console.log("Existe el detalles de servicios: ", servicioDetalles);
-            servicioDetalles.forEach(function (servicioDetalle) {
-              console.log("Detalles: " + servicioDetalle.estado);
-
-              if (servicioDetalle.estado === "Cancelado") {
-                cancelados++;
-                valorCancelado += servicioDetalle.abono;
-              }
-            }); //Cambiar valor or valorIndividual
-
-            contratarDg.textContent = "Descontratar";
-          }
-
-          valorSaldo = servicioContratado.valorIndividual - valorCancelado;
-
-          if (servicioContratado.numeroPagosIndividual !== null) {
-            numeroPagosDf = servicioContratado.numeroPagosIndividual;
-          }
-
-          pendientes = numeroPagosDf - cancelados;
-          numPagosDg.textContent = numeroPagosDf;
-          canceladosDg.textContent = cancelados;
-          pendientesDg.textContent = pendientes;
-          saldoDg.textContent = valorSaldo.toFixed(2);
-          abonadoDg.textContent = valorCancelado.toFixed(2);
-
-          contratarDg.onclick = function _callee13() {
-            return regeneratorRuntime.async(function _callee13$(_context26) {
-              while (1) {
-                switch (_context26.prev = _context26.next) {
-                  case 0:
-                    _context26.next = 2;
-                    return regeneratorRuntime.awrap(desContratarServicio(servicioContratado.serviciosContratadosId, usuario, servicio));
-
-                  case 2:
-                  case "end":
-                    return _context26.stop();
-                }
-              }
-            });
           };
 
-          _context28.next = 78;
-          break;
+          descuentoSeleccionado = descuentoDg.options[descuentoDg.selectedIndex];
+          valorSeleccionado = descuentoSeleccionado.getAttribute("value-descuento");
+          console.log("Atributo seleccionado:", valorSeleccionado);
+          porcentaje = parseInt(valorSeleccionado) / 100;
+          console.log("Porcentaje: " + subtotal, porcentaje);
+          descuento = subtotal * porcentaje;
+          descuentoValDg.value = parseFloat(descuento).toFixed(2);
+          total = servicio.valor - descuento;
+          totalDg.value = parseFloat(total).toFixed(2); // totalDg.value = subtotal - descuento;
+          //----------------------------------------------------------------
 
-        case 72:
-          // subtotalDg.value = "No contratado";
-          // descuentoDg.value = "No contratado";
-          // totalDg.value = "No contratado";
-          // numPagosDg.value = "No contratado";
-          // valPagosDg.value= "No contratado";
+          if (servicio.numeroPagos !== null) {
+            numeroPagosDf = servicio.numeroPagos;
+          } //----------------------------------------------------------------
+          // funcion del select numero de pagos
+
+
+          numPagosDg.value = numeroPagosDf;
+          valorPagoSeleccionado = numPagosDg.options[numPagosDg.selectedIndex].value;
+          console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+          valorPago = total / valorPagoSeleccionado;
+          valPagosDg.value = parseFloat(valorPago).toFixed(2); // if (servicio.valorPagos !== null) {
+          //   valorPago = servicio.valorPagos;
+          // }
+          // valPagosDg.value = valorPago;
+          //----------------------------------------------------------------
+
           canceladosDg.textContent = "No contratado";
           pendientesDg.textContent = "No contratado";
           saldoDg.textContent = "No contratado";
           abonadoDg.textContent = "No contratado";
           contratarDg.textContent = "Contratar";
 
-          contratarDg.onclick = function _callee14() {
+          contratarDg.onclick = function _callee13() {
             var newServicioContratado;
-            return regeneratorRuntime.async(function _callee14$(_context27) {
+            return regeneratorRuntime.async(function _callee13$(_context25) {
               while (1) {
-                switch (_context27.prev = _context27.next) {
+                switch (_context25.prev = _context25.next) {
                   case 0:
                     newServicioContratado = {
                       fechaEmision: formatearFecha(new Date()),
                       estado: "Sin aplicar",
-                      valorIndividual: servicio.valor,
-                      valorPagosIndividual: servicio.valorPagos,
-                      numeroPagosIndividual: servicio.numeroPagos,
+                      valorIndividual: subtotal,
+                      numeroPagosIndividual: numPagosDg.value,
+                      valorPagosIndividual: valorPago,
+                      descuentoValor: descuento,
+                      descuentosId: descuentoDg.value,
                       serviciosId: servicio.id,
-                      contratosId: usuario.contratosId,
-                      descuentoValor: 0.0,
-                      descuentosId: 1
+                      contratosId: usuario.contratosId
                     };
-                    _context27.next = 3;
+                    _context25.next = 3;
                     return regeneratorRuntime.awrap(contratarServicio(newServicioContratado, usuario, servicio));
 
                   case 3:
                   case "end":
-                    return _context27.stop();
+                    return _context25.stop();
                 }
               }
             });
           };
 
-        case 78:
+          if (servicio.valoresDistintosSn == "Si") {
+            console.log("Valores distintos: " + servicio.valoresDistintosSn);
+            subtotalText.textContent = "Subtotal(Individual)";
+            editableSn = true;
+          } else {
+            subtotalText.textContent = "Subtotal(General)";
+            editableSn = false;
+          }
+
+        case 79:
+          // Si el servicio tiene valores distintos.
+          if (!editableSn) {
+            subtotalDg.readOnly = true; // descuentoDg.disabled = true;
+
+            descuentoValDg.readOnly = true;
+            numPagosDg.disabled = true;
+          } else {
+            subtotalDg.readOnly = false; // descuentoDg.disabled = false;
+
+            descuentoValDg.readOnly = false;
+            numPagosDg.disabled = false;
+
+            subtotalDg.oninput = function () {
+              if (subtotalDg.value !== "") {
+                subtotal = subtotalDg.value;
+                var _descuentoSeleccionado = descuentoDg.options[descuentoDg.selectedIndex];
+
+                var _valorSeleccionado = _descuentoSeleccionado.getAttribute("value-descuento");
+
+                console.log("Atributo seleccionado:", _valorSeleccionado);
+                porcentaje = parseInt(_valorSeleccionado) / 100;
+                console.log("Porcentaje: " + subtotal, porcentaje);
+                descuento = subtotal * porcentaje;
+                descuentoValDg.value = parseFloat(descuento).toFixed(2); // total = servicio.valor - descuento;
+
+                total = subtotal - descuento;
+                totalDg.value = parseFloat(total).toFixed(2); //Incluimos la programacion del select numPagos
+
+                if (total !== 0) {
+                  var _valorPagoSeleccionado3 = numPagosDg.options[numPagosDg.selectedIndex].value;
+                  console.log("Valor pagos seleccionado:", _valorPagoSeleccionado3);
+                  valorPago = total / _valorPagoSeleccionado3;
+                } else {
+                  numPagosDg.value = 1;
+                  var _valorPagoSeleccionado4 = numPagosDg.options[numPagosDg.selectedIndex].value;
+                  console.log("Valor pagos seleccionado:", _valorPagoSeleccionado4);
+                  valorPago = total / _valorPagoSeleccionado4;
+                }
+
+                valPagosDg.value = parseFloat(valorPago).toFixed(2);
+              } else {
+                subtotal = servicio.valor;
+                var _descuentoSeleccionado2 = descuentoDg.options[descuentoDg.selectedIndex];
+
+                var _valorSeleccionado2 = _descuentoSeleccionado2.getAttribute("value-descuento");
+
+                console.log("Atributo seleccionado:", _valorSeleccionado2);
+                porcentaje = parseInt(_valorSeleccionado2) / 100;
+                console.log("Porcentaje: " + subtotal, porcentaje);
+                descuento = subtotal * porcentaje;
+                descuentoValDg.value = parseFloat(descuento).toFixed(2); // total = servicio.valor - descuento;
+
+                total = subtotal - descuento;
+                totalDg.value = parseFloat(total).toFixed(2); //Incluimos la programacion del select numPagos
+
+                if (total !== 0) {
+                  numPagosDg.disabled = false;
+                  var _valorPagoSeleccionado5 = numPagosDg.options[numPagosDg.selectedIndex].value;
+                  console.log("Valor pagos seleccionado:", _valorPagoSeleccionado5);
+                  valorPago = total / _valorPagoSeleccionado5;
+                } else {
+                  numPagosDg.value = 1;
+                  numPagosDg.disabled = true;
+                  var _valorPagoSeleccionado6 = numPagosDg.options[numPagosDg.selectedIndex].value;
+                  console.log("Valor pagos seleccionado:", _valorPagoSeleccionado6);
+                  valorPago = total / _valorPagoSeleccionado6;
+                }
+
+                valPagosDg.value = parseFloat(valorPago).toFixed(2);
+              }
+            };
+
+            numPagosDg.onchange = function () {
+              if (total !== 0) {
+                var _valorPagoSeleccionado7 = numPagosDg.options[numPagosDg.selectedIndex].value;
+                console.log("Valor pagos seleccionado:", _valorPagoSeleccionado7);
+                valorPago = total / _valorPagoSeleccionado7;
+              } else {
+                numPagosDg.value = 1;
+                var _valorPagoSeleccionado8 = numPagosDg.options[numPagosDg.selectedIndex].value;
+                console.log("Valor pagos seleccionado:", _valorPagoSeleccionado8);
+                valorPago = total / _valorPagoSeleccionado8;
+              }
+
+              valPagosDg.value = parseFloat(valorPago).toFixed(2);
+            };
+          } // ----------------------------------------------------------------
+          // Borramos Código :|
           // Borramos Codigo :|
+
+
           if (dialogOpciones.close) {
             dialogOpciones.showModal();
           }
 
-        case 79:
+        case 81:
         case "end":
-          return _context28.stop();
+          return _context26.stop();
       }
     }
   });
 };
 
 var desContratarServicio = function desContratarServicio(detalleDescontratar, usuario, servicio) {
-  return regeneratorRuntime.async(function desContratarServicio$(_context30) {
+  return regeneratorRuntime.async(function desContratarServicio$(_context28) {
     while (1) {
-      switch (_context30.prev = _context30.next) {
+      switch (_context28.prev = _context28.next) {
         case 0:
           CerrarFormOpciones();
           Swal.fire({
@@ -1666,26 +1742,26 @@ var desContratarServicio = function desContratarServicio(detalleDescontratar, us
             confirmButtonText: "Sí, continuar",
             cancelButtonText: "Cancelar",
             customClass: "question-contratar"
-          }).then(function _callee15(result) {
+          }).then(function _callee14(result) {
             var contratado;
-            return regeneratorRuntime.async(function _callee15$(_context29) {
+            return regeneratorRuntime.async(function _callee14$(_context27) {
               while (1) {
-                switch (_context29.prev = _context29.next) {
+                switch (_context27.prev = _context27.next) {
                   case 0:
                     if (!result.isConfirmed) {
-                      _context29.next = 8;
+                      _context27.next = 8;
                       break;
                     }
 
-                    _context29.next = 3;
+                    _context27.next = 3;
                     return regeneratorRuntime.awrap(ipcRenderer.invoke("deleteContratadoDetalle", detalleDescontratar));
 
                   case 3:
-                    contratado = _context29.sent;
+                    contratado = _context27.sent;
                     console.log("Resultado de contratar el servicio: " + contratado);
                     mostrarEstadisticas(servicio.id); // servicioOpcionesdg(usuario, servicio);
 
-                    _context29.next = 9;
+                    _context27.next = 9;
                     break;
 
                   case 8:
@@ -1693,7 +1769,7 @@ var desContratarServicio = function desContratarServicio(detalleDescontratar, us
 
                   case 9:
                   case "end":
-                    return _context29.stop();
+                    return _context27.stop();
                 }
               }
             });
@@ -1701,16 +1777,16 @@ var desContratarServicio = function desContratarServicio(detalleDescontratar, us
 
         case 2:
         case "end":
-          return _context30.stop();
+          return _context28.stop();
       }
     }
   });
 };
 
 var contratarServicio = function contratarServicio(servicioContratar, usuario, servicio) {
-  return regeneratorRuntime.async(function contratarServicio$(_context32) {
+  return regeneratorRuntime.async(function contratarServicio$(_context30) {
     while (1) {
-      switch (_context32.prev = _context32.next) {
+      switch (_context30.prev = _context30.next) {
         case 0:
           CerrarFormOpciones();
           Swal.fire({
@@ -1723,56 +1799,58 @@ var contratarServicio = function contratarServicio(servicioContratar, usuario, s
             cancelButtonColor: "#EC7063 ",
             confirmButtonText: "Sí, continuar",
             cancelButtonText: "Cancelar"
-          }).then(function _callee16(result) {
+          }).then(function _callee15(result) {
             var contratado, _result3;
 
-            return regeneratorRuntime.async(function _callee16$(_context31) {
+            return regeneratorRuntime.async(function _callee15$(_context29) {
               while (1) {
-                switch (_context31.prev = _context31.next) {
+                switch (_context29.prev = _context29.next) {
                   case 0:
                     if (!result.isConfirmed) {
-                      _context31.next = 16;
+                      _context29.next = 15;
                       break;
                     }
 
                     dialogOpciones.style.width = "fit-content";
                     dialogOpciones.style.height = "fit-content"; // Aquí puedes realizar la acción que desees cuando el usuario confirme.
 
-                    _context31.next = 5;
+                    _context29.next = 5;
                     return regeneratorRuntime.awrap(ipcRenderer.invoke("createServicioContratado", servicioContratar));
 
                   case 5:
-                    contratado = _context31.sent;
+                    contratado = _context29.sent;
                     console.log("Resultado de contratar el servicio: " + contratado);
 
                     if (!(contratado !== undefined)) {
-                      _context31.next = 14;
+                      _context29.next = 13;
                       break;
                     }
 
-                    console.log("PAsamos a crear Planilla"); // Llamamos a  create planilla asi nos aseguramos de que en caso de no existir la planilla
+                    console.log("Pasamos a crear Planilla o comprobante"); // Llamamos a  create planilla asi nos aseguramos de que en caso de no existir la planilla
                     // correspondiente a ese mes se la cree asi como tambien nos aseguramos de que el detalle
                     // no se aplique dos veces. Los detalles se aplicaran en las planillas vigentes de acuerdo
                     // al mes correspondiente.
 
-                    _context31.next = 11;
+                    _context29.next = 11;
                     return regeneratorRuntime.awrap(ipcRenderer.invoke("createPlanilla"));
 
                   case 11:
-                    _result3 = _context31.sent;
-                    console.log(_result3);
-                    mostrarEstadisticas(servicio.id); // servicioOpcionesdg(usuario, servicio);
+                    _result3 = _context29.sent;
+                    // const resultComprobante = await ipcRenderer.invoke("createComprobante");
+                    console.log(_result3); // console.log(resultComprobante);
+                    // mostrarEstadisticas(servicio.id);
+                    // servicioOpcionesdg(usuario, servicio);
 
-                  case 14:
-                    _context31.next = 17;
+                  case 13:
+                    _context29.next = 16;
                     break;
 
-                  case 16:
+                  case 15:
                     servicioOpcionesdg(usuario, servicio);
 
-                  case 17:
+                  case 16:
                   case "end":
-                    return _context31.stop();
+                    return _context29.stop();
                 }
               }
             });
@@ -1780,7 +1858,7 @@ var contratarServicio = function contratarServicio(servicioContratar, usuario, s
 
         case 2:
         case "end":
-          return _context32.stop();
+          return _context30.stop();
       }
     }
   });
@@ -1805,11 +1883,47 @@ function CerrarFormOpciones() {
 
 var abrirInicio = function abrirInicio() {
   var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context33) {
+  return regeneratorRuntime.async(function abrirInicio$(_context31) {
+    while (1) {
+      switch (_context31.prev = _context31.next) {
+        case 0:
+          url = "src/ui/principal.html";
+          _context31.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context31.stop();
+      }
+    }
+  });
+};
+
+var abrirSocios = function abrirSocios() {
+  var url;
+  return regeneratorRuntime.async(function abrirSocios$(_context32) {
+    while (1) {
+      switch (_context32.prev = _context32.next) {
+        case 0:
+          url = "src/ui/socios.html";
+          _context32.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context32.stop();
+      }
+    }
+  });
+};
+
+var abrirUsuarios = function abrirUsuarios() {
+  var url;
+  return regeneratorRuntime.async(function abrirUsuarios$(_context33) {
     while (1) {
       switch (_context33.prev = _context33.next) {
         case 0:
-          url = "src/ui/principal.html";
+          url = "src/ui/usuarios.html";
           _context33.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1821,13 +1935,13 @@ var abrirInicio = function abrirInicio() {
   });
 };
 
-var abrirSocios = function abrirSocios() {
+var abrirPagos = function abrirPagos() {
   var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context34) {
+  return regeneratorRuntime.async(function abrirPagos$(_context34) {
     while (1) {
       switch (_context34.prev = _context34.next) {
         case 0:
-          url = "src/ui/socios.html";
+          url = "src/ui/planillas.html";
           _context34.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1839,13 +1953,13 @@ var abrirSocios = function abrirSocios() {
   });
 };
 
-var abrirUsuarios = function abrirUsuarios() {
+var abrirPlanillas = function abrirPlanillas() {
   var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context35) {
+  return regeneratorRuntime.async(function abrirPlanillas$(_context35) {
     while (1) {
       switch (_context35.prev = _context35.next) {
         case 0:
-          url = "src/ui/usuarios.html";
+          url = "src/ui/planillas-cuotas.html";
           _context35.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1857,13 +1971,13 @@ var abrirUsuarios = function abrirUsuarios() {
   });
 };
 
-var abrirPagos = function abrirPagos() {
+var abrirParametros = function abrirParametros() {
   var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context36) {
+  return regeneratorRuntime.async(function abrirParametros$(_context36) {
     while (1) {
       switch (_context36.prev = _context36.next) {
         case 0:
-          url = "src/ui/planillas.html";
+          url = "src/ui/parametros.html";
           _context36.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1875,13 +1989,13 @@ var abrirPagos = function abrirPagos() {
   });
 };
 
-var abrirPlanillas = function abrirPlanillas() {
+var abrirImplementos = function abrirImplementos() {
   var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context37) {
+  return regeneratorRuntime.async(function abrirImplementos$(_context37) {
     while (1) {
       switch (_context37.prev = _context37.next) {
         case 0:
-          url = "src/ui/planillas-cuotas.html";
+          url = "src/ui/implementos.html";
           _context37.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1893,55 +2007,19 @@ var abrirPlanillas = function abrirPlanillas() {
   });
 };
 
-var abrirParametros = function abrirParametros() {
+var abrirContratos = function abrirContratos() {
   var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context38) {
+  return regeneratorRuntime.async(function abrirContratos$(_context38) {
     while (1) {
       switch (_context38.prev = _context38.next) {
         case 0:
-          url = "src/ui/parametros.html";
+          url = "src/ui/medidores.html";
           _context38.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
         case 3:
         case "end":
           return _context38.stop();
-      }
-    }
-  });
-};
-
-var abrirImplementos = function abrirImplementos() {
-  var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context39) {
-    while (1) {
-      switch (_context39.prev = _context39.next) {
-        case 0:
-          url = "src/ui/implementos.html";
-          _context39.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context39.stop();
-      }
-    }
-  });
-};
-
-var abrirContratos = function abrirContratos() {
-  var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context40) {
-    while (1) {
-      switch (_context40.prev = _context40.next) {
-        case 0:
-          url = "src/ui/medidores.html";
-          _context40.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context40.stop();
       }
     }
   });

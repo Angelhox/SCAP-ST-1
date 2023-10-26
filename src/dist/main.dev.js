@@ -2300,7 +2300,7 @@ ipcMain.handle("deleteCuotas", function _callee55(event, id) {
     }
   }, null, null, [[4, 13]]);
 });
-ipcMain.handle("getContratadoByServicioContrato", function _callee56(event, contratoId, servicioId) {
+ipcMain.handle("getContratadoByServicioContrato", function _callee56(event, servicioId, contratoId) {
   var conn, _result10;
 
   return regeneratorRuntime.async(function _callee56$(_context56) {
@@ -2318,19 +2318,20 @@ ipcMain.handle("getContratadoByServicioContrato", function _callee56(event, cont
 
         case 6:
           _result10 = _context56.sent;
-          return _context56.abrupt("return", _result10[0]);
+          console.log("Resultado de contratado: " + _result10[0]);
+          return _context56.abrupt("return", _result10);
 
-        case 10:
-          _context56.prev = 10;
+        case 11:
+          _context56.prev = 11;
           _context56.t0 = _context56["catch"](0);
           console.log("Error :" + _context56.t0);
 
-        case 13:
+        case 14:
         case "end":
           return _context56.stop();
       }
     }
-  }, null, null, [[0, 10]]);
+  }, null, null, [[0, 11]]);
 }); // ----------------------------------------------------------------
 //   funciones de los Descuentos
 // ----------------------------------------------------------------
@@ -3013,14 +3014,14 @@ ipcMain.handle("createServicioFijoContratado", function _callee72(event, servici
         case 14:
           datosDescuento = _context73.sent;
 
-          if (datosServicio[0].id !== undefined) {
+          if (datosServicio[0] !== undefined) {
             console.log("Si hay datos: " + datosServicio[0].id);
             servicioValorPagos = datosServicio[0].valorPagos;
             servicioValor = datosServicio[0].valor;
             servicioNumPagos = datosServicio[0].numeroPagos;
           }
 
-          if (datosDescuento[0].id !== undefined) {
+          if (datosDescuento[0] !== undefined) {
             console.log("Si hay descuento: " + datosDescuento[0].valor);
             valorDescuento = datosDescuento[0].valor;
           }
@@ -3039,7 +3040,7 @@ ipcMain.handle("createServicioFijoContratado", function _callee72(event, servici
             descuentoValor: valorDescuento
           };
 
-          if (!(contratadoExiste[0].id !== undefined)) {
+          if (!(contratadoExiste[0] !== undefined)) {
             _context73.next = 30;
             break;
           }
@@ -3098,6 +3099,26 @@ ipcMain.handle("createServicioFijoContratado", function _callee72(event, servici
 }); // ----------------------------------------------------------------
 // Funciones de las planillas
 // ----------------------------------------------------------------
+// ipcMain.handle("createComprobante", async (event) => {
+//   const conn = await getConnection();
+//   try {
+//     // Consultamos cuales son los medidores que se encuentran activos para crear el registro de lecturas
+//     contratosActivos = await conn.query(
+//       "Select * from contratos where medidorSn='No' and estado='Activo';"
+//     );
+//     if (contratosActivos[0] !== undefined) {
+//       contratosActivos.forEach(async (contratoActivo) => {
+//         console.log("Contrato a buscar: " + contratoActivo.id);
+//         createCuentaServicios(contratoActivo.id);
+//       });
+//     }
+//   } catch (error) {
+//     console.log("Error al crear comprobantes: " + error);
+//   }
+// });
+// ----------------------------------------------------------------
+// Funciones de las planillas
+// ----------------------------------------------------------------
 
 ipcMain.handle("createPlanilla", function _callee74(event) {
   var conn;
@@ -3112,37 +3133,45 @@ ipcMain.handle("createPlanilla", function _callee74(event) {
           conn = _context75.sent;
           _context75.prev = 3;
           _context75.next = 6;
-          return regeneratorRuntime.awrap(conn.query("select medidores.id,medidores.codigo,medidores.fechaInstalacion,contratos.id as contratosId " + "from medidores join contratos on contratos.id=medidores.contratosId " + "where contratos.medidorSn='Si'; "));
+          return regeneratorRuntime.awrap(conn.query("select medidores.id,medidores.codigo,medidores.fechaInstalacion,contratos.id as contratosId " + "from medidores join contratos on contratos.id=medidores.contratosId " + "where contratos.estado='Activo'; " // "where contratos.medidorSn='Si' AND contratos.estado='Activo'; "
+          ));
 
         case 6:
           medidoresActivos = _context75.sent;
 
           if (medidoresActivos[0] !== undefined) {
             medidoresActivos.forEach(function _callee73(contratoActivo) {
-              var lecturaAnterior, lecturaConsulta, tarifaBase, newPlanilla, resultadoPlanillas;
+              var lecturaAnterior, lecturaConsulta, tarifaBase, newPlanilla, resultadoPlanillas, _newPlanilla, _resultadoPlanillas;
+
               return regeneratorRuntime.async(function _callee73$(_context74) {
                 while (1) {
                   switch (_context74.prev = _context74.next) {
                     case 0:
                       console.log("Contrato a buscar: " + contratoActivo.id);
-                      _context74.next = 3;
+
+                      if (!(contratoActivo.medidorSn == "Si")) {
+                        _context74.next = 22;
+                        break;
+                      }
+
+                      _context74.next = 4;
                       return regeneratorRuntime.awrap(conn.query("SELECT count(planillas.id) as existe from planillas where month" + "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " + "and  planillas.medidoresId=" + contratoActivo.id + ";"));
 
-                    case 3:
+                    case 4:
                       planillaExiste = _context74.sent;
                       console.log("existe: " + planillaExiste[0].existe); // Si no existe la planilla correspondiente a la fecha se crea a planilla
 
                       if (!(planillaExiste[0].existe === 0)) {
-                        _context74.next = 19;
+                        _context74.next = 20;
                         break;
                       }
 
                       // Obtenemos el valor de la lectura anterior en caso de existir
                       lecturaAnterior = 0.0;
-                      _context74.next = 9;
+                      _context74.next = 10;
                       return regeneratorRuntime.awrap(conn.query(" SELECT planillas.lecturaActual from planillas where " + "medidoresId=" + contratoActivo.id + " order by planillas.fechaEmision desc limit 1;"));
 
-                    case 9:
+                    case 10:
                       lecturaConsulta = _context74.sent;
 
                       if (lecturaConsulta[0] !== undefined) {
@@ -3150,10 +3179,10 @@ ipcMain.handle("createPlanilla", function _callee74(event) {
                         lecturaAnterior = lecturaConsulta[0].lecturaActual;
                       }
 
-                      _context74.next = 13;
+                      _context74.next = 14;
                       return regeneratorRuntime.awrap(conn.query("SELECT * FROM tarifas where tarifa='Familiar';"));
 
-                    case 13:
+                    case 14:
                       tarifaBase = _context74.sent;
                       newPlanilla = {
                         //fechaEmision: "now()",
@@ -3166,17 +3195,69 @@ ipcMain.handle("createPlanilla", function _callee74(event) {
                         tarifa: "Familiar",
                         tarifaValor: tarifaBase[0].valor
                       };
-                      _context74.next = 17;
+                      _context74.next = 18;
                       return regeneratorRuntime.awrap(conn.query("INSERT INTO planillas set ?", newPlanilla));
 
-                    case 17:
+                    case 18:
                       resultadoPlanillas = _context74.sent;
                       console.log("Resultado de crear planillas: " + resultadoPlanillas); // return resultadoPlanillas;
 
-                    case 19:
+                    case 20:
+                      _context74.next = 33;
+                      break;
+
+                    case 22:
+                      _context74.next = 24;
+                      return regeneratorRuntime.awrap(conn.query("SELECT count(planillas.id) as existe from planillas where month" + "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " + "and  planillas.medidoresId=" + contratoActivo.id + ";"));
+
+                    case 24:
+                      planillaExiste = _context74.sent;
+                      console.log("existe: " + planillaExiste[0].existe); // Si no existe la planilla correspondiente a la fecha se crea a planilla
+
+                      if (!(planillaExiste[0].existe == 0)) {
+                        _context74.next = 33;
+                        break;
+                      }
+
+                      // Obtenemos el valor de la lectura anterior en caso de existir
+                      lecturaAnterior = 0.0; // const lecturaConsulta = await conn.query(
+                      //   " SELECT planillas.lecturaActual from planillas where " +
+                      //     "medidoresId=" +
+                      //     contratoActivo.id +
+                      //     " order by planillas.fechaEmision desc limit 1;"
+                      // );
+                      // if (lecturaConsulta[0] !== undefined) {
+                      //   console.log(
+                      //     "lectura Anterior: " + lecturaConsulta[0].lecturaActual
+                      //   );
+                      //   lecturaAnterior = lecturaConsulta[0].lecturaActual;
+                      // }
+                      // const tarifaBase = await conn.query(
+                      //   "SELECT * FROM tarifas where tarifa='Familiar';"
+                      // );
+
+                      _newPlanilla = {
+                        //fechaEmision: "now()",
+                        valor: 0.0,
+                        estado: "NA",
+                        lecturaActual: 0.0,
+                        lecturaAnterior: lecturaAnterior,
+                        Observacion: "NA",
+                        medidoresId: contratoActivo.id,
+                        tarifa: "NA",
+                        tarifaValor: 0.0
+                      };
+                      _context74.next = 31;
+                      return regeneratorRuntime.awrap(conn.query("INSERT INTO planillas set ?", _newPlanilla));
+
+                    case 31:
+                      _resultadoPlanillas = _context74.sent;
+                      console.log("Resultado de crear planillas: " + _resultadoPlanillas); // return resultadoPlanillas;
+
+                    case 33:
                       createCuentaServicios(contratoActivo.contratosId);
 
-                    case 20:
+                    case 34:
                     case "end":
                       return _context74.stop();
                   }
@@ -3277,7 +3358,8 @@ function createCuentaServicios(contratoId) {
           //   "where serviciosContratados.contratosId=" +
           //   contratoId +
           //   " and serviciosContratados.estado='Sin aplicar' and not servicios.tipo='Servicio fijo'"
-          "SELECT * FROM viewServiciosCancelar WHERE contratosId=" + contratoId + " AND estado='Sin aplicar' AND NOT tipo='Servicio fijo';"));
+          "SELECT * FROM viewServiciosCancelar WHERE contratosId=" + contratoId + // " AND estado='Sin aplicar' AND NOT tipo='Servicio fijo';"
+          " AND NOT tipo='Servicio fijo';"));
 
         case 24:
           otrosValores = _context76.sent;
@@ -3310,7 +3392,7 @@ function createDetallesServicios(serviciosContratados, encabezadoId) {
         case 2:
           conn = _context78.sent;
           serviciosContratados.forEach(function _callee75(servicioContratado) {
-            var valorPagos, total, newDetalleServicios, resultadoDetalleServicio, modificaEstado;
+            var valorPagos, total, abonado, abono, abonosAplicados, totalPagar, newDetalleServicios, aplicadosAnteriores, faltante, pagosRestantes, resultadoDetalleServicio, modificaEstado;
             return regeneratorRuntime.async(function _callee75$(_context77) {
               while (1) {
                 switch (_context77.prev = _context77.next) {
@@ -3326,71 +3408,151 @@ function createDetallesServicios(serviciosContratados, encabezadoId) {
                     console.log("Detalle servicio existe: " + detalleServicioExiste[0].existe); // Si no existen los detalles de servicios correspondiente a la fecha se crean y se añaden al encabezado
 
                     if (!(detalleServicioExiste[0].existe === 0)) {
-                      _context77.next = 25;
+                      _context77.next = 53;
                       break;
                     }
 
+                    console.log("Servicio a registrar: " + servicioContratado.valorIndividual, servicioContratado.valorPagosIndividual);
                     valorPagos = 0.0;
-                    total = 0.0; // El descuento esta en veremos :(
-                    // if (servicioContratado.valoresDistintos === "Si") {
+                    total = 0.0;
+                    abonado = 0;
+                    abono = 0;
+                    abonosAplicados = 0;
+                    totalPagar = servicioContratado.valorIndividual - servicioContratado.descuentoValor;
+                    newDetalleServicios = {}; // if (servicioContratado.valoresDistintos === "Si") {
 
-                    if (servicioContratado.aplazableSn === "Si") {
-                      total = servicioContratado.valorIndividual;
-                      valorPagos = total = servicioContratado.valorIndividual;
-                      valorPagos = servicioContratado.valorPagosindividual;
+                    if (!(servicioContratado.aplazableSn === "Si")) {
+                      _context77.next = 36;
+                      break;
+                    }
+
+                    _context77.next = 17;
+                    return regeneratorRuntime.awrap(conn.query("SELECT * FROM detallesServicio WHERE serviciosContratadosId=" + servicioContratado.id + " ;"));
+
+                  case 17:
+                    aplicadosAnteriores = _context77.sent;
+
+                    if (!(aplicadosAnteriores[0] !== undefined)) {
+                      _context77.next = 32;
+                      break;
+                    }
+
+                    console.log("Entro a los aplazables con anteriores"); // Si exisen detalles de este servicio aplicados anteriormente
+
+                    aplicadosAnteriores.forEach(function (aplicadoAnterior) {
+                      //Sumo los valores aplicados
+                      abonado += aplicadoAnterior.abono;
+                      abonosAplicados++;
+                    }); // total = servicioContratado.valorIndividual;
+
+                    if (!(abonado < totalPagar)) {
+                      _context77.next = 28;
+                      break;
+                    }
+
+                    console.log("Entro a los aplazables que no superan el abonado");
+                    faltante = totalPagar - abonado;
+
+                    if (faltante > servicioContratado.valorPagosIndividual) {
+                      console.log("Entro a los aplazables con faltante mayor a la cuota");
+                      pagosRestantes = servicioContratado.numeroPagosindividual - abonosAplicados;
+                      abono = servicioContratado.valorPagosIndividual;
                     } else {
-                      total = servicioContratado.valorIndividual;
-                      valorPagos = servicioContratado.valorPagosindividual;
-                    } // } else {
-                    // if (servicioContratado.aplazableSn === "Si") {
-                    //   total = servicioContratado.valor;
-                    //   valorPagos =
-                    //     servicioContratado.valorPagos - servicioContratado.valorDescuento;
-                    // } else {
-                    //   total = servicioContratado.valor;
-                    //   valorPagos =
-                    //     servicioContratado.valorPagos - servicioContratado.valorDescuento;
-                    // }
-                    // }
+                      console.log("Entro a los aplazables con faltante menor a la cuota");
+                      abono = faltante;
+                    } // valorPagos = servicioContratado.valorPagosindividual;
 
 
                     newDetalleServicios = {
                       serviciosContratadosId: servicioContratado.id,
-                      descuento: servicioContratado.valorDescuento,
-                      subtotal: total,
-                      total: total - servicioContratado.valorDescuento,
-                      saldo: total - servicioContratado.valorDescuento,
-                      abono: valorPagos,
+                      descuento: servicioContratado.descuentoValor,
+                      subtotal: servicioContratado.valorIndividual,
+                      total: totalPagar,
+                      // El saldo debe ser calculado
+                      // saldo: total - servicioContratado.valorDescuento,
+                      saldo: totalPagar - abonado,
+                      // El abono debe ser calculado
+                      abono: abono,
                       encabezadosId: encabezadoId,
                       estado: "Por cancelar" //fechaEmision
 
                     };
-                    _context77.next = 12;
+                    _context77.next = 30;
+                    break;
+
+                  case 28:
+                    console.log("Entro a los aplazables que superan el abonado");
+                    return _context77.abrupt("return", null);
+
+                  case 30:
+                    _context77.next = 34;
+                    break;
+
+                  case 32:
+                    console.log("Entro a los aplazables sin anteriores");
+                    newDetalleServicios = {
+                      serviciosContratadosId: servicioContratado.id,
+                      descuento: servicioContratado.descuentoValor,
+                      subtotal: servicioContratado.valorIndividual,
+                      total: totalPagar,
+                      // El saldo debe ser calculado
+                      saldo: totalPagar - servicioContratado.valorPagosIndividual,
+                      // El abono debe ser calculado
+                      abono: parseFloat(servicioContratado.valorPagosIndividual),
+                      encabezadosId: encabezadoId,
+                      estado: "Por cancelar" //fechaEmision
+
+                    };
+
+                  case 34:
+                    _context77.next = 38;
+                    break;
+
+                  case 36:
+                    console.log("Entro a los no aplazables"); //total = servicioContratado.valorIndividual;
+                    // valorPagos = servicioContratado.valorPagosindividual;
+
+                    newDetalleServicios = {
+                      serviciosContratadosId: servicioContratado.id,
+                      descuento: servicioContratado.descuentoValor,
+                      subtotal: servicioContratado.valorIndividual,
+                      total: totalPagar,
+                      // El saldo debe ser calculado
+                      saldo: total - servicioContratado.valorDescuento,
+                      // El abono debe ser calculado
+                      abono: parseFloat(servicioContratado.valorPagosIndividual),
+                      encabezadosId: encabezadoId,
+                      estado: "Por cancelar" //fechaEmision
+
+                    };
+
+                  case 38:
+                    _context77.next = 40;
                     return regeneratorRuntime.awrap(conn.query("INSERT INTO detallesServicio set ?", newDetalleServicios));
 
-                  case 12:
+                  case 40:
                     resultadoDetalleServicio = _context77.sent;
                     console.log("servicioContratado.tipo: ", servicioContratado.tipo);
 
                     if (!(servicioContratado.tipo !== "Servicio fijo")) {
-                      _context77.next = 23;
+                      _context77.next = 51;
                       break;
                     }
 
                     console.log("entrando a cambiar estado");
-                    _context77.next = 18;
+                    _context77.next = 46;
                     return regeneratorRuntime.awrap(conn.query("UPDATE serviciosContratados SET estado='Aplicado' WHERE serviciosContratados.id=" + servicioContratado.id + ";"));
 
-                  case 18:
+                  case 46:
                     modificaEstado = _context77.sent;
                     console.log("Resultado de crear planillas: " + resultadoDetalleServicio);
                     return _context77.abrupt("return", resultadoDetalleServicio);
 
-                  case 23:
+                  case 51:
                     console.log("Resultado de crear planillas: " + resultadoDetalleServicio);
                     return _context77.abrupt("return", resultadoDetalleServicio);
 
-                  case 25:
+                  case 53:
                   case "end":
                     return _context77.stop();
                 }
@@ -3487,111 +3649,121 @@ ipcMain.handle("getPlanillaById", function _callee77(event, planillaId) {
     }
   });
 }); // Funcion que relaiza un filtro entre las planillas de acuerdo al codigo del medidor
+// ipcMain.handle(
+//   "getDatosPlanillasByCodigo",
+//   async (
+//     event,
+//     codigoMedidor,
+//     fechaPlanilla,
+//     estadoPlanilla,
+//     estadoEdicion
+//   ) => {
+//     try {
+//       const conn = await getConnection();
+//       conn.query("SET lc_time_names = 'es_ES';");
+//       const results = conn.query(
+//         "select planillas.id,planillas.fecha,planillas.valor,planillas.estado,planillas.estadoEdicion," +
+//           "planillas.lecturaActual,planillas.lecturaAnterior,planillas.observacion," +
+//           "planillas.codigo as codigoPlanillas," +
+//           "medidores.codigo as codigoMedidores,socios.cedula, socios.nombre, socios.apellido," +
+//           "concat(medidores.barrio,', ',medidores.callePrincipal,' y ',medidores.calleSecundaria,', casa: '," +
+//           "medidores.numeroCasa,' ',medidores.referencia,'-') as ubicacion " +
+//           "from planillas " +
+//           "join contratos on contratos.id=planillas.contratosId join medidores on " +
+//           "contratos.id=medidores.contratosId join socios on socios.id=contratos.sociosId " +
+//           "where medidores.codigo ='" +
+//           codigoMedidor +
+//           "' and monthname(planillas.fecha)like '%" +
+//           fechaPlanilla +
+//           "%' " +
+//           "and planillas.estado like'%" +
+//           estadoPlanilla +
+//           "%' and planillas.estadoEdicion like'%" +
+//           estadoEdicion +
+//           "%';"
+//       );
+//       const parametrosDesechos = await conn.query(
+//         "select * from parametros where nombreParametro='Tarifa recolección de desechos';"
+//       );
+//       console.log(
+//         "Consulta de los parametrso de desechos: ",
+//         parametrosDesechos
+//       );
+//       const notification = new Notification({
+//         title: "Exito",
+//         body: "Se muestran los datos del medidor",
+//         // icon: "/path/to/icon.png",
+//         // onClick: () => {
+//         //   // Acción a realizar al hacer clic en la notificación
+//         // },
+//       });
+//       notification.show();
+//       console.log(results);
+//       return results;
+//     } catch (error) {
+//       const notification = new Notification({
+//         title: "Error",
+//         body: "Es posible que el medidor proporcionado no exista",
+//         // icon: "/path/to/icon.png",
+//         // onClick: () => {
+//         //   // Acción a realizar al hacer clic en la notificación
+//         // },
+//       });
+//       notification.show();
+//     }
+//   }
+// );
+// ----------------------------------------------------------------
+// Funciones de las lecturas(Planillas)
+// ----------------------------------------------------------------
 
-ipcMain.handle("getDatosPlanillasByCodigo", function _callee78(event, codigoMedidor, fechaPlanilla, estadoPlanilla, estadoEdicion) {
-  var conn, results, parametrosDesechos, notification, _notification3;
-
+ipcMain.handle("getLecturasByFecha", function _callee78(event, contratosId, fechaEmision) {
+  var conn, results;
   return regeneratorRuntime.async(function _callee78$(_context81) {
     while (1) {
       switch (_context81.prev = _context81.next) {
         case 0:
-          _context81.prev = 0;
-          _context81.next = 3;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 3:
-          conn = _context81.sent;
-          conn.query("SET lc_time_names = 'es_ES';");
-          results = conn.query("select planillas.id,planillas.fecha,planillas.valor,planillas.estado,planillas.estadoEdicion," + "planillas.lecturaActual,planillas.lecturaAnterior,planillas.observacion," + "planillas.codigo as codigoPlanillas," + "medidores.codigo as codigoMedidores,socios.cedula, socios.nombre, socios.apellido," + "concat(medidores.barrio,', ',medidores.callePrincipal,' y ',medidores.calleSecundaria,', casa: '," + "medidores.numeroCasa,' ',medidores.referencia,'-') as ubicacion " + "from planillas " + "join contratos on contratos.id=planillas.contratosId join medidores on " + "contratos.id=medidores.contratosId join socios on socios.id=contratos.sociosId " + "where medidores.codigo ='" + codigoMedidor + "' and monthname(planillas.fecha)like '%" + fechaPlanilla + "%' " + "and planillas.estado like'%" + estadoPlanilla + "%' and planillas.estadoEdicion like'%" + estadoEdicion + "%';");
-          _context81.next = 8;
-          return regeneratorRuntime.awrap(conn.query("select * from parametros where nombreParametro='Tarifa recolección de desechos';"));
-
-        case 8:
-          parametrosDesechos = _context81.sent;
-          console.log("Consulta de los parametrso de desechos: ", parametrosDesechos);
-          notification = new Notification({
-            title: "Exito",
-            body: "Se muestran los datos del medidor" // icon: "/path/to/icon.png",
-            // onClick: () => {
-            //   // Acción a realizar al hacer clic en la notificación
-            // },
-
-          });
-          notification.show();
-          console.log(results);
-          return _context81.abrupt("return", results);
-
-        case 16:
-          _context81.prev = 16;
-          _context81.t0 = _context81["catch"](0);
-          _notification3 = new Notification({
-            title: "Error",
-            body: "Es posible que el medidor proporcionado no exista" // icon: "/path/to/icon.png",
-            // onClick: () => {
-            //   // Acción a realizar al hacer clic en la notificación
-            // },
-
-          });
-
-          _notification3.show();
-
-        case 20:
-        case "end":
-          return _context81.stop();
-      }
-    }
-  }, null, null, [[0, 16]]);
-}); // ----------------------------------------------------------------
-// Funciones de las lecturas(Planillas)
-// ----------------------------------------------------------------
-
-ipcMain.handle("getLecturasByFecha", function _callee79(event, contratosId, fechaEmision) {
-  var conn, results;
-  return regeneratorRuntime.async(function _callee79$(_context82) {
-    while (1) {
-      switch (_context82.prev = _context82.next) {
-        case 0:
-          _context82.next = 2;
+          _context81.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
         case 2:
-          conn = _context82.sent;
-          _context82.prev = 3;
-          _context82.next = 6;
+          conn = _context81.sent;
+          _context81.prev = 3;
+          _context81.next = 6;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewplanillas WHERE contratosId=" + contratosId + " and month(fechaEmision)=month('" + fechaEmision + "') and " + " year(fechaEmision)=year('" + fechaEmision + "');"));
 
         case 6:
-          results = _context82.sent;
+          results = _context81.sent;
           console.log(results[0]);
-          return _context82.abrupt("return", results);
+          return _context81.abrupt("return", results);
 
         case 11:
-          _context82.prev = 11;
-          _context82.t0 = _context82["catch"](3);
-          console.log(_context82.t0);
+          _context81.prev = 11;
+          _context81.t0 = _context81["catch"](3);
+          console.log(_context81.t0);
 
         case 14:
         case "end":
-          return _context82.stop();
+          return _context81.stop();
       }
     }
   }, null, null, [[3, 11]]);
 }); // ----------------------------------------------------------------
 // Funcion que relaiza un filtro entre las cuotas de acuerdo al codigo del medidor
 
-ipcMain.handle("getDatosCuotasByCodigo", function _callee80(event, codigoMedidor) {
-  var conn, results, notification, _notification4;
+ipcMain.handle("getDatosCuotasByCodigo", function _callee79(event, codigoMedidor) {
+  var conn, results, notification, _notification3;
 
-  return regeneratorRuntime.async(function _callee80$(_context83) {
+  return regeneratorRuntime.async(function _callee79$(_context82) {
     while (1) {
-      switch (_context83.prev = _context83.next) {
+      switch (_context82.prev = _context82.next) {
         case 0:
-          _context83.prev = 0;
-          _context83.next = 3;
+          _context82.prev = 0;
+          _context82.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context83.sent;
+          conn = _context82.sent;
           conn.query("SET lc_time_names = 'es_ES';");
           results = conn.query("select servicios.id,servicios.fecha,servicios.servicio,servicios.descripcion,servicios.valor," + "servicios.estado from servicios join extrasplanilla on servicios.Id=extrasplanilla.serviciosId " + "join planillas on planillas.id=extrasplanilla.planillasId join " + "contratos on contratos.id=planillas.contratosId join medidores " + "on contratos.id=medidores.contratosId where servicios.tipo='cuota'and medidores.codigo='" + codigoMedidor + "'; ");
           notification = new Notification({
@@ -3600,21 +3772,21 @@ ipcMain.handle("getDatosCuotasByCodigo", function _callee80(event, codigoMedidor
           });
           notification.show();
           console.log(results);
-          return _context83.abrupt("return", results);
+          return _context82.abrupt("return", results);
 
         case 12:
-          _context83.prev = 12;
-          _context83.t0 = _context83["catch"](0);
-          _notification4 = new Notification({
+          _context82.prev = 12;
+          _context82.t0 = _context82["catch"](0);
+          _notification3 = new Notification({
             title: "Error",
             body: "Es posible que el medidor proporcionado no exista"
           });
 
-          _notification4.show();
+          _notification3.show();
 
         case 16:
         case "end":
-          return _context83.stop();
+          return _context82.stop();
       }
     }
   }, null, null, [[0, 12]]);
@@ -3623,54 +3795,54 @@ ipcMain.handle("getDatosCuotasByCodigo", function _callee80(event, codigoMedidor
 // ----------------------------------------------------------------
 // Funcion que carga los servicios de acuerdo al id de la planilla
 
-ipcMain.handle("getDatosServiciosByContratoId", function _callee81(event, contratoId, fechaEmision, criterio) {
+ipcMain.handle("getDatosServiciosByContratoId", function _callee80(event, contratoId, fechaEmision, criterio) {
   var conn, _result13, _result14, _result15;
 
-  return regeneratorRuntime.async(function _callee81$(_context84) {
+  return regeneratorRuntime.async(function _callee80$(_context83) {
     while (1) {
-      switch (_context84.prev = _context84.next) {
+      switch (_context83.prev = _context83.next) {
         case 0:
-          _context84.next = 2;
+          _context83.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
         case 2:
-          conn = _context84.sent;
+          conn = _context83.sent;
 
           if (!(criterio === "otros")) {
-            _context84.next = 11;
+            _context83.next = 11;
             break;
           }
 
-          _context84.next = 6;
+          _context83.next = 6;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewDetallesServicio WHERE contratosId = " + contratoId + " and month(fechaEmision) = month('" + fechaEmision + "') and year(fechaEmision)= year('" + fechaEmision + "') and not tipo='Servicio fijo';"));
 
         case 6:
-          _result13 = _context84.sent;
+          _result13 = _context83.sent;
           console.log("resultado de buscar servicios: ", _result13);
-          return _context84.abrupt("return", _result13);
+          return _context83.abrupt("return", _result13);
 
         case 11:
           if (!(criterio === "fijos")) {
-            _context84.next = 19;
+            _context83.next = 19;
             break;
           }
 
-          _context84.next = 14;
+          _context83.next = 14;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewDetallesServicio WHERE contratosId = " + contratoId + " and month(fechaEmision) = month('" + fechaEmision + "') and year(fechaEmision)= year('" + fechaEmision + "') and  tipo='Servicio fijo';"));
 
         case 14:
-          _result14 = _context84.sent;
+          _result14 = _context83.sent;
           console.log("resultado de buscar servicios: ", _result14);
-          return _context84.abrupt("return", _result14);
+          return _context83.abrupt("return", _result14);
 
         case 19:
-          _context84.next = 21;
+          _context83.next = 21;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewDetallesServicio WHERE contratosId = " + contratoId + " and month(fechaEmision) = month('" + fechaEmision + "') and year(fechaEmision)= year('" + fechaEmision + "');"));
 
         case 21:
-          _result15 = _context84.sent;
+          _result15 = _context83.sent;
           console.log("resultado de buscar servicios: ", _result15);
-          return _context84.abrupt("return", _result15);
+          return _context83.abrupt("return", _result15);
 
         case 24:
           console.log("fechaEmision recibida: ", fechaEmision, contratoId); // const result = await conn.query(
@@ -3683,12 +3855,39 @@ ipcMain.handle("getDatosServiciosByContratoId", function _callee81(event, contra
 
         case 25:
         case "end":
+          return _context83.stop();
+      }
+    }
+  });
+});
+ipcMain.handle("updateDetalle", function _callee81(event, id, detalle) {
+  var conn, result;
+  return regeneratorRuntime.async(function _callee81$(_context84) {
+    while (1) {
+      switch (_context84.prev = _context84.next) {
+        case 0:
+          _context84.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context84.sent;
+          console.log("Actualizando detalle: " + id + detalle);
+          _context84.next = 6;
+          return regeneratorRuntime.awrap(conn.query("UPDATE detallesServicio set ? where id = ?", [detalle, id]));
+
+        case 6:
+          result = _context84.sent;
+          console.log(result);
+          return _context84.abrupt("return", result);
+
+        case 9:
+        case "end":
           return _context84.stop();
       }
     }
   });
 });
-ipcMain.handle("updateDetalle", function _callee82(event, id, detalle) {
+ipcMain.handle("getDetallesByContratadoId", function _callee82(event, contratadoId) {
   var conn, result;
   return regeneratorRuntime.async(function _callee82$(_context85) {
     while (1) {
@@ -3699,44 +3898,17 @@ ipcMain.handle("updateDetalle", function _callee82(event, id, detalle) {
 
         case 2:
           conn = _context85.sent;
-          console.log("Actualizando detalle: " + id + detalle);
-          _context85.next = 6;
-          return regeneratorRuntime.awrap(conn.query("UPDATE detallesServicio set ? where id = ?", [detalle, id]));
+          _context85.next = 5;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM detallesServicio WHERE detallesServicio.serviciosContratadosId=" + contratadoId + ";"));
 
-        case 6:
+        case 5:
           result = _context85.sent;
           console.log(result);
           return _context85.abrupt("return", result);
 
-        case 9:
-        case "end":
-          return _context85.stop();
-      }
-    }
-  });
-});
-ipcMain.handle("getDetallesByContratadoId", function _callee83(event, contratadoId) {
-  var conn, result;
-  return regeneratorRuntime.async(function _callee83$(_context86) {
-    while (1) {
-      switch (_context86.prev = _context86.next) {
-        case 0:
-          _context86.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context86.sent;
-          _context86.next = 5;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM detallesServicio WHERE detallesServicio.serviciosContratadosId=" + contratadoId + ";"));
-
-        case 5:
-          result = _context86.sent;
-          console.log(result);
-          return _context86.abrupt("return", result);
-
         case 8:
         case "end":
-          return _context86.stop();
+          return _context85.stop();
       }
     }
   });
@@ -3744,25 +3916,25 @@ ipcMain.handle("getDetallesByContratadoId", function _callee83(event, contratado
 // Funcion de cancelado
 // ----------------------------------------------------------------
 
-ipcMain.handle("cancelarServicios", function _callee85(event, planillaCancelarId, encabezadoCancelarId, serviciosCancelar) {
+ipcMain.handle("cancelarServicios", function _callee84(event, planillaCancelarId, encabezadoCancelarId, serviciosCancelar) {
   var conn, _result16;
 
-  return regeneratorRuntime.async(function _callee85$(_context88) {
+  return regeneratorRuntime.async(function _callee84$(_context87) {
     while (1) {
-      switch (_context88.prev = _context88.next) {
+      switch (_context87.prev = _context87.next) {
         case 0:
-          _context88.prev = 0;
-          _context88.next = 3;
+          _context87.prev = 0;
+          _context87.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context88.sent;
+          conn = _context87.sent;
           console.log("Actualizando detalle: ", planillaCancelarId, encabezadoCancelarId, serviciosCancelar);
-          serviciosCancelar.forEach(function _callee84(servicioCancelar) {
+          serviciosCancelar.forEach(function _callee83(servicioCancelar) {
             var abono;
-            return regeneratorRuntime.async(function _callee84$(_context87) {
+            return regeneratorRuntime.async(function _callee83$(_context86) {
               while (1) {
-                switch (_context87.prev = _context87.next) {
+                switch (_context86.prev = _context86.next) {
                   case 0:
                     abono = 0;
 
@@ -3770,46 +3942,46 @@ ipcMain.handle("cancelarServicios", function _callee85(event, planillaCancelarId
                       abono = parseFloat(servicioCancelar.abono).toFixed(2);
                     }
 
-                    _context87.next = 4;
+                    _context86.next = 4;
                     return regeneratorRuntime.awrap(conn.query("UPDATE detallesServicio set estado='Cancelado',abono=" + abono + " WHERE id = ? ;", servicioCancelar.id));
 
                   case 4:
                   case "end":
-                    return _context87.stop();
+                    return _context86.stop();
                 }
               }
             });
           });
-          _context88.next = 8;
+          _context87.next = 8;
           return regeneratorRuntime.awrap(conn.query("UPDATE planillas set estado='Cancelado' WHERE id = ? ;", planillaCancelarId));
 
         case 8:
-          _context88.next = 10;
+          _context87.next = 10;
           return regeneratorRuntime.awrap(conn.query("UPDATE encabezado set estado='Cancelado',fechaPago=Now() WHERE id = ? ;", encabezadoCancelarId));
 
         case 10:
-          _result16 = _context88.sent;
+          _result16 = _context87.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Actualizado!",
             message: "Se ha cancelado la planilla."
           });
           console.log(_result16);
-          return _context88.abrupt("return", _result16);
+          return _context87.abrupt("return", _result16);
 
         case 16:
-          _context88.prev = 16;
-          _context88.t0 = _context88["catch"](0);
+          _context87.prev = 16;
+          _context87.t0 = _context87["catch"](0);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al cancelar la planilla."
           });
-          console.log("Error al cancelar: ", _context88.t0);
+          console.log("Error al cancelar: ", _context87.t0);
 
         case 20:
         case "end":
-          return _context88.stop();
+          return _context87.stop();
       }
     }
   }, null, null, [[0, 16]]);
@@ -3820,7 +3992,35 @@ ipcMain.handle("cancelarServicios", function _callee85(event, planillaCancelarId
 // Funcion que carga los servicios de acuerdo al id de la planilla
 // ----------------------------------------------------------------
 
-ipcMain.handle("getTarifas", function _callee86() {
+ipcMain.handle("getTarifas", function _callee85() {
+  var conn, result;
+  return regeneratorRuntime.async(function _callee85$(_context88) {
+    while (1) {
+      switch (_context88.prev = _context88.next) {
+        case 0:
+          _context88.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context88.sent;
+          _context88.next = 5;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM tarifas;"));
+
+        case 5:
+          result = _context88.sent;
+          console.log(result);
+          return _context88.abrupt("return", result);
+
+        case 8:
+        case "end":
+          return _context88.stop();
+      }
+    }
+  });
+}); // ----------------------------------------------------------------
+// Funcion que carga las cuotas de acuerdo al id de la planilla
+
+ipcMain.handle("getCuotasByPlanillaId", function _callee86(event, planillaId) {
   var conn, result;
   return regeneratorRuntime.async(function _callee86$(_context89) {
     while (1) {
@@ -3832,7 +4032,7 @@ ipcMain.handle("getTarifas", function _callee86() {
         case 2:
           conn = _context89.sent;
           _context89.next = 5;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM tarifas;"));
+          return regeneratorRuntime.awrap(conn.query("select planillas.codigo,servicios.id," + "servicios.servicio,servicios.descripcion,servicios.fecha,servicios.valor,servicios.estado " + "from servicios join extrasplanilla on servicios.id=extrasplanilla.serviciosId " + "join planillas on planillas.id=extrasplanilla.planillasId " + "where servicios.tipo='cuota' and planillas.id=?;", planillaId));
 
         case 5:
           result = _context89.sent;
@@ -3846,54 +4046,26 @@ ipcMain.handle("getTarifas", function _callee86() {
     }
   });
 }); // ----------------------------------------------------------------
-// Funcion que carga las cuotas de acuerdo al id de la planilla
 
-ipcMain.handle("getCuotasByPlanillaId", function _callee87(event, planillaId) {
-  var conn, result;
+ipcMain.handle("createCuota", function _callee87(event, cuota, planillaId) {
+  var conn, _result17, idNuevoServicio, newExtrasPlanilla, result1;
+
   return regeneratorRuntime.async(function _callee87$(_context90) {
     while (1) {
       switch (_context90.prev = _context90.next) {
         case 0:
-          _context90.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context90.sent;
-          _context90.next = 5;
-          return regeneratorRuntime.awrap(conn.query("select planillas.codigo,servicios.id," + "servicios.servicio,servicios.descripcion,servicios.fecha,servicios.valor,servicios.estado " + "from servicios join extrasplanilla on servicios.id=extrasplanilla.serviciosId " + "join planillas on planillas.id=extrasplanilla.planillasId " + "where servicios.tipo='cuota' and planillas.id=?;", planillaId));
-
-        case 5:
-          result = _context90.sent;
-          console.log(result);
-          return _context90.abrupt("return", result);
-
-        case 8:
-        case "end":
-          return _context90.stop();
-      }
-    }
-  });
-}); // ----------------------------------------------------------------
-
-ipcMain.handle("createCuota", function _callee88(event, cuota, planillaId) {
-  var conn, _result17, idNuevoServicio, newExtrasPlanilla, result1;
-
-  return regeneratorRuntime.async(function _callee88$(_context91) {
-    while (1) {
-      switch (_context91.prev = _context91.next) {
-        case 0:
-          _context91.prev = 0;
-          _context91.next = 3;
+          _context90.prev = 0;
+          _context90.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context91.sent;
+          conn = _context90.sent;
           console.log("Cuota recibida: ", cuota);
-          _context91.next = 7;
+          _context90.next = 7;
           return regeneratorRuntime.awrap(conn.query("Insert into servicios set ?", cuota));
 
         case 7:
-          _result17 = _context91.sent;
+          _result17 = _context90.sent;
           idNuevoServicio = _result17.insertId;
           console.log(_result17.insertId);
           newExtrasPlanilla = {
@@ -3901,33 +4073,60 @@ ipcMain.handle("createCuota", function _callee88(event, cuota, planillaId) {
             planillasId: planillaId,
             descuentosId: 3
           };
-          _context91.next = 13;
+          _context90.next = 13;
           return regeneratorRuntime.awrap(conn.query("Insert into extrasplanilla set ?", newExtrasPlanilla));
 
         case 13:
-          result1 = _context91.sent;
+          result1 = _context90.sent;
           console.log(result1);
           new Notification({
             title: "Electrom Mysql",
             body: "New servicio saved succesfully"
           }).show();
           servicio.id = _result17.insertId;
-          return _context91.abrupt("return", servicio);
+          return _context90.abrupt("return", servicio);
 
         case 20:
-          _context91.prev = 20;
-          _context91.t0 = _context91["catch"](0);
-          console.log(_context91.t0);
+          _context90.prev = 20;
+          _context90.t0 = _context90["catch"](0);
+          console.log(_context90.t0);
 
         case 23:
         case "end":
-          return _context91.stop();
+          return _context90.stop();
       }
     }
   }, null, null, [[0, 20]]);
 }); // Funcion que carga multas y descuentos de acuerdo al id de la planilla
 
-ipcMain.handle("getMultasDescByPlanillaId", function _callee89(event, planillaId) {
+ipcMain.handle("getMultasDescByPlanillaId", function _callee88(event, planillaId) {
+  var conn, result;
+  return regeneratorRuntime.async(function _callee88$(_context91) {
+    while (1) {
+      switch (_context91.prev = _context91.next) {
+        case 0:
+          _context91.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context91.sent;
+          _context91.next = 5;
+          return regeneratorRuntime.awrap(conn.query("select planillas.codigo,multasdescuentos.id,multasdescuentos.tipo," + "multasdescuentos.motivo,multasdescuentos.fecha,multasdescuentos.valor from " + "multasdescuentos join planillas on planillas.id=multasdescuentos.planillaId " + "where planillas.id=?;", planillaId));
+
+        case 5:
+          result = _context91.sent;
+          console.log(result);
+          return _context91.abrupt("return", result);
+
+        case 8:
+        case "end":
+          return _context91.stop();
+      }
+    }
+  });
+}); // Funcion que edita los valores permitidos de la planilla
+
+ipcMain.handle("updatePlanilla", function _callee89(event, id, planilla) {
   var conn, result;
   return regeneratorRuntime.async(function _callee89$(_context92) {
     while (1) {
@@ -3938,93 +4137,88 @@ ipcMain.handle("getMultasDescByPlanillaId", function _callee89(event, planillaId
 
         case 2:
           conn = _context92.sent;
-          _context92.next = 5;
-          return regeneratorRuntime.awrap(conn.query("select planillas.codigo,multasdescuentos.id,multasdescuentos.tipo," + "multasdescuentos.motivo,multasdescuentos.fecha,multasdescuentos.valor from " + "multasdescuentos join planillas on planillas.id=multasdescuentos.planillaId " + "where planillas.id=?;", planillaId));
+          console.log("Actualizando planilla: " + planilla);
+          _context92.next = 6;
+          return regeneratorRuntime.awrap(conn.query("UPDATE planillas set ? where id = ?", [planilla, id]));
 
-        case 5:
+        case 6:
           result = _context92.sent;
           console.log(result);
           return _context92.abrupt("return", result);
 
-        case 8:
-        case "end":
-          return _context92.stop();
-      }
-    }
-  });
-}); // Funcion que edita los valores permitidos de la planilla
-
-ipcMain.handle("updatePlanilla", function _callee90(event, id, planilla) {
-  var conn, result;
-  return regeneratorRuntime.async(function _callee90$(_context93) {
-    while (1) {
-      switch (_context93.prev = _context93.next) {
-        case 0:
-          _context93.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context93.sent;
-          console.log("Actualizando planilla: " + planilla);
-          _context93.next = 6;
-          return regeneratorRuntime.awrap(conn.query("UPDATE planillas set ? where id = ?", [planilla, id]));
-
-        case 6:
-          result = _context93.sent;
-          console.log(result);
-          return _context93.abrupt("return", result);
-
         case 9:
         case "end":
-          return _context93.stop();
+          return _context92.stop();
       }
     }
   });
 }); // ----------------------------------------------------------------
 // Funciones de los parametros
 
-ipcMain.handle("createParametro", function _callee91(event, parametro) {
+ipcMain.handle("createParametro", function _callee90(event, parametro) {
   var conn, _result18;
 
-  return regeneratorRuntime.async(function _callee91$(_context94) {
+  return regeneratorRuntime.async(function _callee90$(_context93) {
     while (1) {
-      switch (_context94.prev = _context94.next) {
+      switch (_context93.prev = _context93.next) {
         case 0:
-          _context94.prev = 0;
-          _context94.next = 3;
+          _context93.prev = 0;
+          _context93.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context94.sent;
+          conn = _context93.sent;
           console.log("Recibido: ", parametro);
           parametro.valor = parseFloat(parametro.valor);
-          _context94.next = 8;
+          _context93.next = 8;
           return regeneratorRuntime.awrap(conn.query("Insert into parametros set ?", parametro));
 
         case 8:
-          _result18 = _context94.sent;
+          _result18 = _context93.sent;
           console.log(_result18);
           new Notification({
             title: "Electrom Mysql",
             body: "New parametro saved succesfully"
           }).show();
           parametro.id = _result18.insertId;
-          return _context94.abrupt("return", parametro);
+          return _context93.abrupt("return", parametro);
 
         case 15:
-          _context94.prev = 15;
-          _context94.t0 = _context94["catch"](0);
-          console.log(_context94.t0);
+          _context93.prev = 15;
+          _context93.t0 = _context93["catch"](0);
+          console.log(_context93.t0);
 
         case 18:
         case "end":
-          return _context94.stop();
+          return _context93.stop();
       }
     }
   }, null, null, [[0, 15]]);
 });
-ipcMain.handle("getParametros", function _callee92() {
+ipcMain.handle("getParametros", function _callee91() {
   var conn, results;
+  return regeneratorRuntime.async(function _callee91$(_context94) {
+    while (1) {
+      switch (_context94.prev = _context94.next) {
+        case 0:
+          _context94.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context94.sent;
+          results = conn.query("Select * from parametros order by id desc;");
+          console.log(results);
+          return _context94.abrupt("return", results);
+
+        case 6:
+        case "end":
+          return _context94.stop();
+      }
+    }
+  });
+});
+ipcMain.handle("getParametroById", function _callee92(event, id) {
+  var conn, result;
   return regeneratorRuntime.async(function _callee92$(_context95) {
     while (1) {
       switch (_context95.prev = _context95.next) {
@@ -4034,18 +4228,22 @@ ipcMain.handle("getParametros", function _callee92() {
 
         case 2:
           conn = _context95.sent;
-          results = conn.query("Select * from parametros order by id desc;");
-          console.log(results);
-          return _context95.abrupt("return", results);
+          _context95.next = 5;
+          return regeneratorRuntime.awrap(conn.query("Select * from parametros where id = ?", id));
 
-        case 6:
+        case 5:
+          result = _context95.sent;
+          console.log(result[0]);
+          return _context95.abrupt("return", result[0]);
+
+        case 8:
         case "end":
           return _context95.stop();
       }
     }
   });
 });
-ipcMain.handle("getParametroById", function _callee93(event, id) {
+ipcMain.handle("updateParametro", function _callee93(event, id, parametro) {
   var conn, result;
   return regeneratorRuntime.async(function _callee93$(_context96) {
     while (1) {
@@ -4057,12 +4255,12 @@ ipcMain.handle("getParametroById", function _callee93(event, id) {
         case 2:
           conn = _context96.sent;
           _context96.next = 5;
-          return regeneratorRuntime.awrap(conn.query("Select * from parametros where id = ?", id));
+          return regeneratorRuntime.awrap(conn.query("UPDATE parametros set ? where id = ?", [parametro, id]));
 
         case 5:
           result = _context96.sent;
-          console.log(result[0]);
-          return _context96.abrupt("return", result[0]);
+          console.log(result);
+          return _context96.abrupt("return", result);
 
         case 8:
         case "end":
@@ -4071,55 +4269,29 @@ ipcMain.handle("getParametroById", function _callee93(event, id) {
     }
   });
 });
-ipcMain.handle("updateParametro", function _callee94(event, id, parametro) {
+ipcMain.handle("deleteParametro", function _callee94(event, id) {
   var conn, result;
   return regeneratorRuntime.async(function _callee94$(_context97) {
     while (1) {
       switch (_context97.prev = _context97.next) {
         case 0:
-          _context97.next = 2;
+          console.log("id from main.js: ", id);
+          _context97.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 2:
+        case 3:
           conn = _context97.sent;
-          _context97.next = 5;
-          return regeneratorRuntime.awrap(conn.query("UPDATE parametros set ? where id = ?", [parametro, id]));
+          _context97.next = 6;
+          return regeneratorRuntime.awrap(conn.query("Delete from parametros where id = ?", id));
 
-        case 5:
+        case 6:
           result = _context97.sent;
           console.log(result);
           return _context97.abrupt("return", result);
 
-        case 8:
-        case "end":
-          return _context97.stop();
-      }
-    }
-  });
-});
-ipcMain.handle("deleteParametro", function _callee95(event, id) {
-  var conn, result;
-  return regeneratorRuntime.async(function _callee95$(_context98) {
-    while (1) {
-      switch (_context98.prev = _context98.next) {
-        case 0:
-          console.log("id from main.js: ", id);
-          _context98.next = 3;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 3:
-          conn = _context98.sent;
-          _context98.next = 6;
-          return regeneratorRuntime.awrap(conn.query("Delete from parametros where id = ?", id));
-
-        case 6:
-          result = _context98.sent;
-          console.log(result);
-          return _context98.abrupt("return", result);
-
         case 9:
         case "end":
-          return _context98.stop();
+          return _context97.stop();
       }
     }
   });

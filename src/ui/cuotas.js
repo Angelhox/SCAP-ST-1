@@ -16,6 +16,7 @@ const buscarServicios = document.getElementById("buscarServicios");
 const criterio = document.getElementById("criterio");
 const criterioContent = document.getElementById("criterio-content");
 const servicioAplazableSn = document.getElementById("aplazablesn");
+const valoresDistintos = document.getElementById("distintosSn");
 const aplazableOptions = document.getElementById("aplazable-options");
 const numeroPagos = document.getElementById("numero-pagos");
 const valorPagos = document.getElementById("valor-pagos");
@@ -87,6 +88,7 @@ let usuarios = [];
 let valorIndividual = 0.0;
 let editingStatus = false;
 let editServicioId = "";
+let valoresDistintosDf = "No";
 servicioForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (validator.isEmpty(servicioNombre.value)) {
@@ -103,6 +105,9 @@ servicioForm.addEventListener("submit", async (e) => {
     mensajeError.textContent = "El valor el servicio es obligatorio.";
     servicioValor.focus();
   } else {
+    if (valoresDistintos.value !== null) {
+      valoresDistintosDf = valoresDistintos.value;
+    }
     const newCuota = {
       fechaCreacion: formatearFecha(new Date()),
       nombre: servicioNombre.value,
@@ -113,7 +118,7 @@ servicioForm.addEventListener("submit", async (e) => {
       numeroPagos: numeroPagos.value,
       valorPagos: valorPagos.value,
       individualSn: servicioIndividualSn.value,
-      valoresDistintosSn: "No",
+      valoresDistintosSn: valoresDistintosDf,
     };
     if (!editingStatus) {
       const result = await ipcRenderer.invoke("createCuotas", newCuota);
@@ -466,23 +471,23 @@ async function renderUsuarios(usuarios, servicio) {
     usuariosList.appendChild(divContainer);
   });
 }
-const contratar = async () => {
-  porContratar.forEach(async (contratando) => {
-    newServicioContratado = {
-      fechaEmision: formatearFecha(new Date()),
-      estado: "Sin aplicar",
-      serviciosId: editServicioId,
-      contratosId: contratando,
-      descuentosId: 1,
-      valorIndividual: valorIndividual,
-    };
-    const contratado = await ipcRenderer.invoke(
-      "createSercicioContratado",
-      newServicioContratado
-    );
-    return contratado;
-  });
-};
+// const contratar = async () => {
+//   porContratar.forEach(async (contratando) => {
+//     newServicioContratado = {
+//       fechaEmision: formatearFecha(new Date()),
+//       estado: "Sin aplicar",
+//       serviciosId: editServicioId,
+//       contratosId: contratando,
+//       descuentosId: 1,
+//       valorIndividual: valorIndividual,
+//     };
+//     const contratado = await ipcRenderer.invoke(
+//       "createSercicioContratado",
+//       newServicioContratado
+//     );
+//     return contratado;
+//   });
+// };
 // function renderServicios(servicios) {
 //   serviciosList.innerHTML = "";
 //   servicios.forEach((servicio) => {
@@ -576,6 +581,7 @@ const mostrarEstadisticas = async (servicioId) => {
   await getRecaudaciones(servicioId);
 };
 const getRecaudaciones = async () => {
+  console.log("Mostrando recaudaciones");
   let valoresRecaudados = 0.0;
   let valoresPendientes = 0.0;
   let valoresTotales = 0.0;
@@ -779,31 +785,31 @@ ipcRenderer.on("datos-a-ocacionales", async () => {
   // await mostrarEstadisticas(servicioRv.id);
   // mostrarSeccion("seccion2");
 });
-ipcRenderer.on("Notificar", (event, response) => {
-  if (response.title === "Borrado!") {
-    resetFormAfterSave();
-  } else if (response.title === "Actualizado!") {
-    resetFormAfterUpdate();
-  } else if (response.title === "Guardado!") {
-    resetFormAfterSave();
-  }
-  console.log("Response: " + response);
-  if (response.success) {
-    Swal.fire({
-      title: response.title,
-      text: response.message,
-      icon: "success",
-      confirmButtonColor: "#f8c471",
-    });
-  } else {
-    Swal.fire({
-      title: response.title,
-      text: response.message,
-      icon: "error",
-      confirmButtonColor: "#f8c471",
-    });
-  }
-});
+// ipcRenderer.on("Notificar", (event, response) => {
+//   if (response.title === "Borrado!") {
+//     resetFormAfterSave();
+//   } else if (response.title === "Actualizado!") {
+//     resetFormAfterUpdate();
+//   } else if (response.title === "Guardado!") {
+//     resetFormAfterSave();
+//   }
+//   console.log("Response: " + response);
+//   if (response.success) {
+//     Swal.fire({
+//       title: response.title,
+//       text: response.message,
+//       icon: "success",
+//       confirmButtonColor: "#f8c471",
+//     });
+//   } else {
+//     Swal.fire({
+//       title: response.title,
+//       text: response.message,
+//       icon: "error",
+//       confirmButtonColor: "#f8c471",
+//     });
+//   }
+// });
 async function resetFormAfterUpdate() {
   let criterioBuscar = criterio.value;
   let criterioContentBuscar = criterioContent.value;
@@ -811,7 +817,7 @@ async function resetFormAfterUpdate() {
   console;
   await getServicios(criterioBuscar, criterioContentBuscar);
   mensajeError.textContent = "";
-  fechaCreacion.value = formatearFecha(new Date());
+  servicioCreacion.value = formatearFecha(new Date());
 }
 async function resetFormAfterSave() {
   let criterioBuscar = criterio.value;
@@ -943,7 +949,45 @@ function anioLimites() {
     anioLimite.appendChild(option);
   }
 }
-async function vistaFactura() {
+btnReporte.onclick = () => {
+  Swal.fire({
+    title: "Selecciona una acción",
+    icon: "info",
+    html: `
+      <button class="swal2-confirm swal2-styled" id="reporteGeneral" onclick="vistaFactura('general')">General</button>
+      <button class="swal2-confirm swal2-styled" id="reporteCancelados" onclick="vistaFactura('cancelados')">Cancelados</button>
+      <button class="swal2-confirm swal2-styled" id="reporteSinCancelar" onclick="vistaFactura('sinCancelar')">Sin cancelar</button>
+
+    `,
+    showCloseButton: true,
+    allowOutsideClick: false,
+    showConfirmButton: false,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // if (result.dismiss === Swal.DismissReason.close) {
+      //   // El botón de cierre (X) fue presionado
+      //   Swal.fire("Operación cancelada", "", "error");
+      // } else if (result.target.id === "accion1") {
+      //   // El botón "Acción 1" fue presionado
+      //   Swal.fire("Acción 1 realizada", "", "success");
+      // } else if (result.target.id === "accion2") {
+      //   // El botón "Acción 2" fue presionado
+      //   Swal.fire("Acción 2 realizada", "", "success");
+      // } else if (result.target.id === "accion3") {
+      //   // El botón "Acción 3" fue presionado
+      //   Swal.fire("Acción 3 realizada", "", "success");
+      // }
+    } else {
+      // El botón "Cancelar" fue presionado
+      Swal.fire("Reporte cancelado", "", "success");
+    }
+  });
+};
+async function vistaFactura(tipo) {
+  let recaudacionesReporte = [];
+  // Supongamos que tienes un arreglo de objetos
+  // Define la condición de filtro (por ejemplo, objetos con id mayor que 2)
+
   const datos = {
     mensaje: "Hola desde pagina1",
     otroDato: 12345,
@@ -959,11 +1003,31 @@ async function vistaFactura() {
     recaudado: valorPendiente.textContent,
     totalFinal: valorTotal.textContent,
   };
+
+  if (tipo == "cancelados") {
+    recaudacionesReporte = [];
+    recaudacionesReporte = recaudaciones.filter(function (recaudacion) {
+      return recaudacion.detalleEstado == "Cancelado";
+    });
+    console.log("rp: Cancelados ", recaudacionesReporte);
+  } else if (tipo == "sinCancelar") {
+    recaudacionesReporte = [];
+
+    recaudacionesReporte = recaudaciones.filter(function (recaudacion) {
+      return recaudacion.detalleEstado == "Por cancelar";
+    });
+    console.log("rp Sin cancelar: ", recaudacionesReporte);
+  } else {
+    recaudacionesReporte = [];
+
+    recaudacionesReporte = recaudaciones;
+    console.log("rp general: ", recaudacionesReporte);
+  }
   await ipcRenderer.send(
     "datos-a-pagina3",
     datos,
     encabezado,
-    recaudaciones,
+    recaudacionesReporte,
     datosTotales
   );
 }
@@ -997,7 +1061,7 @@ const servicioOpcionesdg = async (usuario, servicio) => {
   errortextAbono.textContent = "Error";
   errContainer.style.display = "none";
   abonarDg.readOnly = true;
-  let presubtotal = 0;
+
   let subtotal = 0;
   let total = 0;
   let porcentaje = 0;
@@ -1007,83 +1071,99 @@ const servicioOpcionesdg = async (usuario, servicio) => {
   let pendientes = 0;
   let valorCancelado = 0;
   let valorPago = 0;
-  let valorAbonar = 0;
   let valorSaldo = 0;
   let numeroPagosDf = 1;
-  // funciones de los descuentos al seleccionarlos
-
-  console.log("Contratado?: " + servicio.id, usuario.contratosId);
-  const servicioContratado = await ipcRenderer.invoke(
-    "getContratadoByServicioContrato",
-    usuario.contratosId,
-    servicio.id
-  );
-  // console.log("Servicio al Dg: " + servicio.contratadosId);
+  let descuentoDf = 1;
+  let editableSn = false;
+  // Datos del servicio independientes
   servicioDg.textContent = servicio.nombre;
   descripcionDg.textContent = servicio.descripcion;
+  detallesDg.textContent = servicio.tipo + " | " + aplazable;
+  servicioValorDg.textContent = "Valor: $" + servicio.valor;
   if (servicioDg.aplazableSn === "Si") {
     aplazable = "Aplazable";
   }
-  detallesDg.textContent = servicio.tipo + " | " + aplazable;
-  servicioValorDg.textContent = "Valor: $" + servicio.valor;
-  console.log("Valores distintos: " + servicio.valoresDistintosSn);
-  // ----------------------------------------------------------------
-  // Independientemente de ser valores distintos o no
-  if (servicio.valor !== null) {
-    subtotal = parseFloat(servicio.valor).toFixed(2);
-  }
-  subtotalDg.value = subtotal;
-  descuentoDg.value = 1;
-  const descuentoSeleccionado = descuentoDg.options[descuentoDg.selectedIndex];
-  const valorSeleccionado =
-    descuentoSeleccionado.getAttribute("value-descuento");
-  console.log("Atributo seleccionado:", valorSeleccionado);
-  porcentaje = parseInt(valorSeleccionado) / 100;
-  console.log("Porcentaje: " + subtotal, porcentaje);
-  descuento = subtotal * porcentaje;
-  descuentoValDg.value = parseFloat(descuento).toFixed(2);
-  total = servicio.valor - descuento;
-  totalDg.value = parseFloat(total).toFixed(2);
-  if (servicio.numeroPagos !== null) {
-    numeroPagosDf = servicio.numeroPagos;
-  }
-  numPagosDg.value = numeroPagosDf;
-  const valorPagoSeleccionado =
-    numPagosDg.options[numPagosDg.selectedIndex].value;
-  console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
-  valorPago = total / valorPagoSeleccionado;
-  valPagosDg.value = parseFloat(valorPago).toFixed(2);
-  subtotalDg.oninput = () => {
-    if (subtotalDg.value !== "") {
-      subtotal = subtotalDg.value;
-      const descuentoSeleccionado =
-        descuentoDg.options[descuentoDg.selectedIndex];
-      const valorSeleccionado =
-        descuentoSeleccionado.getAttribute("value-descuento");
-      console.log("Atributo seleccionado:", valorSeleccionado);
-      porcentaje = parseInt(valorSeleccionado) / 100;
-      console.log("Porcentaje: " + subtotal, porcentaje);
-      descuento = subtotal * porcentaje;
-      descuentoValDg.value = parseFloat(descuento).toFixed(2);
-      // total = servicio.valor - descuento;
-      total = subtotal - descuento;
-      totalDg.value = parseFloat(total).toFixed(2);
-      //Incluimos la programacion del select numPagos
-      if (total !== 0) {
-        const valorPagoSeleccionado =
-          numPagosDg.options[numPagosDg.selectedIndex].value;
-        console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
-        valorPago = total / valorPagoSeleccionado;
-      } else {
-        numPagosDg.value = 1;
-        const valorPagoSeleccionado =
-          numPagosDg.options[numPagosDg.selectedIndex].value;
-        console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
-        valorPago = total / valorPagoSeleccionado;
-      }
-      valPagosDg.value = parseFloat(valorPago).toFixed(2);
-    } else {
+  // Verifico si el servicio ha sido contratado
+  console.log("Contratado?: " + servicio.id, usuario.contratosId);
+  const servicioContratado = await ipcRenderer.invoke(
+    "getContratadoByServicioContrato",
+    servicio.id,
+    usuario.contratosId
+  );
+  if (servicioContratado[0] !== undefined) {
+    console.log("El servicio ha sido contratado: " + servicioContratado[0]);
+    // Si el servicio ya ha sido contratado
+    if (servicioContratado[0].valorIndividual !== null) {
+      subtotal = servicioContratado[0].valorIndividual;
+    }
+    subtotalDg.value = subtotal;
+    if (servicioContratado[0].descuentosId !== null) {
+      descuentoDf = servicioContratado[0].descuentosId;
+    }
+    descuentoDg.value = descuentoDf;
+    if (servicioContratado[0].valorDescuento !== null) {
+      descuento = servicioContratado[0].valorDescuento;
+    }
+    // el valor del descuento es el que ya esta guardado.
+    descuentoValDg.value = descuento;
+    if (servicioContratado[0].numeroPagosIndividual !== null) {
+      numeroPagosDf = servicioContratado[0].numeroPagosIndividual;
+    }
+    numPagosDg.value = numeroPagosDf;
+    if (servicioContratado[0].valorPagosIndividual !== null) {
+      valorPago = servicioContratado[0].valorPagosIndividual;
+    }
+    // el valor de los pagos es el que ya esta guardado.
+    valPagosDg.value = valorPago;
+    total = subtotal - descuento;
+    totalDg.value = total;
+    // Si esta contratado pero, esta cancelado ?
+    const servicioDetalles = await ipcRenderer.invoke(
+      "getDetallesByContratadoId",
+      servicioContratado[0].serviciosContratadosId
+    );
+
+    if (servicioDetalles.length > 0) {
+      console.log("Existe el detalle de servicios: ", servicioDetalles);
+      servicioDetalles.forEach((servicioDetalle) => {
+        console.log("Detalles: " + servicioDetalle.estado);
+        if (servicioDetalle.estado === "Cancelado") {
+          cancelados++;
+          valorCancelado += servicioDetalle.abono;
+        }
+        if (cancelados > 0) {
+          editableSn = false;
+          descuentoDg.disabled = false;
+        }
+      });
+      //Cambiar valor or valorIndividual
+      contratarDg.textContent = "Descontratar";
+      contratarDg.onclick = async function () {
+        await desContratarServicio(
+          servicioContratado[0].serviciosContratadosId,
+          usuario,
+          servicio
+        );
+      };
+    }
+
+    canceladosDg.textContent = cancelados;
+    pendientesDg.textContent = numeroPagosDf - cancelados;
+    abonadoDg.textContent = valorCancelado;
+    saldoDg.textContent = total - valorCancelado;
+  } else {
+    // En caso de que el servicio no este contratado cargamos los valores
+    // por defecto del servicio.
+    if (servicio.valor !== null) {
       subtotal = servicio.valor;
+    }
+    subtotalDg.value = subtotal;
+    descuentoDg.value = descuentoDf;
+    descuentoDg.disabled = false;
+    descuentoValDg.value = descuento;
+    //----------------------------------------------------------------
+    // funcion del select descuentos
+    descuentoDg.onchange = () => {
       const descuentoSeleccionado =
         descuentoDg.options[descuentoDg.selectedIndex];
       const valorSeleccionado =
@@ -1106,31 +1186,13 @@ const servicioOpcionesdg = async (usuario, servicio) => {
       } else {
         numPagosDg.value = 1;
         numPagosDg.disabled = true;
-
         const valorPagoSeleccionado =
           numPagosDg.options[numPagosDg.selectedIndex].value;
         console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
         valorPago = total / valorPagoSeleccionado;
       }
       valPagosDg.value = parseFloat(valorPago).toFixed(2);
-    }
-  };
-  numPagosDg.onchange = () => {
-    if (total !== 0) {
-      const valorPagoSeleccionado =
-        numPagosDg.options[numPagosDg.selectedIndex].value;
-      console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
-      valorPago = total / valorPagoSeleccionado;
-    } else {
-      numPagosDg.value = 1;
-      const valorPagoSeleccionado =
-        numPagosDg.options[numPagosDg.selectedIndex].value;
-      console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
-      valorPago = total / valorPagoSeleccionado;
-    }
-    valPagosDg.value = parseFloat(valorPago).toFixed(2);
-  };
-  descuentoDg.onchange = () => {
+    };
     const descuentoSeleccionado =
       descuentoDg.options[descuentoDg.selectedIndex];
     const valorSeleccionado =
@@ -1140,83 +1202,30 @@ const servicioOpcionesdg = async (usuario, servicio) => {
     console.log("Porcentaje: " + subtotal, porcentaje);
     descuento = subtotal * porcentaje;
     descuentoValDg.value = parseFloat(descuento).toFixed(2);
-    // total = servicio.valor - descuento;
-    total = subtotal - descuento;
+    total = servicio.valor - descuento;
     totalDg.value = parseFloat(total).toFixed(2);
-    //Incluimos la programacion del select numPagos
-    if (total !== 0) {
-      numPagosDg.disabled = false;
-      const valorPagoSeleccionado =
-        numPagosDg.options[numPagosDg.selectedIndex].value;
-      console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
-      valorPago = total / valorPagoSeleccionado;
-    } else {
-      numPagosDg.value = 1;
-      numPagosDg.disabled = true;
-      const valorPagoSeleccionado =
-        numPagosDg.options[numPagosDg.selectedIndex].value;
-      console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
-      valorPago = total / valorPagoSeleccionado;
-    }
-    valPagosDg.value = parseFloat(valorPago).toFixed(2);
-  };
-  // ----------------------------------------------------------------
-  if (servicio.valoresDistintosSn == "Si") {
-    subtotalText.textContent = "Subtotal(Individual)";
-  } else {
-    subtotalText.textContent = "Subtotal(General)";
-    // subtotalDg.readOnly = true;
-    totalDg.readOnly = true;
-    valPagosDg.readOnly = true;
-  }
-  if (servicioContratado !== undefined) {
-    //Comprobar si esta cancelado ese servicio contratado.
-    const servicioDetalles = await ipcRenderer.invoke(
-      "getDetallesByContratadoId",
-      servicioContratado.serviciosContratadosId
-    );
+    // totalDg.value = subtotal - descuento;
 
-    subtotalDg.textContent = servicioContratado.valorIndividual.toFixed(2);
-    descuentoDg.textContent = servicioContratado.valorDescuento.toFixed(2);
-    const totalCalculado = servicioContratado.valorIndividual;
-    servicios.valorDescuento;
-    totalDg.textContent = parseFloat(totalCalculado).toFixed(2);
-    console.log("Numero Pagos: " + servicioContratado.numeroPagosIndividual);
-    if (servicioDetalles.length > 0) {
-      console.log("Existe el detalles de servicios: ", servicioDetalles);
-      servicioDetalles.forEach((servicioDetalle) => {
-        console.log("Detalles: " + servicioDetalle.estado);
-        if (servicioDetalle.estado === "Cancelado") {
-          cancelados++;
-          valorCancelado += servicioDetalle.abono;
-        }
-      });
-      //Cambiar valor or valorIndividual
-      contratarDg.textContent = "Descontratar";
+    //----------------------------------------------------------------
+
+    if (servicio.numeroPagos !== null) {
+      numeroPagosDf = servicio.numeroPagos;
     }
-    valorSaldo = servicioContratado.valorIndividual - valorCancelado;
-    if (servicioContratado.numeroPagosIndividual !== null) {
-      numeroPagosDf = servicioContratado.numeroPagosIndividual;
-    }
-    pendientes = numeroPagosDf - cancelados;
-    numPagosDg.textContent = numeroPagosDf;
-    canceladosDg.textContent = cancelados;
-    pendientesDg.textContent = pendientes;
-    saldoDg.textContent = valorSaldo.toFixed(2);
-    abonadoDg.textContent = valorCancelado.toFixed(2);
-    contratarDg.onclick = async function () {
-      await desContratarServicio(
-        servicioContratado.serviciosContratadosId,
-        usuario,
-        servicio
-      );
-    };
-  } else {
-    // subtotalDg.value = "No contratado";
-    // descuentoDg.value = "No contratado";
-    // totalDg.value = "No contratado";
-    // numPagosDg.value = "No contratado";
-    // valPagosDg.value= "No contratado";
+    //----------------------------------------------------------------
+    // funcion del select numero de pagos
+    numPagosDg.value = numeroPagosDf;
+    const valorPagoSeleccionado =
+      numPagosDg.options[numPagosDg.selectedIndex].value;
+    console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+    valorPago = total / valorPagoSeleccionado;
+    valPagosDg.value = parseFloat(valorPago).toFixed(2);
+
+    // if (servicio.valorPagos !== null) {
+    //   valorPago = servicio.valorPagos;
+    // }
+    // valPagosDg.value = valorPago;
+    //----------------------------------------------------------------
+
     canceladosDg.textContent = "No contratado";
     pendientesDg.textContent = "No contratado";
     saldoDg.textContent = "No contratado";
@@ -1226,17 +1235,118 @@ const servicioOpcionesdg = async (usuario, servicio) => {
       const newServicioContratado = {
         fechaEmision: formatearFecha(new Date()),
         estado: "Sin aplicar",
-        valorIndividual: servicio.valor,
-        valorPagosIndividual: servicio.valorPagos,
-        numeroPagosIndividual: servicio.numeroPagos,
+        valorIndividual: subtotal,
+        numeroPagosIndividual: numPagosDg.value,
+        valorPagosIndividual: valorPago,
+        descuentoValor: descuento,
+        descuentosId: descuentoDg.value,
         serviciosId: servicio.id,
         contratosId: usuario.contratosId,
-        descuentoValor: 0.0,
-        descuentosId: 1,
       };
       await contratarServicio(newServicioContratado, usuario, servicio);
     };
+    if (servicio.valoresDistintosSn == "Si") {
+      console.log("Valores distintos: " + servicio.valoresDistintosSn);
+      subtotalText.textContent = "Subtotal(Individual)";
+      editableSn = true;
+    } else {
+      subtotalText.textContent = "Subtotal(General)";
+      editableSn = false;
+    }
   }
+  // Si el servicio tiene valores distintos.
+
+  if (!editableSn) {
+    subtotalDg.readOnly = true;
+    // descuentoDg.disabled = true;
+    descuentoValDg.readOnly = true;
+    numPagosDg.disabled = true;
+  } else {
+    subtotalDg.readOnly = false;
+    // descuentoDg.disabled = false;
+    descuentoValDg.readOnly = false;
+    numPagosDg.disabled = false;
+
+    subtotalDg.oninput = () => {
+      if (subtotalDg.value !== "") {
+        subtotal = subtotalDg.value;
+        const descuentoSeleccionado =
+          descuentoDg.options[descuentoDg.selectedIndex];
+        const valorSeleccionado =
+          descuentoSeleccionado.getAttribute("value-descuento");
+        console.log("Atributo seleccionado:", valorSeleccionado);
+        porcentaje = parseInt(valorSeleccionado) / 100;
+        console.log("Porcentaje: " + subtotal, porcentaje);
+        descuento = subtotal * porcentaje;
+        descuentoValDg.value = parseFloat(descuento).toFixed(2);
+        // total = servicio.valor - descuento;
+        total = subtotal - descuento;
+        totalDg.value = parseFloat(total).toFixed(2);
+        //Incluimos la programacion del select numPagos
+        if (total !== 0) {
+          const valorPagoSeleccionado =
+            numPagosDg.options[numPagosDg.selectedIndex].value;
+          console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+          valorPago = total / valorPagoSeleccionado;
+        } else {
+          numPagosDg.value = 1;
+          const valorPagoSeleccionado =
+            numPagosDg.options[numPagosDg.selectedIndex].value;
+          console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+          valorPago = total / valorPagoSeleccionado;
+        }
+        valPagosDg.value = parseFloat(valorPago).toFixed(2);
+      } else {
+        subtotal = servicio.valor;
+        const descuentoSeleccionado =
+          descuentoDg.options[descuentoDg.selectedIndex];
+        const valorSeleccionado =
+          descuentoSeleccionado.getAttribute("value-descuento");
+        console.log("Atributo seleccionado:", valorSeleccionado);
+        porcentaje = parseInt(valorSeleccionado) / 100;
+        console.log("Porcentaje: " + subtotal, porcentaje);
+        descuento = subtotal * porcentaje;
+        descuentoValDg.value = parseFloat(descuento).toFixed(2);
+        // total = servicio.valor - descuento;
+        total = subtotal - descuento;
+        totalDg.value = parseFloat(total).toFixed(2);
+        //Incluimos la programacion del select numPagos
+        if (total !== 0) {
+          numPagosDg.disabled = false;
+          const valorPagoSeleccionado =
+            numPagosDg.options[numPagosDg.selectedIndex].value;
+          console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+          valorPago = total / valorPagoSeleccionado;
+        } else {
+          numPagosDg.value = 1;
+          numPagosDg.disabled = true;
+
+          const valorPagoSeleccionado =
+            numPagosDg.options[numPagosDg.selectedIndex].value;
+          console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+          valorPago = total / valorPagoSeleccionado;
+        }
+        valPagosDg.value = parseFloat(valorPago).toFixed(2);
+      }
+    };
+    numPagosDg.onchange = () => {
+      if (total !== 0) {
+        const valorPagoSeleccionado =
+          numPagosDg.options[numPagosDg.selectedIndex].value;
+        console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+        valorPago = total / valorPagoSeleccionado;
+      } else {
+        numPagosDg.value = 1;
+        const valorPagoSeleccionado =
+          numPagosDg.options[numPagosDg.selectedIndex].value;
+        console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+        valorPago = total / valorPagoSeleccionado;
+      }
+      valPagosDg.value = parseFloat(valorPago).toFixed(2);
+    };
+  }
+  // ----------------------------------------------------------------
+  // Borramos Código :|
   // Borramos Codigo :|
 
   if (dialogOpciones.close) {
@@ -1295,16 +1405,19 @@ const contratarServicio = async (servicioContratar, usuario, servicio) => {
       console.log("Resultado de contratar el servicio: " + contratado);
 
       if (contratado !== undefined) {
-        console.log("PAsamos a crear Planilla");
+        console.log("Pasamos a crear Planilla o comprobante");
         // Llamamos a  create planilla asi nos aseguramos de que en caso de no existir la planilla
         // correspondiente a ese mes se la cree asi como tambien nos aseguramos de que el detalle
         // no se aplique dos veces. Los detalles se aplicaran en las planillas vigentes de acuerdo
         // al mes correspondiente.
         const result = await ipcRenderer.invoke("createPlanilla");
+        // const resultComprobante = await ipcRenderer.invoke("createComprobante");
         console.log(result);
-        mostrarEstadisticas(servicio.id);
+        // console.log(resultComprobante);
+        // mostrarEstadisticas(servicio.id);
         // servicioOpcionesdg(usuario, servicio);
       }
+      // mostrarEstadisticas(servicio.id);
     } else {
       servicioOpcionesdg(usuario, servicio);
     }

@@ -141,10 +141,11 @@
     max-width: 100%;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border: solid 2px #85C1E9;
-    border-bottom: solid 2px #f2f2f2;
+    /* border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px; */
+    border: solid 2px #f8c471;
+    /* border-bottom: solid 2px #f2f2f2; */
+    border-bottom: none;
 }
 
 .encabezado-bt {
@@ -159,6 +160,11 @@
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
 
+}
+
+.lecturas-title {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .dialog-servicios {
@@ -312,4 +318,29 @@ input {
 .trans {
     color: #00000000;
     background-color: #00000000;
+}
+
+/* Estilo para el ícono en estado normal (sin hover) */
+.fa-caret-down {
+    color: black;
+    transition: color 0.3s;
+    /* Transición suave de color */
+}
+
+.fa-caret-up {
+    color: black;
+    transition: color 0.3s;
+    /* Transición suave de color */
+}
+
+/* Estilo para el botón en estado hover */
+button:hover .fa-caret-up {
+    color: #f8c471;
+    /* Cambiar el color en hover */
+}
+
+/* Estilo para el botón en estado hover */
+button:hover .fa-caret-down {
+    color: #f8c471;
+    /* Cambiar el color en hover */
 }

@@ -1359,7 +1359,7 @@ ipcMain.handle("deleteCuotas", async (event, id) => {
 });
 ipcMain.handle(
   "getContratadoByServicioContrato",
-  async (event, contratoId, servicioId) => {
+  async (event, servicioId, contratoId) => {
     try {
       const conn = await getConnection();
       const result = await conn.query(
@@ -1370,7 +1370,8 @@ ipcMain.handle(
           contratoId +
           " ;"
       );
-      return result[0];
+      console.log("Resultado de contratado: " + result[0]);
+      return result;
     } catch (error) {
       console.log("Error :" + error);
     }
@@ -1756,13 +1757,13 @@ ipcMain.handle(
       const datosDescuento = await conn.query(
         "SELECT * FROM tiposDescuento WHERE id=" + descuentosId + ";"
       );
-      if (datosServicio[0].id !== undefined) {
+      if (datosServicio[0] !== undefined) {
         console.log("Si hay datos: " + datosServicio[0].id);
         servicioValorPagos = datosServicio[0].valorPagos;
         servicioValor = datosServicio[0].valor;
         servicioNumPagos = datosServicio[0].numeroPagos;
       }
-      if (datosDescuento[0].id !== undefined) {
+      if (datosDescuento[0] !== undefined) {
         console.log("Si hay descuento: " + datosDescuento[0].valor);
         valorDescuento = datosDescuento[0].valor;
       }
@@ -1781,7 +1782,7 @@ ipcMain.handle(
         numeroPagosindividual: servicioNumPagos,
         descuentoValor: valorDescuento,
       };
-      if (contratadoExiste[0].id !== undefined) {
+      if (contratadoExiste[0] !== undefined) {
         // Si existe el servicio contratado
         // if (contratadoExiste[0].estado !== adquiridoSn) {
         // Realizar la actualizacion solo si los valores son distintos
@@ -1832,6 +1833,26 @@ ipcMain.handle(
 // ----------------------------------------------------------------
 // Funciones de las planillas
 // ----------------------------------------------------------------
+// ipcMain.handle("createComprobante", async (event) => {
+//   const conn = await getConnection();
+//   try {
+//     // Consultamos cuales son los medidores que se encuentran activos para crear el registro de lecturas
+//     contratosActivos = await conn.query(
+//       "Select * from contratos where medidorSn='No' and estado='Activo';"
+//     );
+//     if (contratosActivos[0] !== undefined) {
+//       contratosActivos.forEach(async (contratoActivo) => {
+//         console.log("Contrato a buscar: " + contratoActivo.id);
+//         createCuentaServicios(contratoActivo.id);
+//       });
+//     }
+//   } catch (error) {
+//     console.log("Error al crear comprobantes: " + error);
+//   }
+// });
+// ----------------------------------------------------------------
+// Funciones de las planillas
+// ----------------------------------------------------------------
 ipcMain.handle("createPlanilla", async (event) => {
   const conn = await getConnection();
   try {
@@ -1839,55 +1860,104 @@ ipcMain.handle("createPlanilla", async (event) => {
     medidoresActivos = await conn.query(
       "select medidores.id,medidores.codigo,medidores.fechaInstalacion,contratos.id as contratosId " +
         "from medidores join contratos on contratos.id=medidores.contratosId " +
-        "where contratos.medidorSn='Si'; "
+        "where contratos.estado='Activo'; "
+      // "where contratos.medidorSn='Si' AND contratos.estado='Activo'; "
     );
     if (medidoresActivos[0] !== undefined) {
       medidoresActivos.forEach(async (contratoActivo) => {
         console.log("Contrato a buscar: " + contratoActivo.id);
-        planillaExiste = await conn.query(
-          "SELECT count(planillas.id) as existe from planillas where month" +
-            "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " +
-            "and  planillas.medidoresId=" +
-            contratoActivo.id +
-            ";"
-        );
-        console.log("existe: " + planillaExiste[0].existe);
-        // Si no existe la planilla correspondiente a la fecha se crea a planilla
-        if (planillaExiste[0].existe === 0) {
-          // Obtenemos el valor de la lectura anterior en caso de existir
-          var lecturaAnterior = 0.0;
-          const lecturaConsulta = await conn.query(
-            " SELECT planillas.lecturaActual from planillas where " +
-              "medidoresId=" +
+        if (contratoActivo.medidorSn == "Si") {
+          planillaExiste = await conn.query(
+            "SELECT count(planillas.id) as existe from planillas where month" +
+              "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " +
+              "and  planillas.medidoresId=" +
               contratoActivo.id +
-              " order by planillas.fechaEmision desc limit 1;"
+              ";"
           );
-          if (lecturaConsulta[0] !== undefined) {
-            console.log(
-              "lectura Anterior: " + lecturaConsulta[0].lecturaActual
+          console.log("existe: " + planillaExiste[0].existe);
+          // Si no existe la planilla correspondiente a la fecha se crea a planilla
+          if (planillaExiste[0].existe === 0) {
+            // Obtenemos el valor de la lectura anterior en caso de existir
+            var lecturaAnterior = 0.0;
+            const lecturaConsulta = await conn.query(
+              " SELECT planillas.lecturaActual from planillas where " +
+                "medidoresId=" +
+                contratoActivo.id +
+                " order by planillas.fechaEmision desc limit 1;"
             );
-            lecturaAnterior = lecturaConsulta[0].lecturaActual;
+            if (lecturaConsulta[0] !== undefined) {
+              console.log(
+                "lectura Anterior: " + lecturaConsulta[0].lecturaActual
+              );
+              lecturaAnterior = lecturaConsulta[0].lecturaActual;
+            }
+            const tarifaBase = await conn.query(
+              "SELECT * FROM tarifas where tarifa='Familiar';"
+            );
+            const newPlanilla = {
+              //fechaEmision: "now()",
+              valor: tarifaBase[0].valor,
+              estado: "Por cobrar",
+              lecturaActual: 0.0,
+              lecturaAnterior: lecturaAnterior,
+              Observacion: "NA",
+              medidoresId: contratoActivo.id,
+              tarifa: "Familiar",
+              tarifaValor: tarifaBase[0].valor,
+            };
+            const resultadoPlanillas = await conn.query(
+              "INSERT INTO planillas set ?",
+              newPlanilla
+            );
+            console.log("Resultado de crear planillas: " + resultadoPlanillas);
+            // return resultadoPlanillas;
           }
-          const tarifaBase = await conn.query(
-            "SELECT * FROM tarifas where tarifa='Familiar';"
+        } else {
+          planillaExiste = await conn.query(
+            "SELECT count(planillas.id) as existe from planillas where month" +
+              "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " +
+              "and  planillas.medidoresId=" +
+              contratoActivo.id +
+              ";"
           );
-          const newPlanilla = {
-            //fechaEmision: "now()",
-            valor: tarifaBase[0].valor,
-            estado: "Por cobrar",
-            lecturaActual: 0.0,
-            lecturaAnterior: lecturaAnterior,
-            Observacion: "NA",
-            medidoresId: contratoActivo.id,
-            tarifa: "Familiar",
-            tarifaValor: tarifaBase[0].valor,
-          };
-          const resultadoPlanillas = await conn.query(
-            "INSERT INTO planillas set ?",
-            newPlanilla
-          );
-          console.log("Resultado de crear planillas: " + resultadoPlanillas);
-          // return resultadoPlanillas;
+          console.log("existe: " + planillaExiste[0].existe);
+          // Si no existe la planilla correspondiente a la fecha se crea a planilla
+          if (planillaExiste[0].existe == 0) {
+            // Obtenemos el valor de la lectura anterior en caso de existir
+            var lecturaAnterior = 0.0;
+            // const lecturaConsulta = await conn.query(
+            //   " SELECT planillas.lecturaActual from planillas where " +
+            //     "medidoresId=" +
+            //     contratoActivo.id +
+            //     " order by planillas.fechaEmision desc limit 1;"
+            // );
+            // if (lecturaConsulta[0] !== undefined) {
+            //   console.log(
+            //     "lectura Anterior: " + lecturaConsulta[0].lecturaActual
+            //   );
+            //   lecturaAnterior = lecturaConsulta[0].lecturaActual;
+            // }
+            // const tarifaBase = await conn.query(
+            //   "SELECT * FROM tarifas where tarifa='Familiar';"
+            // );
+            const newPlanilla = {
+              //fechaEmision: "now()",
+              valor: 0.0,
+              estado: "NA",
+              lecturaActual: 0.0,
+              lecturaAnterior: lecturaAnterior,
+              Observacion: "NA",
+              medidoresId: contratoActivo.id,
+              tarifa: "NA",
+              tarifaValor: 0.0,
+            };
+            const resultadoPlanillas = await conn.query(
+              "INSERT INTO planillas set ?",
+              newPlanilla
+            );
+            console.log("Resultado de crear planillas: " + resultadoPlanillas);
+            // return resultadoPlanillas;
+          }
         }
         createCuentaServicios(contratoActivo.contratosId);
       });
@@ -1960,7 +2030,8 @@ async function createCuentaServicios(contratoId) {
       //   " and serviciosContratados.estado='Sin aplicar' and not servicios.tipo='Servicio fijo'"
       "SELECT * FROM viewServiciosCancelar WHERE contratosId=" +
         contratoId +
-        " AND estado='Sin aplicar' AND NOT tipo='Servicio fijo';"
+        // " AND estado='Sin aplicar' AND NOT tipo='Servicio fijo';"
+        " AND NOT tipo='Servicio fijo';"
     );
 
     createDetallesServicios(otrosValores, encabezadoId);
@@ -1984,17 +2055,115 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
     console.log("Detalle servicio existe: " + detalleServicioExiste[0].existe);
     // Si no existen los detalles de servicios correspondiente a la fecha se crean y se añaden al encabezado
     if (detalleServicioExiste[0].existe === 0) {
+      console.log(
+        "Servicio a registrar: " + servicioContratado.valorIndividual,
+        servicioContratado.valorPagosIndividual
+      );
       let valorPagos = 0.0;
       let total = 0.0;
-      // El descuento esta en veremos :(
+      let abonado = 0;
+      let abono = 0;
+      let abonosAplicados = 0;
+      let totalPagar =
+        servicioContratado.valorIndividual - servicioContratado.descuentoValor;
+      let newDetalleServicios = {};
+
       // if (servicioContratado.valoresDistintos === "Si") {
       if (servicioContratado.aplazableSn === "Si") {
-        total = servicioContratado.valorIndividual;
-        valorPagos = total = servicioContratado.valorIndividual;
-        valorPagos = servicioContratado.valorPagosindividual;
+        // Consultamos el valor total aplicado anteriormente
+        const aplicadosAnteriores = await conn.query(
+          "SELECT * FROM detallesServicio WHERE serviciosContratadosId=" +
+            servicioContratado.id +
+            " ;"
+        );
+        if (aplicadosAnteriores[0] !== undefined) {
+          console.log("Entro a los aplazables con anteriores");
+
+          // Si exisen detalles de este servicio aplicados anteriormente
+          aplicadosAnteriores.forEach((aplicadoAnterior) => {
+            //Sumo los valores aplicados
+            abonado += aplicadoAnterior.abono;
+            abonosAplicados++;
+          });
+          // total = servicioContratado.valorIndividual;
+
+          if (abonado < totalPagar) {
+            console.log("Entro a los aplazables que no superan el abonado");
+
+            var faltante = totalPagar - abonado;
+            if (faltante > servicioContratado.valorPagosIndividual) {
+              console.log(
+                "Entro a los aplazables con faltante mayor a la cuota"
+              );
+
+              var pagosRestantes =
+                servicioContratado.numeroPagosindividual - abonosAplicados;
+              abono = servicioContratado.valorPagosIndividual;
+            } else {
+              console.log(
+                "Entro a los aplazables con faltante menor a la cuota"
+              );
+
+              abono = faltante;
+            }
+            // valorPagos = servicioContratado.valorPagosindividual;
+            newDetalleServicios = {
+              serviciosContratadosId: servicioContratado.id,
+              descuento: servicioContratado.descuentoValor,
+              subtotal: servicioContratado.valorIndividual,
+              total: totalPagar,
+              // El saldo debe ser calculado
+              // saldo: total - servicioContratado.valorDescuento,
+              saldo: totalPagar - abonado,
+              // El abono debe ser calculado
+              abono: abono,
+              encabezadosId: encabezadoId,
+              estado: "Por cancelar",
+              //fechaEmision
+            };
+          } else {
+            console.log("Entro a los aplazables que superan el abonado");
+
+            return null;
+            // Si lo abonado iguala o supera (No deberia) no aplicamos.
+          }
+        } else {
+          console.log("Entro a los aplazables sin anteriores");
+          newDetalleServicios = {
+            serviciosContratadosId: servicioContratado.id,
+            descuento: servicioContratado.descuentoValor,
+            subtotal: servicioContratado.valorIndividual,
+            total: totalPagar,
+            // El saldo debe ser calculado
+            saldo: totalPagar - servicioContratado.valorPagosIndividual,
+
+            // El abono debe ser calculado
+            abono: parseFloat(servicioContratado.valorPagosIndividual),
+            encabezadosId: encabezadoId,
+            estado: "Por cancelar",
+            //fechaEmision
+          };
+        }
+        //total = servicioContratado.valorIndividual;
+        // valorPagos = servicioContratado.valorIndividual;
       } else {
-        total = servicioContratado.valorIndividual;
-        valorPagos = servicioContratado.valorPagosindividual;
+        console.log("Entro a los no aplazables");
+
+        //total = servicioContratado.valorIndividual;
+        // valorPagos = servicioContratado.valorPagosindividual;
+        newDetalleServicios = {
+          serviciosContratadosId: servicioContratado.id,
+          descuento: servicioContratado.descuentoValor,
+          subtotal: servicioContratado.valorIndividual,
+          total: totalPagar,
+          // El saldo debe ser calculado
+          saldo: total - servicioContratado.valorDescuento,
+          // El abono debe ser calculado
+          abono: parseFloat(servicioContratado.valorPagosIndividual),
+          encabezadosId: encabezadoId,
+          estado: "Por cancelar",
+          //fechaEmision
+        };
       }
       // } else {
       // if (servicioContratado.aplazableSn === "Si") {
@@ -2008,17 +2177,6 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
       // }
       // }
 
-      const newDetalleServicios = {
-        serviciosContratadosId: servicioContratado.id,
-        descuento: servicioContratado.valorDescuento,
-        subtotal: total,
-        total: total - servicioContratado.valorDescuento,
-        saldo: total - servicioContratado.valorDescuento,
-        abono: valorPagos,
-        encabezadosId: encabezadoId,
-        estado: "Por cancelar",
-        //fechaEmision
-      };
       const resultadoDetalleServicio = await conn.query(
         "INSERT INTO detallesServicio set ?",
         newDetalleServicios
@@ -2109,71 +2267,71 @@ ipcMain.handle("getPlanillaById", async (event, planillaId) => {
   return results;
 });
 // Funcion que relaiza un filtro entre las planillas de acuerdo al codigo del medidor
-ipcMain.handle(
-  "getDatosPlanillasByCodigo",
-  async (
-    event,
-    codigoMedidor,
-    fechaPlanilla,
-    estadoPlanilla,
-    estadoEdicion
-  ) => {
-    try {
-      const conn = await getConnection();
-      conn.query("SET lc_time_names = 'es_ES';");
-      const results = conn.query(
-        "select planillas.id,planillas.fecha,planillas.valor,planillas.estado,planillas.estadoEdicion," +
-          "planillas.lecturaActual,planillas.lecturaAnterior,planillas.observacion," +
-          "planillas.codigo as codigoPlanillas," +
-          "medidores.codigo as codigoMedidores,socios.cedula, socios.nombre, socios.apellido," +
-          "concat(medidores.barrio,', ',medidores.callePrincipal,' y ',medidores.calleSecundaria,', casa: '," +
-          "medidores.numeroCasa,' ',medidores.referencia,'-') as ubicacion " +
-          "from planillas " +
-          "join contratos on contratos.id=planillas.contratosId join medidores on " +
-          "contratos.id=medidores.contratosId join socios on socios.id=contratos.sociosId " +
-          "where medidores.codigo ='" +
-          codigoMedidor +
-          "' and monthname(planillas.fecha)like '%" +
-          fechaPlanilla +
-          "%' " +
-          "and planillas.estado like'%" +
-          estadoPlanilla +
-          "%' and planillas.estadoEdicion like'%" +
-          estadoEdicion +
-          "%';"
-      );
-      const parametrosDesechos = await conn.query(
-        "select * from parametros where nombreParametro='Tarifa recolección de desechos';"
-      );
-      console.log(
-        "Consulta de los parametrso de desechos: ",
-        parametrosDesechos
-      );
-      const notification = new Notification({
-        title: "Exito",
-        body: "Se muestran los datos del medidor",
-        // icon: "/path/to/icon.png",
-        // onClick: () => {
-        //   // Acción a realizar al hacer clic en la notificación
-        // },
-      });
-      notification.show();
+// ipcMain.handle(
+//   "getDatosPlanillasByCodigo",
+//   async (
+//     event,
+//     codigoMedidor,
+//     fechaPlanilla,
+//     estadoPlanilla,
+//     estadoEdicion
+//   ) => {
+//     try {
+//       const conn = await getConnection();
+//       conn.query("SET lc_time_names = 'es_ES';");
+//       const results = conn.query(
+//         "select planillas.id,planillas.fecha,planillas.valor,planillas.estado,planillas.estadoEdicion," +
+//           "planillas.lecturaActual,planillas.lecturaAnterior,planillas.observacion," +
+//           "planillas.codigo as codigoPlanillas," +
+//           "medidores.codigo as codigoMedidores,socios.cedula, socios.nombre, socios.apellido," +
+//           "concat(medidores.barrio,', ',medidores.callePrincipal,' y ',medidores.calleSecundaria,', casa: '," +
+//           "medidores.numeroCasa,' ',medidores.referencia,'-') as ubicacion " +
+//           "from planillas " +
+//           "join contratos on contratos.id=planillas.contratosId join medidores on " +
+//           "contratos.id=medidores.contratosId join socios on socios.id=contratos.sociosId " +
+//           "where medidores.codigo ='" +
+//           codigoMedidor +
+//           "' and monthname(planillas.fecha)like '%" +
+//           fechaPlanilla +
+//           "%' " +
+//           "and planillas.estado like'%" +
+//           estadoPlanilla +
+//           "%' and planillas.estadoEdicion like'%" +
+//           estadoEdicion +
+//           "%';"
+//       );
+//       const parametrosDesechos = await conn.query(
+//         "select * from parametros where nombreParametro='Tarifa recolección de desechos';"
+//       );
+//       console.log(
+//         "Consulta de los parametrso de desechos: ",
+//         parametrosDesechos
+//       );
+//       const notification = new Notification({
+//         title: "Exito",
+//         body: "Se muestran los datos del medidor",
+//         // icon: "/path/to/icon.png",
+//         // onClick: () => {
+//         //   // Acción a realizar al hacer clic en la notificación
+//         // },
+//       });
+//       notification.show();
 
-      console.log(results);
-      return results;
-    } catch (error) {
-      const notification = new Notification({
-        title: "Error",
-        body: "Es posible que el medidor proporcionado no exista",
-        // icon: "/path/to/icon.png",
-        // onClick: () => {
-        //   // Acción a realizar al hacer clic en la notificación
-        // },
-      });
-      notification.show();
-    }
-  }
-);
+//       console.log(results);
+//       return results;
+//     } catch (error) {
+//       const notification = new Notification({
+//         title: "Error",
+//         body: "Es posible que el medidor proporcionado no exista",
+//         // icon: "/path/to/icon.png",
+//         // onClick: () => {
+//         //   // Acción a realizar al hacer clic en la notificación
+//         // },
+//       });
+//       notification.show();
+//     }
+//   }
+// );
 
 // ----------------------------------------------------------------
 // Funciones de las lecturas(Planillas)
