@@ -463,6 +463,7 @@ async function renderUsuarios(usuarios, servicio) {
 
       // Agrega la clase "selected" al elemento que se hizo clic
       divCol4.classList.add("bg-secondary");
+
       // detallesContratos(datosContrato.contratosId);
 
       servicioOpcionesdg(usuario, servicio);
@@ -663,7 +664,14 @@ const getBeneficiarios = async (criterio, criterioContent, servicio) => {
     criterioContent
   );
   console.log("Beneficiarios: ", usuarios);
+  // if (servicio.IndividualSn == "No") {
+  //   const usuariosFiltrados = usuarios.filter(
+  //     (usuario) => usuario.principalSn == "Si"
+  //   );
+  //   renderUsuarios(usuariosFiltrados, servicio);
+  // } else {
   renderUsuarios(usuarios, servicio);
+  // }
 };
 const getServicios = async () => {
   cuotas = await ipcRenderer.invoke("getCuotas");
@@ -785,31 +793,31 @@ ipcRenderer.on("datos-a-ocacionales", async () => {
   // await mostrarEstadisticas(servicioRv.id);
   // mostrarSeccion("seccion2");
 });
-// ipcRenderer.on("Notificar", (event, response) => {
-//   if (response.title === "Borrado!") {
-//     resetFormAfterSave();
-//   } else if (response.title === "Actualizado!") {
-//     resetFormAfterUpdate();
-//   } else if (response.title === "Guardado!") {
-//     resetFormAfterSave();
-//   }
-//   console.log("Response: " + response);
-//   if (response.success) {
-//     Swal.fire({
-//       title: response.title,
-//       text: response.message,
-//       icon: "success",
-//       confirmButtonColor: "#f8c471",
-//     });
-//   } else {
-//     Swal.fire({
-//       title: response.title,
-//       text: response.message,
-//       icon: "error",
-//       confirmButtonColor: "#f8c471",
-//     });
-//   }
-// });
+ipcRenderer.on("Notificar", (event, response) => {
+  if (response.title === "Borrado!") {
+    resetFormAfterSave();
+  } else if (response.title === "Actualizado!") {
+    resetFormAfterUpdate();
+  } else if (response.title === "Guardado!") {
+    resetFormAfterSave();
+  }
+  console.log("Response: " + response);
+  if (response.success) {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "success",
+      confirmButtonColor: "#f8c471",
+    });
+  } else {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "error",
+      confirmButtonColor: "#f8c471",
+    });
+  }
+});
 async function resetFormAfterUpdate() {
   let criterioBuscar = criterio.value;
   let criterioContentBuscar = criterioContent.value;
@@ -1146,7 +1154,14 @@ const servicioOpcionesdg = async (usuario, servicio) => {
         );
       };
     }
-
+    contratarDg.textContent = "Descontratar";
+    contratarDg.onclick = async function () {
+      await desContratarServicio(
+        servicioContratado[0].serviciosContratadosId,
+        usuario,
+        servicio
+      );
+    };
     canceladosDg.textContent = cancelados;
     pendientesDg.textContent = numeroPagosDf - cancelados;
     abonadoDg.textContent = valorCancelado;
@@ -1259,12 +1274,10 @@ const servicioOpcionesdg = async (usuario, servicio) => {
   if (!editableSn) {
     subtotalDg.readOnly = true;
     // descuentoDg.disabled = true;
-    descuentoValDg.readOnly = true;
     numPagosDg.disabled = true;
   } else {
     subtotalDg.readOnly = false;
     // descuentoDg.disabled = false;
-    descuentoValDg.readOnly = false;
     numPagosDg.disabled = false;
 
     subtotalDg.oninput = () => {
@@ -1345,6 +1358,11 @@ const servicioOpcionesdg = async (usuario, servicio) => {
       valPagosDg.value = parseFloat(valorPago).toFixed(2);
     };
   }
+  if (servicio.aplazableSn == "Si") {
+    numPagosDg.disabled = false;
+  } else {
+    numPagosDg.disabled = true;
+  }
   // ----------------------------------------------------------------
   // Borramos Código :|
   // Borramos Codigo :|
@@ -1400,7 +1418,9 @@ const contratarServicio = async (servicioContratar, usuario, servicio) => {
       // Aquí puedes realizar la acción que desees cuando el usuario confirme.
       const contratado = await ipcRenderer.invoke(
         "createServicioContratado",
-        servicioContratar
+        servicioContratar,
+        usuario.sociosId,
+        servicio.IndividualSn
       );
       console.log("Resultado de contratar el servicio: " + contratado);
 
@@ -1413,11 +1433,12 @@ const contratarServicio = async (servicioContratar, usuario, servicio) => {
         const result = await ipcRenderer.invoke("createPlanilla");
         // const resultComprobante = await ipcRenderer.invoke("createComprobante");
         console.log(result);
+
         // console.log(resultComprobante);
-        // mostrarEstadisticas(servicio.id);
+        mostrarEstadisticas(servicio.id);
         // servicioOpcionesdg(usuario, servicio);
       }
-      // mostrarEstadisticas(servicio.id);
+      mostrarEstadisticas(servicio.id);
     } else {
       servicioOpcionesdg(usuario, servicio);
     }

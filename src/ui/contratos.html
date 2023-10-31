@@ -159,7 +159,7 @@
         </div>
       </nav>
     </header>
-    <section class="" id="seccion1">
+    <section class="active" id="seccion1">
       <div class="row container-fluid" style="padding-top: 2em">
         <div class="col-lg-8 col-md-8 col-sm-12 encabezado-servicios">
           <div
@@ -409,25 +409,37 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-2">
+                <div class="col-4 text-center">
                   <label for="estadoContrato">Estado</label>
-                  <div
-                    class="form-check form-switch d-flex justify-content-center align-items-baseline"
-                  >
-                    <input
-                      checked
-                      disabled
-                      type="checkbox"
-                      class="custom-checkbox"
-                      autocomplete="off"
-                      id="estadoContrato"
-                    />
-                    <label
-                      id="labelEstadoContrato"
-                      class="btn-check-custom"
-                      for="estadoContrato"
-                      >Activo</label
-                    ><br />
+                  <div class="row mt-2">
+                    <div
+                      class="col-6 form-check form-switch d-flex justify-content-center align-items-baseline"
+                      style="padding: 0 0.5em"
+                    >
+                      <input
+                        checked
+                        disabled
+                        type="checkbox"
+                        class="custom-checkbox"
+                        autocomplete="off"
+                        id="estadoContrato"
+                      />
+                      <label
+                        id="labelEstadoContrato"
+                        class="btn-check-custom align-self-start"
+                        for="estadoContrato"
+                        >Activo</label
+                      >
+                    </div>
+                    <div class="col-6" style="padding: 0 0.5em">
+                      <input
+                        style="width: 100%"
+                        id="principalSn"
+                        class="form-control"
+                        readonly
+                        value="Principal"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -509,7 +521,7 @@
         </form>
       </div>
     </section>
-    <section class="active" id="seccion2">
+    <section class="" id="seccion2">
       <div class="row container-fluid" style="padding-top: 7em">
         <div
           class="col-xl-8 col-lg-12 col-md-12 col-sm-12"

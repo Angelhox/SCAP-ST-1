@@ -24,7 +24,8 @@ var editingStatus = false; // --------------------------------------------------
 var contratoCodigo = document.getElementById("codigocontrato");
 var contratoFecha = document.getElementById("fechaContrato");
 var contratoEstado = document.getElementById("estadoContrato");
-var labelEstadoContrato = document.getElementById("labelEstadoContrato"); //Indica si se ha seleccionado el servicio de agua con medidor
+var labelEstadoContrato = document.getElementById("labelEstadoContrato");
+var contratoPrincipalSn = document.getElementById("principalSn"); //Indica si se ha seleccionado el servicio de agua con medidor
 
 var contratoConMedidor = false; // Tabla de contratos con medidor
 
@@ -166,7 +167,7 @@ function eventoServiciosId(serviciosFijos) {
 
 
 contratoForm.addEventListener("submit", function _callee(e) {
-  var newMedidor, contratoEstadoDf, medidorDf, callePrincipalDf, calleSecundariaDf, numeroCasaDf, observacionDf, _newContrato, fakeMedidor, resultContrato, result, _resultContrato, resultMedidor;
+  var newMedidor, contratoEstadoDf, medidorDf, callePrincipalDf, calleSecundariaDf, numeroCasaDf, observacionDf, principalDf, _newContrato, fakeMedidor, resultContrato, result, _resultContrato, resultMedidor;
 
   return regeneratorRuntime.async(function _callee$(_context2) {
     while (1) {
@@ -183,7 +184,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa un número de cédula correspondiente a un socio registrado.";
           socioContratanteCedula.focus();
-          _context2.next = 101;
+          _context2.next = 103;
           break;
 
         case 8:
@@ -195,7 +196,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una fecha de contrato válida.";
           contratoFecha.focus();
-          _context2.next = 101;
+          _context2.next = 103;
           break;
 
         case 14:
@@ -210,7 +211,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   mensajeError.textContent = "Ingresa un numero de casa válido.";
           //   medidorNumeroCasa.focus();
 
-          _context2.next = 101;
+          _context2.next = 103;
           break;
 
         case 20:
@@ -228,7 +229,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   mensajeError.textContent = "Ingresa una calle secundaria válida.";
           //   medidorSecundaria.focus();
 
-          _context2.next = 101;
+          _context2.next = 103;
           break;
 
         case 26:
@@ -240,7 +241,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una referencia válida.";
           medidorReferencia.focus();
-          _context2.next = 101;
+          _context2.next = 103;
           break;
 
         case 32:
@@ -252,7 +253,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una fecha de instalación válida.";
           medidorInstalacion.focus();
-          _context2.next = 101;
+          _context2.next = 103;
           break;
 
         case 38:
@@ -276,14 +277,14 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   errorContainer.style.color = "red";
           //   mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
 
-          _context2.next = 101;
+          _context2.next = 103;
           break;
 
         case 44:
           console.log("Servicios a contratar: " + serviciosDisponiblesAContratar);
 
           if (!(!socioContratanteId == "")) {
-            _context2.next = 100;
+            _context2.next = 102;
             break;
           }
 
@@ -292,7 +293,8 @@ contratoForm.addEventListener("submit", function _callee(e) {
           callePrincipalDf = "SN";
           calleSecundariaDf = "SN";
           numeroCasaDf = "SN";
-          observacionDf = "SN";
+          observacionDf = "NA";
+          principalDf = "Si";
 
           if (contratoConMedidor) {
             medidorDf = "Si";
@@ -318,6 +320,10 @@ contratoForm.addEventListener("submit", function _callee(e) {
             observacionDf = medidorObservacion.value;
           }
 
+          if (!validator.isEmpty(contratoPrincipalSn.value)) {
+            principalDf = contratoPrincipalSn.value;
+          }
+
           newMedidor = {
             codigo: contratoCodigo.value,
             fechaInstalacion: medidorInstalacion.value,
@@ -340,7 +346,8 @@ contratoForm.addEventListener("submit", function _callee(e) {
             callePrincipal: callePrincipalDf,
             calleSecundaria: calleSecundariaDf,
             numeroCasa: numeroCasaDf,
-            referencia: medidorReferencia.value // contratosId: contratoId,
+            referencia: medidorReferencia.value,
+            principalSn: principalDf // contratosId: contratoId,
 
           };
           fakeMedidor = {
@@ -351,24 +358,24 @@ contratoForm.addEventListener("submit", function _callee(e) {
           };
 
           if (editingStatus) {
-            _context2.next = 82;
+            _context2.next = 84;
             break;
           }
 
-          _context2.prev = 62;
-          _context2.next = 65;
+          _context2.prev = 64;
+          _context2.next = 67;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("createContrato", _newContrato, numero, sectorId));
 
-        case 65:
+        case 67:
           resultContrato = _context2.sent;
           console.log("Muestro resultado de insertar contrato: ", resultContrato);
           contratoId = resultContrato.id;
           console.log("Muestro id resultado de insertar contrato: ", contratoId);
           fakeMedidor.contratosId = contratoId;
-          _context2.next = 72;
+          _context2.next = 74;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", contratoId, fakeMedidor));
 
-        case 72:
+        case 74:
           result = _context2.sent;
           console.log("resultado de crearMedidor: ", result);
           editContrato(contratoId); // if (!contratoId == "" || !contratoId == undefined) {
@@ -387,63 +394,63 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   // }
           // }
 
-          _context2.next = 80;
+          _context2.next = 82;
           break;
 
-        case 77:
-          _context2.prev = 77;
-          _context2.t0 = _context2["catch"](62);
+        case 79:
+          _context2.prev = 79;
+          _context2.t0 = _context2["catch"](64);
           console.log("Error al registrar el contrato: ", _context2.t0);
 
-        case 80:
-          _context2.next = 98;
+        case 82:
+          _context2.next = 100;
           break;
 
-        case 82:
+        case 84:
           console.log("Editing contrato with electron");
           newMedidor.contratosId = editContratoId;
-          _context2.prev = 84;
-          _context2.next = 87;
+          _context2.prev = 86;
+          _context2.next = 89;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, _newContrato));
 
-        case 87:
+        case 89:
           _resultContrato = _context2.sent;
 
           if (!contratoConMedidor) {
-            _context2.next = 92;
+            _context2.next = 94;
             break;
           }
 
-          _context2.next = 91;
+          _context2.next = 93;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", editContratoId, newMedidor));
 
-        case 91:
+        case 93:
           resultMedidor = _context2.sent;
 
-        case 92:
+        case 94:
           // contratarServicios(serviciosDisponiblesAContratar, editContratoId);
           console.log(_resultContrato);
-          _context2.next = 98;
+          _context2.next = 100;
           break;
 
-        case 95:
-          _context2.prev = 95;
-          _context2.t1 = _context2["catch"](84);
+        case 97:
+          _context2.prev = 97;
+          _context2.t1 = _context2["catch"](86);
           console.log("Error al editar el contrato: ", _context2.t1);
 
-        case 98:
-          _context2.next = 101;
+        case 100:
+          _context2.next = 103;
           break;
 
-        case 100:
+        case 102:
           console.log("Socio not found");
 
-        case 101:
+        case 103:
         case "end":
           return _context2.stop();
       }
     }
-  }, null, null, [[62, 77], [84, 95]]);
+  }, null, null, [[64, 79], [86, 97]]);
 }); // ----------------------------------------------------------------
 // Funcion que recibe el id del servicio a contratar y los relaciona con el id del contrato
 // Registra un servicio contratado a la vez.
@@ -1355,37 +1362,101 @@ var detallesContratos = function detallesContratos(id) {
 
 
 var editContrato = function editContrato(id) {
-  var contrato, conMedidor;
-  return regeneratorRuntime.async(function editContrato$(_context9) {
+  var principalSn, contrato, conMedidor;
+  return regeneratorRuntime.async(function editContrato$(_context11) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context11.prev = _context11.next) {
         case 0:
+          principalSn = "undefined";
           contratoForm.reset();
           getServiciosDisponibles();
-          _context9.next = 4;
+          _context11.next = 5;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosContratosById", id));
 
-        case 4:
-          contrato = _context9.sent;
+        case 5:
+          contrato = _context11.sent;
           console.log("Recibido: " + contrato);
           conMedidor = contrato.medidorSn;
 
           if (!(conMedidor == "Si")) {
-            _context9.next = 38;
+            _context11.next = 40;
             break;
           }
 
           contratoConMedidor = true;
           console.log("conMedidor");
-          _context9.next = 12;
+          _context11.next = 13;
           return regeneratorRuntime.awrap(habilitarFormMedidor());
 
-        case 12:
+        case 13:
           contratoFecha.value = formatearFecha(contrato.fecha);
           socioContratanteCedula.value = contrato.cedulaPasaporte;
           socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
           socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre;
           contratoCodigo.value = contrato.codigo;
+
+          if (contrato.principalSn == "No") {
+            principalSn = "Secundario";
+            contratoPrincipalSn.value = principalSn;
+
+            contratoPrincipalSn.onclick = function () {
+              Swal.fire({
+                title: "¿Quieres realizar cambios?",
+                text: "Este contrato es " + principalSn + " por lo que no presentara valores por socio " + "puedes hacer de este un contrato principal actualizando el resto de contratos " + "de este socio a secundarios.",
+                icon: "question",
+                iconColor: "#f8c471",
+                showCancelButton: true,
+                confirmButtonColor: "#2874A6",
+                cancelButtonColor: "#EC7063 ",
+                confirmButtonText: "Cambiar a principal",
+                cancelButtonText: "Cancelar"
+              }).then(function _callee6(result) {
+                return regeneratorRuntime.async(function _callee6$(_context9) {
+                  while (1) {
+                    switch (_context9.prev = _context9.next) {
+                      case 0:
+                        if (result.isConfirmed) {
+                          Swal.fire({
+                            title: "Quieres confirmar esta accion?",
+                            text: "Actualizaremos este contrato como principal.",
+                            showCancelButton: true,
+                            confirmButtonText: "Aceptar",
+                            cancelButtonText: "Cancelar"
+                          }).then(function (result) {
+                            if (result.isConfirmed) {
+                              // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                              cambiarContratoPrincipal(contrato.id, contrato.sociosId);
+                            }
+                          });
+                        }
+
+                      case 1:
+                      case "end":
+                        return _context9.stop();
+                    }
+                  }
+                });
+              });
+            };
+          } else {
+            principalSn = "Principal";
+            contratoPrincipalSn.value = principalSn; // ----------------------------------------------------------------
+            // Cambiar el contrato principal.
+            // ----------------------------------------------------------------
+
+            contratoPrincipalSn.onclick = function () {
+              Swal.fire({
+                title: "Contrato principal",
+                text: "Los valores por socio se" + "cargaran en las planillas de este contrato.",
+                icon: "info",
+                iconColor: "green",
+                showConfirmButton: true,
+                confirmButtonText: "Sandy",
+                confirmButtonColor: "green"
+              });
+            };
+          }
+
           contratoConMedidor = true; //medidorCodigo.value = contrato.codigoMedidor;
 
           medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
@@ -1410,38 +1481,80 @@ var editContrato = function editContrato(id) {
           generarCodigoBt.disabled = true; // ~~~~~~~~~~~~~~~~
 
           editContratoId = contrato.id;
-          _context9.next = 58;
+          _context11.next = 61;
           break;
 
-        case 38:
+        case 40:
           console.log("sinMedidor");
           contratoConMedidor = false;
           inHabilitarFormMedidor();
           contratoCodigo.value = contrato.codigo;
           contratoFecha.value = formatearFecha(contrato.fecha);
+
+          if (contrato.principalSn == "No") {
+            principalSn = "Secundario";
+            contratoPrincipalSn.value = principalSn;
+
+            contratoPrincipalSn.onclick = function () {
+              Swal.fire({
+                title: "¿Quieres realizar cambios?",
+                text: "Este contrato es " + principalSn + " por lo que no presentara valores por socio " + "puedes hacer de este un contrato principal actualizando el resto de contratos " + "de este socio a secundarios.",
+                icon: "question",
+                iconColor: "#f8c471",
+                showCancelButton: true,
+                confirmButtonColor: "#2874A6",
+                cancelButtonColor: "#EC7063 ",
+                confirmButtonText: "Cambiar a principal",
+                cancelButtonText: "Cancelar"
+              }).then(function _callee7(result) {
+                return regeneratorRuntime.async(function _callee7$(_context10) {
+                  while (1) {
+                    switch (_context10.prev = _context10.next) {
+                      case 0:
+                        if (result.isConfirmed) {
+                          Swal.fire({
+                            title: "Quieres confirmar esta accion?",
+                            text: "Actualizaremos este contrato como principal.",
+                            showCancelButton: true,
+                            confirmButtonText: "Aceptar",
+                            cancelButtonText: "Cancelar"
+                          }).then(function (result) {
+                            if (result.isConfirmed) {
+                              cambiarContratoPrincipal(contrato.id, contrato.sociosId); // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                            }
+                          });
+                        }
+
+                      case 1:
+                      case "end":
+                        return _context10.stop();
+                    }
+                  }
+                });
+              });
+            };
+          } else {
+            principalSn = "Principal";
+            contratoPrincipalSn.value = principalSn; // ----------------------------------------------------------------
+            // Cambiar el contrato principal.
+            // ----------------------------------------------------------------
+
+            contratoPrincipalSn.onclick = function () {
+              Swal.fire({
+                title: "Contrato principal",
+                text: "Los valores por socio se" + "cargaran en las planillas de este contrato.",
+                icon: "info",
+                iconColor: "green",
+                showConfirmButton: true,
+                confirmButtonText: "Aceptar",
+                confirmButtonColor: "green"
+              });
+            };
+          }
+
           socioContratanteCedula.value = contrato.cedulaPasaporte;
           socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
-          socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre; // if (medidor.pagoRecoleccionDesechos == "Si") {
-          //   contratoPagoRecoleccion.checked = true;
-          // } else {
-          //   contratoPagoRecoleccion.checked = false;
-          // }
-          // if (medidor.pagoAlcanterillado == "Si") {
-          //   contratoPagoAlcanterillado.checked = true;
-          // } else {
-          //   contratoPagoAlcanterillado.checked = false;
-          // }
-          // if (medidor.pagoEscrituras == "Si") {
-          //   contratoPagoEscrituras.checked = true;
-          // } else {
-          //   contratoPagoEscrituras.checked = false;
-          // }
-          // if (medidor.pagoAguaPotable == "Si") {
-          //   contratoPagoAguaPotable.checked = true;
-          // } else {
-          //   contratoPagoAguaPotable.checked = false;
-          // }
-          // medidorCodigo.value = medidor.codigo;
+          socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre; // medidorCodigo.value = medidor.codigo;
           // medidorInstalacion.value = formatearFecha(medidor.fechaInstalacion);
           // medidoresDisponibles.selectedIndex = 0;
           // medidorMarca.value = medidor.marca;
@@ -1470,7 +1583,7 @@ var editContrato = function editContrato(id) {
 
           editContratoId = contrato.id;
 
-        case 58:
+        case 61:
           socioContratanteId = contrato.sociosId;
           editingStatus = true;
           console.log(contrato);
@@ -1480,42 +1593,71 @@ var editContrato = function editContrato(id) {
           seccion2.classList.remove("active");
           seccion1.classList.add("active");
 
-        case 66:
+        case 69:
         case "end":
-          return _context9.stop();
+          return _context11.stop();
       }
     }
   });
-}; // ----------------------------------------------------------------
+};
+
+function cambiarContratoPrincipal(contratoId, socioId) {
+  var cambioPrincipal;
+  return regeneratorRuntime.async(function cambiarContratoPrincipal$(_context12) {
+    while (1) {
+      switch (_context12.prev = _context12.next) {
+        case 0:
+          _context12.prev = 0;
+          _context12.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("updatePrincipal", contratoId, socioId));
+
+        case 3:
+          cambioPrincipal = _context12.sent;
+          editContrato(contratoId);
+          _context12.next = 10;
+          break;
+
+        case 7:
+          _context12.prev = 7;
+          _context12.t0 = _context12["catch"](0);
+          console.log(_context12.t0);
+
+        case 10:
+        case "end":
+          return _context12.stop();
+      }
+    }
+  }, null, null, [[0, 7]]);
+} // ----------------------------------------------------------------
 // Funcion que carga los servicios contratados segun el id del contrato
 // y los muestra en el formulario para editarlos
 // ----------------------------------------------------------------
 
 
 function editarServiciosContratados(id) {
-  return regeneratorRuntime.async(function editarServiciosContratados$(_context10) {
+  return regeneratorRuntime.async(function editarServiciosContratados$(_context13) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context13.prev = _context13.next) {
         case 0:
-          _context10.prev = 0;
-          _context10.next = 3;
+          _context13.prev = 0;
+          _context13.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getServiciosContratadosById", id));
 
         case 3:
-          serviciosEditar = _context10.sent;
+          serviciosEditar = _context13.sent;
           //serviciosContratadosList.push(serviciosContratados.serviciosFijosId);
           console.log("Servicios a editar: ", serviciosEditar);
-          _context10.next = 10;
+          _context13.next = 10;
           break;
 
         case 7:
-          _context10.prev = 7;
-          _context10.t0 = _context10["catch"](0);
-          console.log("Error al cargar los servicios contratados para " + id + " : " + _context10.t0);
+          _context13.prev = 7;
+          _context13.t0 = _context13["catch"](0);
+          console.log("Error al cargar los servicios contratados para " + id + " : " + _context13.t0);
 
         case 10:
         case "end":
-          return _context10.stop();
+          return _context13.stop();
       }
     }
   }, null, null, [[0, 7]]);
@@ -1526,29 +1668,29 @@ function editarServiciosContratados(id) {
 
 var deleteMedidor = function deleteMedidor(id) {
   var response, result;
-  return regeneratorRuntime.async(function deleteMedidor$(_context11) {
+  return regeneratorRuntime.async(function deleteMedidor$(_context14) {
     while (1) {
-      switch (_context11.prev = _context11.next) {
+      switch (_context14.prev = _context14.next) {
         case 0:
           response = confirm("Estas seguro de eliminar este medidor?");
 
           if (!response) {
-            _context11.next = 8;
+            _context14.next = 8;
             break;
           }
 
           console.log("id from medidores.js");
-          _context11.next = 5;
+          _context14.next = 5;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("deleteMedidor", id));
 
         case 5:
-          result = _context11.sent;
+          result = _context14.sent;
           console.log("Resultado medidores.js", result);
           getContratos();
 
         case 8:
         case "end":
-          return _context11.stop();
+          return _context14.stop();
       }
     }
   });
@@ -1558,21 +1700,21 @@ var deleteMedidor = function deleteMedidor(id) {
 
 
 var getContratos = function getContratos() {
-  return regeneratorRuntime.async(function getContratos$(_context12) {
+  return regeneratorRuntime.async(function getContratos$(_context15) {
     while (1) {
-      switch (_context12.prev = _context12.next) {
+      switch (_context15.prev = _context15.next) {
         case 0:
-          _context12.next = 2;
+          _context15.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosConMedidor"));
 
         case 2:
-          datosContratos = _context12.sent;
+          datosContratos = _context15.sent;
           console.log(datosContratos);
           renderContratosConMedidor(datosContratos);
 
         case 5:
         case "end":
-          return _context12.stop();
+          return _context15.stop();
       }
     }
   });
@@ -1582,21 +1724,21 @@ var getContratos = function getContratos() {
 
 
 var getContratosSinMedidor = function getContratosSinMedidor() {
-  return regeneratorRuntime.async(function getContratosSinMedidor$(_context13) {
+  return regeneratorRuntime.async(function getContratosSinMedidor$(_context16) {
     while (1) {
-      switch (_context13.prev = _context13.next) {
+      switch (_context16.prev = _context16.next) {
         case 0:
-          _context13.next = 2;
+          _context16.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosSinMedidor"));
 
         case 2:
-          datosContratosSinMedidor = _context13.sent;
+          datosContratosSinMedidor = _context16.sent;
           console.log("Here: ", datosContratosSinMedidor);
           renderContratosSinMedidor(datosContratosSinMedidor);
 
         case 5:
         case "end":
-          return _context13.stop();
+          return _context16.stop();
       }
     }
   });
@@ -1606,22 +1748,22 @@ var getContratosSinMedidor = function getContratosSinMedidor() {
 
 
 var getServiciosDisponibles = function getServiciosDisponibles() {
-  return regeneratorRuntime.async(function getServiciosDisponibles$(_context14) {
+  return regeneratorRuntime.async(function getServiciosDisponibles$(_context17) {
     while (1) {
-      switch (_context14.prev = _context14.next) {
+      switch (_context17.prev = _context17.next) {
         case 0:
-          _context14.next = 2;
+          _context17.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getServiciosDisponibles"));
 
         case 2:
-          serviciosDisponibles = _context14.sent;
+          serviciosDisponibles = _context17.sent;
           console.log(serviciosDisponibles);
           renderServiciosDisponibles(serviciosDisponibles);
           eventoServiciosId(serviciosDisponibles);
 
         case 6:
         case "end":
-          return _context14.stop();
+          return _context17.stop();
       }
     }
   });
@@ -1631,20 +1773,20 @@ var getServiciosDisponibles = function getServiciosDisponibles() {
 
 
 function init() {
-  return regeneratorRuntime.async(function init$(_context15) {
+  return regeneratorRuntime.async(function init$(_context18) {
     while (1) {
-      switch (_context15.prev = _context15.next) {
+      switch (_context18.prev = _context18.next) {
         case 0:
-          _context15.next = 2;
+          _context18.next = 2;
           return regeneratorRuntime.awrap(getContratos());
 
         case 2:
-          _context15.next = 4;
+          _context18.next = 4;
           return regeneratorRuntime.awrap(getContratosSinMedidor());
 
         case 4:
         case "end":
-          return _context15.stop();
+          return _context18.stop();
       }
     }
   });
@@ -1670,16 +1812,16 @@ function formatearFecha(fecha) {
 
 function obtenerSugerencias() {
   var cedulasSugerencias;
-  return regeneratorRuntime.async(function obtenerSugerencias$(_context16) {
+  return regeneratorRuntime.async(function obtenerSugerencias$(_context19) {
     while (1) {
-      switch (_context16.prev = _context16.next) {
+      switch (_context19.prev = _context19.next) {
         case 0:
-          _context16.prev = 0;
-          _context16.next = 3;
+          _context19.prev = 0;
+          _context19.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getSocios"));
 
         case 3:
-          cedulasSugerencias = _context16.sent;
+          cedulasSugerencias = _context19.sent;
           sugerencias = cedulasSugerencias.map(function (objeto) {
             return objeto; // objeto.cedulaPasaporte +
             // " " +
@@ -1691,17 +1833,17 @@ function obtenerSugerencias() {
             // " " +
             // objeto.segundoApellido
           });
-          _context16.next = 10;
+          _context19.next = 10;
           break;
 
         case 7:
-          _context16.prev = 7;
-          _context16.t0 = _context16["catch"](0);
-          console.error("Error al obtener las sugerencias:", _context16.t0);
+          _context19.prev = 7;
+          _context19.t0 = _context19["catch"](0);
+          console.error("Error al obtener las sugerencias:", _context19.t0);
 
         case 10:
         case "end":
-          return _context16.stop();
+          return _context19.stop();
       }
     }
   }, null, null, [[0, 7]]);
@@ -1781,16 +1923,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var obtenerDatosSocioContratante = function obtenerDatosSocioContratante(cedula) {
   var socioContratante;
-  return regeneratorRuntime.async(function obtenerDatosSocioContratante$(_context17) {
+  return regeneratorRuntime.async(function obtenerDatosSocioContratante$(_context20) {
     while (1) {
-      switch (_context17.prev = _context17.next) {
+      switch (_context20.prev = _context20.next) {
         case 0:
           console.log("Se llamo a la carga de datos del contratante", cedula);
-          _context17.next = 3;
+          _context20.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratanteByCedula", cedula));
 
         case 3:
-          socioContratante = _context17.sent;
+          socioContratante = _context20.sent;
           socioContratanteNombre.value = socioContratante.primerNombre + " " + socioContratante.segundoNombre;
           socioContratanteApellido.value = socioContratante.primerApellido + " " + socioContratante.segundoApellido;
           socioContratanteId = socioContratante.id;
@@ -1799,7 +1941,7 @@ var obtenerDatosSocioContratante = function obtenerDatosSocioContratante(cedula)
 
         case 9:
         case "end":
-          return _context17.stop();
+          return _context20.stop();
       }
     }
   });
@@ -1810,21 +1952,21 @@ var obtenerDatosSocioContratante = function obtenerDatosSocioContratante(cedula)
 
 var verificarContratosAnteriores = function verificarContratosAnteriores(cedula) {
   var contratos;
-  return regeneratorRuntime.async(function verificarContratosAnteriores$(_context18) {
+  return regeneratorRuntime.async(function verificarContratosAnteriores$(_context21) {
     while (1) {
-      switch (_context18.prev = _context18.next) {
+      switch (_context21.prev = _context21.next) {
         case 0:
           console.log("Se llamo a la verificacion de contratos", cedula);
-          _context18.next = 3;
+          _context21.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosAnterioresByCedula", cedula));
 
         case 3:
-          contratos = _context18.sent;
+          contratos = _context21.sent;
           console.log(contratos);
 
         case 5:
         case "end":
-          return _context18.stop();
+          return _context21.stop();
       }
     }
   });
@@ -1900,17 +2042,17 @@ function inHabilitarFormMedidor() {
 
 function generarCodigo() {
   var codigoGenerado, barrio, sectores, selectElement, numeroContrato, select, codigoInput;
-  return regeneratorRuntime.async(function generarCodigo$(_context19) {
+  return regeneratorRuntime.async(function generarCodigo$(_context22) {
     while (1) {
-      switch (_context19.prev = _context19.next) {
+      switch (_context22.prev = _context22.next) {
         case 0:
           codigoGenerado = "error";
           barrio = "No seleccionado";
-          _context19.next = 4;
+          _context22.next = 4;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getSectores"));
 
         case 4:
-          sectores = _context19.sent;
+          sectores = _context22.sent;
           selectElement = document.createElement("select");
           selectElement.id = "sectorNombre";
           selectElement.classList.add("form-select"); // Itera sobre la lista de sectores y agrega opciones al select
@@ -1978,7 +2120,7 @@ function generarCodigo() {
 
         case 18:
         case "end":
-          return _context19.stop();
+          return _context22.stop();
       }
     }
   });
@@ -2015,6 +2157,21 @@ medidorSinMedidor.onchange = function () {
   }
 };
 
+ipcRenderer.on("contrato-desde-socios", function _callee8(event, socioId, socioCedula) {
+  return regeneratorRuntime.async(function _callee8$(_context23) {
+    while (1) {
+      switch (_context23.prev = _context23.next) {
+        case 0:
+          console.log("Socio id recibido: " + socioId, socioCedula);
+          obtenerDatosSocioContratante(socioCedula);
+
+        case 2:
+        case "end":
+          return _context23.stop();
+      }
+    }
+  });
+});
 ipcRenderer.on("Notificar", function (event, response) {
   if (response.title === "Borrado!") {
     resetForm();
@@ -2044,15 +2201,15 @@ ipcRenderer.on("Notificar", function (event, response) {
 });
 
 function resetFormAfterUpdate() {
-  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context20) {
+  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context24) {
     while (1) {
-      switch (_context20.prev = _context20.next) {
+      switch (_context24.prev = _context24.next) {
         case 0:
-          _context20.next = 2;
+          _context24.next = 2;
           return regeneratorRuntime.awrap(getContratos());
 
         case 2:
-          _context20.next = 4;
+          _context24.next = 4;
           return regeneratorRuntime.awrap(getContratosSinMedidor());
 
         case 4:
@@ -2061,22 +2218,22 @@ function resetFormAfterUpdate() {
 
         case 6:
         case "end":
-          return _context20.stop();
+          return _context24.stop();
       }
     }
   });
 }
 
 function resetFormAfterSave() {
-  return regeneratorRuntime.async(function resetFormAfterSave$(_context21) {
+  return regeneratorRuntime.async(function resetFormAfterSave$(_context25) {
     while (1) {
-      switch (_context21.prev = _context21.next) {
+      switch (_context25.prev = _context25.next) {
         case 0:
-          _context21.next = 2;
+          _context25.next = 2;
           return regeneratorRuntime.awrap(getContratos());
 
         case 2:
-          _context21.next = 4;
+          _context25.next = 4;
           return regeneratorRuntime.awrap(getContratosSinMedidor());
 
         case 4:
@@ -2088,7 +2245,7 @@ function resetFormAfterSave() {
 
         case 6:
         case "end":
-          return _context21.stop();
+          return _context25.stop();
       }
     }
   });
@@ -2162,83 +2319,11 @@ btnSeccion2.addEventListener("click", function () {
 
 var abrirInicio = function abrirInicio() {
   var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context22) {
-    while (1) {
-      switch (_context22.prev = _context22.next) {
-        case 0:
-          url = "src/ui/principal.html";
-          _context22.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context22.stop();
-      }
-    }
-  });
-};
-
-var abrirSocios = function abrirSocios() {
-  var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context23) {
-    while (1) {
-      switch (_context23.prev = _context23.next) {
-        case 0:
-          url = "src/ui/socios.html";
-          _context23.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context23.stop();
-      }
-    }
-  });
-};
-
-var abrirUsuarios = function abrirUsuarios() {
-  var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context24) {
-    while (1) {
-      switch (_context24.prev = _context24.next) {
-        case 0:
-          url = "src/ui/usuarios.html";
-          _context24.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context24.stop();
-      }
-    }
-  });
-};
-
-var abrirPagos = function abrirPagos() {
-  var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context25) {
-    while (1) {
-      switch (_context25.prev = _context25.next) {
-        case 0:
-          url = "src/ui/planillas.html";
-          _context25.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context25.stop();
-      }
-    }
-  });
-};
-
-var abrirPlanillas = function abrirPlanillas() {
-  var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context26) {
+  return regeneratorRuntime.async(function abrirInicio$(_context26) {
     while (1) {
       switch (_context26.prev = _context26.next) {
         case 0:
-          url = "src/ui/planillas.html";
+          url = "src/ui/principal.html";
           _context26.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -2250,13 +2335,13 @@ var abrirPlanillas = function abrirPlanillas() {
   });
 };
 
-var abrirParametros = function abrirParametros() {
+var abrirSocios = function abrirSocios() {
   var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context27) {
+  return regeneratorRuntime.async(function abrirSocios$(_context27) {
     while (1) {
       switch (_context27.prev = _context27.next) {
         case 0:
-          url = "src/ui/parametros.html";
+          url = "src/ui/socios.html";
           _context27.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -2268,13 +2353,13 @@ var abrirParametros = function abrirParametros() {
   });
 };
 
-var abrirImplementos = function abrirImplementos() {
+var abrirUsuarios = function abrirUsuarios() {
   var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context28) {
+  return regeneratorRuntime.async(function abrirUsuarios$(_context28) {
     while (1) {
       switch (_context28.prev = _context28.next) {
         case 0:
-          url = "src/ui/implementos.html";
+          url = "src/ui/usuarios.html";
           _context28.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -2286,19 +2371,91 @@ var abrirImplementos = function abrirImplementos() {
   });
 };
 
-var abrirContratos = function abrirContratos() {
+var abrirPagos = function abrirPagos() {
   var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context29) {
+  return regeneratorRuntime.async(function abrirPagos$(_context29) {
     while (1) {
       switch (_context29.prev = _context29.next) {
         case 0:
-          url = "src/ui/medidores.html";
+          url = "src/ui/planillas.html";
           _context29.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
         case 3:
         case "end":
           return _context29.stop();
+      }
+    }
+  });
+};
+
+var abrirPlanillas = function abrirPlanillas() {
+  var url;
+  return regeneratorRuntime.async(function abrirPlanillas$(_context30) {
+    while (1) {
+      switch (_context30.prev = _context30.next) {
+        case 0:
+          url = "src/ui/planillas.html";
+          _context30.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context30.stop();
+      }
+    }
+  });
+};
+
+var abrirParametros = function abrirParametros() {
+  var url;
+  return regeneratorRuntime.async(function abrirParametros$(_context31) {
+    while (1) {
+      switch (_context31.prev = _context31.next) {
+        case 0:
+          url = "src/ui/parametros.html";
+          _context31.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context31.stop();
+      }
+    }
+  });
+};
+
+var abrirImplementos = function abrirImplementos() {
+  var url;
+  return regeneratorRuntime.async(function abrirImplementos$(_context32) {
+    while (1) {
+      switch (_context32.prev = _context32.next) {
+        case 0:
+          url = "src/ui/implementos.html";
+          _context32.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context32.stop();
+      }
+    }
+  });
+};
+
+var abrirContratos = function abrirContratos() {
+  var url;
+  return regeneratorRuntime.async(function abrirContratos$(_context33) {
+    while (1) {
+      switch (_context33.prev = _context33.next) {
+        case 0:
+          url = "src/ui/medidores.html";
+          _context33.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context33.stop();
       }
     }
   });

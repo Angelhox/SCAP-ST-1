@@ -362,6 +362,15 @@ ipcMain.on(
     );
   }
 );
+ipcMain.on("contrato-desde-socios", async (event, socioId, socioCedula) => {
+  console.log("Datos a enviar: " + socioId, socioCedula);
+
+  // pagina2Window = new BrowserWindow({ show: false });
+  await window.loadFile("src/ui/contratos.html");
+  // window.send("datos-a-pagina2", datos);
+  await window.show();
+  await window.webContents.send("contrato-desde-socios", socioId, socioCedula);
+});
 // Recibe la peticion de la pagina de planillas para
 // enviar a la pagina de servicios.
 // ipcMain.on("datos-a-servicios", async (event, servicio) => {
@@ -1156,48 +1165,99 @@ ipcMain.handle("createCuotas", async (event, cuota) => {
     console.log(error);
   }
 });
-ipcMain.handle("createServicioContratado", async (event, contratar) => {
-  try {
-    const conn = await getConnection();
-    console.log("Recibido: ", contratar);
-    const contratadoExiste = await conn.query(
-      "SELECT count(id) as existe FROM serviciosContratados WHERE " +
-        "serviciosId= " +
-        contratar.serviciosId +
-        " AND " +
-        "contratosId= " +
-        contratar.contratosId +
-        ";"
-    );
-    if (!contratadoExiste[0].existe > 0) {
-      const resultServicio = await conn.query(
-        "INSERT INTO serviciosContratados set ?;",
-        contratar
-      );
-      console.log(resultServicio);
-      event.sender.send("Notificar", {
-        success: true,
-        title: "Guardado!",
-        message: "Contratado.",
-      });
-      contratar.id = resultServicio.insertId;
-      return resultServicio;
-    } else {
+ipcMain.handle(
+  "createServicioContratado",
+  async (event, contratar, socioId, individualSn) => {
+    try {
+      const conn = await getConnection();
+      console.log("Recibido: ", contratar, " ", individualSn);
+
+      if (individualSn == "No") {
+        console.log("No es individual ");
+        // consultamos si ya existe un contrato con el id del socio que presente este valor
+        const socioContratanteExiste = await conn.query(
+          "SELECT * FROM viewServiciosContratados WHERE serviciosId=" +
+            contratar.serviciosId +
+            " AND sociosId=" +
+            socioId +
+            " ;"
+        );
+        if (!socioContratanteExiste.length > 0) {
+          console.log("No lo encontro");
+          const contratadoExiste = await conn.query(
+            "SELECT count(id) as existe FROM serviciosContratados WHERE " +
+              "serviciosId= " +
+              contratar.serviciosId +
+              " AND " +
+              "contratosId= " +
+              contratar.contratosId +
+              ";"
+          );
+          if (!contratadoExiste[0].existe > 0) {
+            const resultServicio = await conn.query(
+              "INSERT INTO serviciosContratados set ?;",
+              contratar
+            );
+            console.log(resultServicio);
+            event.sender.send("Notificar", {
+              success: true,
+              title: "Guardado!",
+              message: "Contratado.",
+            });
+            contratar.id = resultServicio.insertId;
+            return resultServicio;
+          } else {
+            event.sender.send("Notificar", {
+              success: false,
+              title: "Error!",
+              message: "El servicio ya ha sido registrado en este contrato.",
+            });
+          }
+        }
+      } else {
+        console.log("Es individual");
+
+        const contratadoExiste = await conn.query(
+          "SELECT count(id) as existe FROM serviciosContratados WHERE " +
+            "serviciosId= " +
+            contratar.serviciosId +
+            " AND " +
+            "contratosId= " +
+            contratar.contratosId +
+            ";"
+        );
+        if (!contratadoExiste[0].existe > 0) {
+          const resultServicio = await conn.query(
+            "INSERT INTO serviciosContratados set ?;",
+            contratar
+          );
+          console.log(resultServicio);
+          event.sender.send("Notificar", {
+            success: true,
+            title: "Guardado!",
+            message: "Contratado.",
+          });
+          contratar.id = resultServicio.insertId;
+          return resultServicio;
+        } else {
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "El servicio ya ha sido registrado en este contrato.",
+          });
+        }
+      }
+    } catch (error) {
       event.sender.send("Notificar", {
         success: false,
         title: "Error!",
-        message: "El servicio ya ha sido registrado en este contrato.",
+        message: "Ha ocurrido un error al contratar.",
       });
+      console.log(error);
     }
-  } catch (error) {
-    event.sender.send("Notificar", {
-      success: false,
-      title: "Error!",
-      message: "Ha ocurrido un error al contratar.",
-    });
-    console.log(error);
   }
-});
+);
+
 ipcMain.handle("deleteContratadoDetalle", async (event, descontratar) => {
   let canceladoSn = false;
   let cancelados = 0;
@@ -1464,29 +1524,6 @@ ipcMain.handle("getMedidorById", async (event, id) => {
 //   }
 //   return result[0];
 // });
-ipcMain.handle("getDatosContratosById", async (event, id) => {
-  const conn = await getConnection();
-  var mensaje = "NM: ";
-  var result = "";
-  result = await conn.query(
-    "SELECT * FROM viewcontratosconmedidor where id=" + id + ";"
-  );
-
-  if (!result.length == 0) {
-    mensaje = "Datos contrato con medidor: ";
-  } else {
-    result = await conn.query(
-      "SELECT * FROM viewcontratossinmedidor where id=" + id + ";"
-    );
-    if (!result.length == 0) {
-      mensaje = "Datos contrato sin medidor: ";
-    } else {
-      mensaje = "No se encontraron datos: ";
-    }
-  }
-  console.log(mensaje, result[0]);
-  return result[0];
-});
 
 ipcMain.handle("deleteMedidor", async (event, id) => {
   console.log("id from main.js: ", id);
@@ -1596,6 +1633,15 @@ ipcMain.handle("createContrato", async (event, contrato, numero, sectorId) => {
   try {
     console.log("Recibido:", event, contrato, numero, sectorId);
     const conn = await getConnection();
+    const contratosAnteriores = await conn.query(
+      "SELECT * FROM contratos WHERE  sociosId= ?",
+      contrato.sociosId
+    );
+    if (contratosAnteriores.length > 0) {
+      contrato.principalSn = "No";
+    } else {
+      contrato.principalSn = "Si";
+    }
     console.log("Recibido: ", contrato);
     const result = await conn.query("Insert into contratos set ?", contrato);
     sumarSociosSectores(numero, sectorId);
@@ -1605,10 +1651,7 @@ ipcMain.handle("createContrato", async (event, contrato, numero, sectorId) => {
       title: "Guardado!",
       message: "Se ha registrado el nuevo contrato.",
     });
-    // new Notification({
-    //   title: "Registró guardado",
-    //   body: "Se registró un nuevo contrato con éxito",
-    // }).show();
+
     contrato.id = result.insertId;
     return contrato;
   } catch (error) {
@@ -1620,7 +1663,61 @@ ipcMain.handle("createContrato", async (event, contrato, numero, sectorId) => {
     });
   }
 });
+ipcMain.handle("getDatosContratosById", async (event, id) => {
+  const conn = await getConnection();
+  var mensaje = "NM: ";
+  var result = "";
+  result = await conn.query(
+    "SELECT * FROM viewcontratosconmedidor where id=" + id + ";"
+  );
 
+  if (!result.length == 0) {
+    mensaje = "Datos contrato con medidor: ";
+  } else {
+    result = await conn.query(
+      "SELECT * FROM viewcontratossinmedidor where id=" + id + ";"
+    );
+    if (!result.length == 0) {
+      mensaje = "Datos contrato sin medidor: ";
+    } else {
+      mensaje = "No se encontraron datos: ";
+    }
+  }
+  console.log(mensaje, result[0]);
+  return result[0];
+});
+ipcMain.handle("updatePrincipal", async (event, contratoId, socioId) => {
+  try {
+    const conn = await getConnection();
+    const resultSecundarios = await conn.query(
+      "UPDATE contratos SET principalSn='No' WHERE NOT contratos.id=" +
+        contratoId +
+        " AND contratos.sociosId=" +
+        socioId +
+        " ;"
+    );
+    const resultPrincipales = await conn.query(
+      "UPDATE contratos SET principalSn='Si' WHERE contratos.id=" +
+        contratoId +
+        " AND contratos.sociosId=" +
+        socioId +
+        " ;"
+    );
+    event.sender.send("Notificar", {
+      success: true,
+      title: "Actualizado!",
+      message: "Se han actualizado el registro del contrato.",
+    });
+    return contratoId;
+  } catch (error) {
+    event.sender.send("Notificar", {
+      success: false,
+      title: "Error!",
+      message: "Ha ocurrido un error al actualizar el contrato.",
+    });
+    console.log(error);
+  }
+});
 async function sumarSociosSectores(numero, sectorId) {
   console.log("Recibido sectores: " + numero + " " + sectorId);
   try {
@@ -1858,7 +1955,7 @@ ipcMain.handle("createPlanilla", async (event) => {
   try {
     // Consultamos cuales son los medidores que se encuentran activos para crear el registro de lecturas
     medidoresActivos = await conn.query(
-      "select medidores.id,medidores.codigo,medidores.fechaInstalacion,contratos.id as contratosId " +
+      "select medidores.id,medidores.codigo,medidores.fechaInstalacion,contratos.id as contratosId,contratos.medidorSn " +
         "from medidores join contratos on contratos.id=medidores.contratosId " +
         "where contratos.estado='Activo'; "
       // "where contratos.medidorSn='Si' AND contratos.estado='Activo'; "
@@ -1943,7 +2040,7 @@ ipcMain.handle("createPlanilla", async (event) => {
             const newPlanilla = {
               //fechaEmision: "now()",
               valor: 0.0,
-              estado: "NA",
+              estado: "Por cobrar",
               lecturaActual: 0.0,
               lecturaAnterior: lecturaAnterior,
               Observacion: "NA",
@@ -2067,6 +2164,7 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
       let totalPagar =
         servicioContratado.valorIndividual - servicioContratado.descuentoValor;
       let newDetalleServicios = {};
+      let saldo = 0;
 
       // if (servicioContratado.valoresDistintos === "Si") {
       if (servicioContratado.aplazableSn === "Si") {
@@ -2084,6 +2182,7 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
             //Sumo los valores aplicados
             abonado += aplicadoAnterior.abono;
             abonosAplicados++;
+            // saldo=aplicadoAnterior.saldo;
           });
           // total = servicioContratado.valorIndividual;
 
@@ -2106,6 +2205,7 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
 
               abono = faltante;
             }
+            saldo = totalPagar - abonado;
             // valorPagos = servicioContratado.valorPagosindividual;
             newDetalleServicios = {
               serviciosContratadosId: servicioContratado.id,
@@ -2114,7 +2214,7 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
               total: totalPagar,
               // El saldo debe ser calculado
               // saldo: total - servicioContratado.valorDescuento,
-              saldo: totalPagar - abonado,
+              saldo: saldo - abono,
               // El abono debe ser calculado
               abono: abono,
               encabezadosId: encabezadoId,
@@ -2217,38 +2317,152 @@ ipcMain.handle(
     );
     try {
       const conn = await getConnection();
-      if (estado === "all" || estado == undefined) {
-        estado = "";
+      if (estado == undefined) {
+        estado = "Por cobrar";
       }
-      if (criterio === "all" || criterio == undefined) {
-        const results = await conn.query(
-          "SELECT * FROM viewPlanillas WHERE " +
-            "estado='" +
-            estado +
-            "' and " +
-            " year(fechaEmision) = '" +
-            anio +
-            "' and month(fechaEmision) = '" +
-            mes +
-            "' order by fechaEmision desc"
-        );
-        console.log(results);
-        return results;
+      if (criterio == undefined) {
+        criterio = "all";
+      }
+      if (anio == undefined) {
+        anio = "all";
+      }
+      if (mes == undefined) {
+        mes = "all";
+      }
+      if (criterio == "all") {
+        if (anio == "all" && mes == "all") {
+          console.log("anio all mes all");
+          const results = await conn.query(
+            "SELECT * FROM viewPlanillas WHERE " +
+              "estado='" +
+              estado +
+              "' order by fechaEmision desc"
+          );
+          console.log(results);
+          return results;
+        } else if (anio == "all" && mes !== "all") {
+          console.log("anio all mes df", mes);
+          const results = await conn.query(
+            "SELECT * FROM viewPlanillas WHERE " +
+              "estado='" +
+              estado +
+              "' and month(fechaEmision) = '" +
+              mes +
+              "' order by fechaEmision desc ;"
+          );
+          console.log(results);
+          return results;
+        } else if (anio !== "all" && mes == "all") {
+          console.log("mes all anio df", anio);
+          const results = await conn.query(
+            "SELECT * FROM viewPlanillas WHERE " +
+              "estado='" +
+              estado +
+              "' and " +
+              " year(fechaEmision) = '" +
+              anio +
+              "' order by fechaEmision desc ;"
+          );
+          console.log(results);
+          return results;
+        } else if (anio !== "all" && mes !== "all") {
+          console.log("mes df anio df ", mes, anio);
+          const results = await conn.query(
+            "SELECT * FROM viewPlanillas WHERE " +
+              "estado='" +
+              estado +
+              "' and " +
+              " year(fechaEmision) = '" +
+              anio +
+              "' and month(fechaEmision) = '" +
+              mes +
+              "' order by fechaEmision desc ;"
+          );
+          console.log(results);
+          return results;
+        }
       } else {
-        const results = await conn.query(
-          "SELECT * FROM viewPlanillas WHERE " +
-            criterio +
-            " = " +
-            criterioContent +
-            " and estado='" +
-            estado +
-            "' and " +
-            " year(fechaEmision) = '" +
-            anio +
-            "' and month(fechaEmision) = '" +
-            mes +
-            "' order by fechaEmision desc"
-        );
+        if (anio == "all" && mes == "all") {
+          console.log("C mes all anio all");
+          const results = await conn.query(
+            "SELECT * FROM viewPlanillas WHERE " +
+              criterio +
+              " like '%" +
+              criterioContent +
+              "%' and estado='" +
+              estado +
+              "' order by fechaEmision desc ;"
+          );
+          console.log(results);
+          return results;
+        } else if (anio == "all" && mes !== "all") {
+          console.log("C anio all mes df ", mes);
+          const results = await conn.query(
+            "SELECT * FROM viewPlanillas WHERE " +
+              criterio +
+              " like '%" +
+              criterioContent +
+              "%' and estado='" +
+              estado +
+              "' and month(fechaEmision) = '" +
+              mes +
+              "' order by fechaEmision desc ;"
+          );
+          console.log(results);
+          return results;
+        } else if (anio !== "all" && mes == "all") {
+          console.log("C anio df mes all ", anio);
+          const results = await conn.query(
+            "SELECT * FROM viewPlanillas WHERE " +
+              criterio +
+              " like '%" +
+              criterioContent +
+              "%' and estado='" +
+              estado +
+              "' and " +
+              " year(fechaEmision) = '" +
+              anio +
+              "' order by fechaEmision desc ;"
+          );
+          console.log(results);
+          return results;
+        } else if (anio !== "all" && mes !== "all") {
+          console.log("anio df mes df", anio, mes);
+          const results = await conn.query(
+            "SELECT * FROM viewPlanillas WHERE " +
+              criterio +
+              " like '%" +
+              criterioContent +
+              "%' and estado='" +
+              estado +
+              "' and " +
+              " year(fechaEmision) = '" +
+              anio +
+              "' and month(fechaEmision) = '" +
+              mes +
+              "' order by fechaEmision desc ;"
+          );
+          console.log(results);
+          return results;
+        } else {
+          Console.log("?");
+        }
+
+        // const results = await conn.query(
+        //   "SELECT * FROM viewPlanillas WHERE " +
+        //     criterio +
+        //     " = " +
+        //     criterioContent +
+        //     " and estado='" +
+        //     estado +
+        //     "' and " +
+        //     " year(fechaEmision) = '" +
+        //     anio +
+        //     "' and month(fechaEmision) = '" +
+        //     mes +
+        //     "' order by fechaEmision desc"
+        // );
+        // results = await conn.query("SELECT * FROM viewPlanillas");
         console.log("Con parametros", results);
         return results;
       }
@@ -2596,14 +2810,44 @@ ipcMain.handle("getMultasDescByPlanillaId", async (event, planillaId) => {
 });
 // Funcion que edita los valores permitidos de la planilla
 ipcMain.handle("updatePlanilla", async (event, id, planilla) => {
-  const conn = await getConnection();
-  console.log("Actualizando planilla: " + planilla);
-  const result = await conn.query("UPDATE planillas set ? where id = ?", [
-    planilla,
-    id,
-  ]);
-  console.log(result);
-  return result;
+  try {
+    const conn = await getConnection();
+    console.log("Actualizando planilla: " + planilla);
+    const planillaCancelada = await conn.query(
+      "SELECT planillas.estado FROM planillas WHERE planillas.id= " + id + " ;"
+    );
+    if (planillaCancelada[0] !== undefined) {
+      if (planillaCancelada[0].estado == "Cancelado") {
+        event.sender.send("Notificar", {
+          success: false,
+          title: "Error!",
+          message:
+            "Esta planilla ya ha sido cancelada, no puedes editar sus valores.",
+        });
+      } else {
+        const result = await conn.query("UPDATE planillas set ? where id = ?", [
+          planilla,
+          id,
+        ]);
+        console.log(result);
+        event.sender.send("Notificar", {
+          success: true,
+          title: "Actualizado!",
+          message: "Se ha hactualizado la planilla.",
+        });
+        return result;
+      }
+    } else {
+      event.sender.send("Notificar", {
+        success: false,
+        title: "Error!",
+        message:
+          "No existe una planilla, actualiza la lista de planillas e intentalo de nuevo.",
+      });
+    }
+  } catch (error) {
+    console.log("Error al actualizar planilla:", error);
+  }
 });
 // ----------------------------------------------------------------
 // Funciones de los parametros

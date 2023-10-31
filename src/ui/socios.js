@@ -22,6 +22,7 @@ const socioCasa = document.getElementById("numerocasa");
 const socioReferencia = document.getElementById("referencia");
 const sociosList = document.getElementById("socios");
 const buscarSocios = document.getElementById("buscarSocios");
+const crearContrato = document.getElementById("crearContrato");
 const criterio = document.getElementById("criterio");
 const criterioContent = document.getElementById("criterio-content");
 let socios = [];
@@ -154,8 +155,7 @@ socioForm.addEventListener("submit", async (e) => {
             editSocioId,
             newSocio
           );
-          editingStatus = false;
-          editSocioId = "";
+
           console.log(result);
         }
       });
@@ -164,15 +164,17 @@ socioForm.addEventListener("submit", async (e) => {
 });
 function renderSocios(socios) {
   sociosList.innerHTML = "";
+  let indice = 0;
   socios.forEach((socio) => {
+    indice++;
     var telefonoValido = socio.telefonoMovil;
     if (telefonoValido == null || telefonoValido == " ") {
       telefonoValido = socio.telefonoFijo;
     }
     sociosList.innerHTML += `
-       <tr>
-   
-       <td>${socio.primerApellido + " " + socio.segundoApellido}</td>
+       <tr onclick="seleccionarFila('${socio.id}',this)" >
+   <td>${indice}</td>
+       <td >${socio.primerApellido + " " + socio.segundoApellido}</td>
       <td>${socio.primerNombre + " " + socio.segundoNombre}</td>
       <td>${socio.cedulaPasaporte}</td>
       <td>${telefonoValido}</td>
@@ -302,6 +304,24 @@ function calcularEdad(fechaNacimiento) {
 
   return edad;
 }
+function seleccionarFila(id, fila) {
+  // Deseleccionar filas previamente seleccionadas
+  editSocio(id);
+  const filas = document.querySelectorAll("tr");
+  filas.forEach((fila) => {
+    fila.classList.remove("seleccionada");
+  });
+  // Marcar la fila actual como seleccionada
+  fila.classList.add("seleccionada");
+}
+crearContrato.onclick = async () => {
+  if (editingStatus && editSocioId !== "") {
+    let cedulaEnviar=socioCedula.value;
+    await ipcRenderer.send("contrato-desde-socios", editSocioId,cedulaEnviar);
+  } else {
+    console.log("Socio no seleccionado");
+  }
+};
 ipcRenderer.on("Notificar", (event, response) => {
   if (response.title === "Borrado!") {
     resetFormAfterSave();
@@ -330,10 +350,10 @@ ipcRenderer.on("Notificar", (event, response) => {
   }
 });
 async function resetFormAfterUpdate() {
+  console.log("Reseteando despues de update");
   let criterioBuscar = criterio.value;
   let criterioContentBuscar = criterioContent.value;
   console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
-  console;
   await getSocios(criterioBuscar, criterioContentBuscar);
   socioPrimerNombre.focus();
   mensajeError.textContent = "";

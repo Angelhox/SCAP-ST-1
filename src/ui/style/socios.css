@@ -51,7 +51,10 @@ th {
     z-index: 1;
     /* Asegura que el encabezado esté por encima de las celdas */
 }
+.seleccionada td {
 
+    background-color: #85C1E9; /* Puedes ajustar el color según tus preferencias */
+  }
 ::-webkit-scrollbar {
     width: 10px;
     /* Ancho de la barra de desplazamiento*/

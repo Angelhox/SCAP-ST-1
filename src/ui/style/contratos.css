@@ -266,7 +266,7 @@ font-weight: 500;
 }
 
 .btn-check-custom {
-    display: inline-block;
+ width: 100rem;
     padding: 0.375rem 0.75rem;
     font-size: 1rem;
     line-height: 1.5;
@@ -280,6 +280,7 @@ font-weight: 500;
 /* Estilo para ocultar el input nativo del checkbox */
 .custom-checkbox {
     display: none;
+
 }
 
 /* Estilo para el checkbox personalizado cuando está marcado */

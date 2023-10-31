@@ -6,19 +6,23 @@
 } */
 
 .card-planilla {
-    /* max-width: 28rem; */
+    height: 80rem;
 }
 
 .header-planilla {
     font-size: 100%;
     font-weight: 500;
-    color: white;
+    color: black;
 
 }
 
 .header-planilla p {
-    font-size: 100%;
-    color: black;
+    font-size: 100%
+}
+
+.title-contrato {
+    color: rgb(255, 255, 255);
+    padding-top: .05em;
 }
 
 .positive {
@@ -44,25 +48,21 @@
 
 .titulo-socio {
     align-items: baseline;
+
 }
 
-.titulo-socio p {
-
+.titulos {
     margin: 0;
     padding: 0;
-    font-size: 1.21m;
     font-weight: 500;
 }
 
-.titulo-socio h5 {
-    margin: 0;
-    padding: 0;
-}
 
 .titulo-servicios-positive {
     color: #F1948A;
     font-weight: 600;
     border-bottom: 1px solid #85C1E9;
+    padding: .5em 0 0 0;
 }
 
 .titulo-servicios-negative {
@@ -124,6 +124,25 @@
     /* Cambia el color de fondo al pasar el ratón por encima */
 }
 
+.btn-cancelar {
+   
+    background-color:  #F1948A ;
+    padding: 0 1em;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    /* Quita el outline predeterminado */
+    transition: background-color 0.3s;
+    /* Agrega una transición suave al color de fondo */
+}
+
+.btn-cancelar:hover {
+    background-color:#f2f2f2;
+    color: rgb(0,0,0);
+    /* Cambia el color de fondo al pasar el ratón por encima */
+}
 .encabezado-planilla {
     padding: 1em 1em 0 1em;
     background-color: #85C1E9;

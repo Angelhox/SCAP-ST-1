@@ -27,6 +27,7 @@ var socioCasa = document.getElementById("numerocasa");
 var socioReferencia = document.getElementById("referencia");
 var sociosList = document.getElementById("socios");
 var buscarSocios = document.getElementById("buscarSocios");
+var crearContrato = document.getElementById("crearContrato");
 var criterio = document.getElementById("criterio");
 var criterioContent = document.getElementById("criterio-content");
 var socios = [];
@@ -233,7 +234,7 @@ socioForm.addEventListener("submit", function _callee2(e) {
                 switch (_context.prev = _context.next) {
                   case 0:
                     if (!result.isConfirmed) {
-                      _context.next = 7;
+                      _context.next = 5;
                       break;
                     }
 
@@ -242,11 +243,9 @@ socioForm.addEventListener("submit", function _callee2(e) {
 
                   case 3:
                     _result = _context.sent;
-                    editingStatus = false;
-                    editSocioId = "";
                     console.log(_result);
 
-                  case 7:
+                  case 5:
                   case "end":
                     return _context.stop();
                 }
@@ -264,14 +263,16 @@ socioForm.addEventListener("submit", function _callee2(e) {
 
 function renderSocios(socios) {
   sociosList.innerHTML = "";
+  var indice = 0;
   socios.forEach(function (socio) {
+    indice++;
     var telefonoValido = socio.telefonoMovil;
 
     if (telefonoValido == null || telefonoValido == " ") {
       telefonoValido = socio.telefonoFijo;
     }
 
-    sociosList.innerHTML += "\n       <tr>\n   \n       <td>".concat(socio.primerApellido + " " + socio.segundoApellido, "</td>\n      <td>").concat(socio.primerNombre + " " + socio.segundoNombre, "</td>\n      <td>").concat(socio.cedulaPasaporte, "</td>\n      <td>").concat(telefonoValido, "</td>\n      <td>").concat(socio.correo, "</td>\n      <td>").concat(calcularEdad(socio.fechaNacimiento), "</td>\n      <td>").concat(socio.provincia + ", " + socio.canton + ", " + socio.parroquia + ", " + socio.barrio, "</td>\n      <td>\n      <button onclick=\"deleteSocio('").concat(socio.id, "','").concat(socio.primerNombre + " " + socio.primerApellido + " " + socio.segundoApellido, "')\" class=\"btn \"> \n      <i class=\"fa-solid fa-user-minus\"></i>\n      </button>\n      </td>\n      <td>\n      <button onclick=\"editSocio('").concat(socio.id, "')\" class=\"btn \">\n      <i class=\"fa-solid fa-user-pen\"></i>\n      </button>\n      </td>\n   </tr>\n      ");
+    sociosList.innerHTML += "\n       <tr onclick=\"seleccionarFila('".concat(socio.id, "',this)\" >\n   <td>").concat(indice, "</td>\n       <td >").concat(socio.primerApellido + " " + socio.segundoApellido, "</td>\n      <td>").concat(socio.primerNombre + " " + socio.segundoNombre, "</td>\n      <td>").concat(socio.cedulaPasaporte, "</td>\n      <td>").concat(telefonoValido, "</td>\n      <td>").concat(socio.correo, "</td>\n      <td>").concat(calcularEdad(socio.fechaNacimiento), "</td>\n      <td>").concat(socio.provincia + ", " + socio.canton + ", " + socio.parroquia + ", " + socio.barrio, "</td>\n      <td>\n      <button onclick=\"deleteSocio('").concat(socio.id, "','").concat(socio.primerNombre + " " + socio.primerApellido + " " + socio.segundoApellido, "')\" class=\"btn \"> \n      <i class=\"fa-solid fa-user-minus\"></i>\n      </button>\n      </td>\n      <td>\n      <button onclick=\"editSocio('").concat(socio.id, "')\" class=\"btn \">\n      <i class=\"fa-solid fa-user-pen\"></i>\n      </button>\n      </td>\n   </tr>\n      ");
   });
 }
 
@@ -481,6 +482,47 @@ function calcularEdad(fechaNacimiento) {
   return edad;
 }
 
+function seleccionarFila(id, fila) {
+  // Deseleccionar filas previamente seleccionadas
+  editSocio(id);
+  var filas = document.querySelectorAll("tr");
+  filas.forEach(function (fila) {
+    fila.classList.remove("seleccionada");
+  }); // Marcar la fila actual como seleccionada
+
+  fila.classList.add("seleccionada");
+}
+
+crearContrato.onclick = function _callee6() {
+  var cedulaEnviar;
+  return regeneratorRuntime.async(function _callee6$(_context10) {
+    while (1) {
+      switch (_context10.prev = _context10.next) {
+        case 0:
+          if (!(editingStatus && editSocioId !== "")) {
+            _context10.next = 6;
+            break;
+          }
+
+          cedulaEnviar = socioCedula.value;
+          _context10.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("contrato-desde-socios", editSocioId, cedulaEnviar));
+
+        case 4:
+          _context10.next = 7;
+          break;
+
+        case 6:
+          console.log("Socio no seleccionado");
+
+        case 7:
+        case "end":
+          return _context10.stop();
+      }
+    }
+  });
+};
+
 ipcRenderer.on("Notificar", function (event, response) {
   if (response.title === "Borrado!") {
     resetFormAfterSave();
@@ -513,15 +555,15 @@ ipcRenderer.on("Notificar", function (event, response) {
 
 function resetFormAfterUpdate() {
   var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context10) {
+  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context11) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context11.prev = _context11.next) {
         case 0:
+          console.log("Reseteando despues de update");
           criterioBuscar = criterio.value;
           criterioContentBuscar = criterioContent.value;
           console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
-          console;
-          _context10.next = 6;
+          _context11.next = 6;
           return regeneratorRuntime.awrap(getSocios(criterioBuscar, criterioContentBuscar));
 
         case 6:
@@ -530,7 +572,7 @@ function resetFormAfterUpdate() {
 
         case 8:
         case "end":
-          return _context10.stop();
+          return _context11.stop();
       }
     }
   });
@@ -538,15 +580,15 @@ function resetFormAfterUpdate() {
 
 function resetFormAfterSave() {
   var criterioBuscar, criterioContentBuscar;
-  return regeneratorRuntime.async(function resetFormAfterSave$(_context11) {
+  return regeneratorRuntime.async(function resetFormAfterSave$(_context12) {
     while (1) {
-      switch (_context11.prev = _context11.next) {
+      switch (_context12.prev = _context12.next) {
         case 0:
           criterioBuscar = criterio.value;
           criterioContentBuscar = criterioContent.value;
           console.log("Buscando: " + criterioBuscar + "|" + criterioContentBuscar);
           console;
-          _context11.next = 6;
+          _context12.next = 6;
           return regeneratorRuntime.awrap(getSocios(criterioBuscar, criterioContentBuscar));
 
         case 6:
@@ -558,7 +600,7 @@ function resetFormAfterSave() {
 
         case 11:
         case "end":
-          return _context11.stop();
+          return _context12.stop();
       }
     }
   });
@@ -588,29 +630,11 @@ function imprimir() {
 
 var abrirInicio = function abrirInicio() {
   var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context12) {
-    while (1) {
-      switch (_context12.prev = _context12.next) {
-        case 0:
-          url = "src/ui/principal.html";
-          _context12.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context12.stop();
-      }
-    }
-  });
-};
-
-var abrirSocios = function abrirSocios() {
-  var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context13) {
+  return regeneratorRuntime.async(function abrirInicio$(_context13) {
     while (1) {
       switch (_context13.prev = _context13.next) {
         case 0:
-          url = "src/ui/socios.html";
+          url = "src/ui/principal.html";
           _context13.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -622,13 +646,13 @@ var abrirSocios = function abrirSocios() {
   });
 };
 
-var abrirUsuarios = function abrirUsuarios() {
+var abrirSocios = function abrirSocios() {
   var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context14) {
+  return regeneratorRuntime.async(function abrirSocios$(_context14) {
     while (1) {
       switch (_context14.prev = _context14.next) {
         case 0:
-          url = "src/ui/usuarios.html";
+          url = "src/ui/socios.html";
           _context14.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -640,13 +664,13 @@ var abrirUsuarios = function abrirUsuarios() {
   });
 };
 
-var abrirPagos = function abrirPagos() {
+var abrirUsuarios = function abrirUsuarios() {
   var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context15) {
+  return regeneratorRuntime.async(function abrirUsuarios$(_context15) {
     while (1) {
       switch (_context15.prev = _context15.next) {
         case 0:
-          url = "src/ui/planillas.html";
+          url = "src/ui/usuarios.html";
           _context15.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -658,13 +682,13 @@ var abrirPagos = function abrirPagos() {
   });
 };
 
-var abrirPlanillas = function abrirPlanillas() {
+var abrirPagos = function abrirPagos() {
   var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context16) {
+  return regeneratorRuntime.async(function abrirPagos$(_context16) {
     while (1) {
       switch (_context16.prev = _context16.next) {
         case 0:
-          url = "src/ui/planillas-cuotas.html";
+          url = "src/ui/planillas.html";
           _context16.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -676,13 +700,13 @@ var abrirPlanillas = function abrirPlanillas() {
   });
 };
 
-var abrirParametros = function abrirParametros() {
+var abrirPlanillas = function abrirPlanillas() {
   var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context17) {
+  return regeneratorRuntime.async(function abrirPlanillas$(_context17) {
     while (1) {
       switch (_context17.prev = _context17.next) {
         case 0:
-          url = "src/ui/parametros.html";
+          url = "src/ui/planillas-cuotas.html";
           _context17.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -694,13 +718,13 @@ var abrirParametros = function abrirParametros() {
   });
 };
 
-var abrirImplementos = function abrirImplementos() {
+var abrirParametros = function abrirParametros() {
   var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context18) {
+  return regeneratorRuntime.async(function abrirParametros$(_context18) {
     while (1) {
       switch (_context18.prev = _context18.next) {
         case 0:
-          url = "src/ui/implementos.html";
+          url = "src/ui/parametros.html";
           _context18.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -712,19 +736,37 @@ var abrirImplementos = function abrirImplementos() {
   });
 };
 
-var abrirContratos = function abrirContratos() {
+var abrirImplementos = function abrirImplementos() {
   var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context19) {
+  return regeneratorRuntime.async(function abrirImplementos$(_context19) {
     while (1) {
       switch (_context19.prev = _context19.next) {
         case 0:
-          url = "src/ui/medidores.html";
+          url = "src/ui/implementos.html";
           _context19.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
         case 3:
         case "end":
           return _context19.stop();
+      }
+    }
+  });
+};
+
+var abrirContratos = function abrirContratos() {
+  var url;
+  return regeneratorRuntime.async(function abrirContratos$(_context20) {
+    while (1) {
+      switch (_context20.prev = _context20.next) {
+        case 0:
+          url = "src/ui/medidores.html";
+          _context20.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context20.stop();
       }
     }
   });

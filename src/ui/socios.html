@@ -193,7 +193,7 @@
         </div>
         <!-- Tabla de listado de usuarios -->
         <div style="width: 100%; height: 100%; overflow-y: auto">
-          <table class="table">
+          <table class="table table-hover">
             <thead class="table-dark">
               <!-- <tr>
                 <th colspan="9" class="text-center fs-4">
@@ -202,6 +202,7 @@
                 </th>
               </tr> -->
               <tr>
+                <th class="text-center">#</th>
                 <th>Nombres</th>
                 <th>Apellidos</th>
                 <th>Cédula</th>
@@ -583,14 +584,15 @@
 
           <div class="col-12 d-flex justify-content-end">
             <div id="mensajeError" class="fs-6"></div>
-            <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
             <button
               type="button"
-              onclick="imprimir()"
+            id="crearContrato"
               class="btn btn-primary mx-2 rounded-2"
             >
-              imprimir
+              Crear Contrato
             </button>
+            <button class="btn btn-primary mx-2 rounded-2">Guardar</button>
+
             <button
               type="button"
               onclick="resetForm()"

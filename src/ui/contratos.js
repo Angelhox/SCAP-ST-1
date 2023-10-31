@@ -18,6 +18,7 @@ const contratoCodigo = document.getElementById("codigocontrato");
 const contratoFecha = document.getElementById("fechaContrato");
 const contratoEstado = document.getElementById("estadoContrato");
 const labelEstadoContrato = document.getElementById("labelEstadoContrato");
+const contratoPrincipalSn = document.getElementById("principalSn");
 //Indica si se ha seleccionado el servicio de agua con medidor
 var contratoConMedidor = false;
 // Tabla de contratos con medidor
@@ -230,7 +231,8 @@ contratoForm.addEventListener("submit", async (e) => {
       var callePrincipalDf = "SN";
       var calleSecundariaDf = "SN";
       var numeroCasaDf = "SN";
-      var observacionDf = "SN";
+      var observacionDf = "NA";
+      var principalDf = "Si";
       if (contratoConMedidor) {
         medidorDf = "Si";
       }
@@ -249,6 +251,10 @@ contratoForm.addEventListener("submit", async (e) => {
       if (!validator.isEmpty(medidorObservacion.value)) {
         observacionDf = medidorObservacion.value;
       }
+      if (!validator.isEmpty(contratoPrincipalSn.value)) {
+        principalDf = contratoPrincipalSn.value;
+      }
+
       newMedidor = {
         codigo: contratoCodigo.value,
         fechaInstalacion: medidorInstalacion.value,
@@ -272,6 +278,7 @@ contratoForm.addEventListener("submit", async (e) => {
         calleSecundaria: calleSecundariaDf,
         numeroCasa: numeroCasaDf,
         referencia: medidorReferencia.value,
+        principalSn: principalDf,
         // contratosId: contratoId,
       };
       const fakeMedidor = {
@@ -1243,6 +1250,7 @@ const detallesContratos = async (id) => {
 // el formulario para editarlos
 // ----------------------------------------------------------------
 const editContrato = async (id) => {
+  let principalSn = "undefined";
   contratoForm.reset();
   getServiciosDisponibles();
   const contrato = await ipcRenderer.invoke("getDatosContratosById", id);
@@ -1260,12 +1268,68 @@ const editContrato = async (id) => {
     socioContratanteNombre.value =
       contrato.primerNombre + " " + contrato.segundoNombre;
     contratoCodigo.value = contrato.codigo;
+    if (contrato.principalSn == "No") {
+      principalSn = "Secundario";
+      contratoPrincipalSn.value = principalSn;
+      contratoPrincipalSn.onclick = () => {
+        Swal.fire({
+          title: "¿Quieres realizar cambios?",
+          text:
+            "Este contrato es " +
+            principalSn +
+            " por lo que no presentara valores por socio " +
+            "puedes hacer de este un contrato principal actualizando el resto de contratos " +
+            "de este socio a secundarios.",
+          icon: "question",
+          iconColor: "#f8c471",
+          showCancelButton: true,
+          confirmButtonColor: "#2874A6",
+          cancelButtonColor: "#EC7063 ",
+          confirmButtonText: "Cambiar a principal",
+          cancelButtonText: "Cancelar",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: "Quieres confirmar esta accion?",
+              text: "Actualizaremos este contrato como principal.",
+              showCancelButton: true,
+              confirmButtonText: "Aceptar",
+              cancelButtonText: `Cancelar`,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                cambiarContratoPrincipal(contrato.id, contrato.sociosId);
+              }
+            });
+          }
+        });
+      };
+    } else {
+      principalSn = "Principal";
+      contratoPrincipalSn.value = principalSn;
+      // ----------------------------------------------------------------
+      // Cambiar el contrato principal.
+      // ----------------------------------------------------------------
+      contratoPrincipalSn.onclick = () => {
+        Swal.fire({
+          title: "Contrato principal",
+          text:
+            "Los valores por socio se" +
+            "cargaran en las planillas de este contrato.",
+          icon: "info",
+          iconColor: "green",
+          showConfirmButton: true,
+          confirmButtonText: "Sandy",
+          confirmButtonColor: "green",
+        });
+      };
+    }
+
     contratoConMedidor = true;
     //medidorCodigo.value = contrato.codigoMedidor;
     medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
     medidorMarca.value = contrato.marca;
     medidorObservacion.value = contrato.observacion;
-
     medidorBarrio.value = contrato.barrio;
     medidorPrincipal.value = contrato.callePrincipal;
     medidorSecundaria.value = contrato.calleSecundaria;
@@ -1292,32 +1356,68 @@ const editContrato = async (id) => {
     inHabilitarFormMedidor();
     contratoCodigo.value = contrato.codigo;
     contratoFecha.value = formatearFecha(contrato.fecha);
-
+    if (contrato.principalSn == "No") {
+      principalSn = "Secundario";
+      contratoPrincipalSn.value = principalSn;
+      contratoPrincipalSn.onclick = () => {
+        Swal.fire({
+          title: "¿Quieres realizar cambios?",
+          text:
+            "Este contrato es " +
+            principalSn +
+            " por lo que no presentara valores por socio " +
+            "puedes hacer de este un contrato principal actualizando el resto de contratos " +
+            "de este socio a secundarios.",
+          icon: "question",
+          iconColor: "#f8c471",
+          showCancelButton: true,
+          confirmButtonColor: "#2874A6",
+          cancelButtonColor: "#EC7063 ",
+          confirmButtonText: "Cambiar a principal",
+          cancelButtonText: "Cancelar",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: "Quieres confirmar esta accion?",
+              text: "Actualizaremos este contrato como principal.",
+              showCancelButton: true,
+              confirmButtonText: "Aceptar",
+              cancelButtonText: `Cancelar`,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                cambiarContratoPrincipal(contrato.id, contrato.sociosId);
+                // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+              }
+            });
+          }
+        });
+      };
+    } else {
+      principalSn = "Principal";
+      contratoPrincipalSn.value = principalSn;
+      // ----------------------------------------------------------------
+      // Cambiar el contrato principal.
+      // ----------------------------------------------------------------
+      contratoPrincipalSn.onclick = () => {
+        Swal.fire({
+          title: "Contrato principal",
+          text:
+            "Los valores por socio se" +
+            "cargaran en las planillas de este contrato.",
+          icon: "info",
+          iconColor: "green",
+          showConfirmButton: true,
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "green",
+        });
+      };
+    }
     socioContratanteCedula.value = contrato.cedulaPasaporte;
     socioContratanteApellido.value =
       contrato.primerApellido + " " + contrato.segundoApellido;
     socioContratanteNombre.value =
       contrato.primerNombre + " " + contrato.segundoNombre;
-    // if (medidor.pagoRecoleccionDesechos == "Si") {
-    //   contratoPagoRecoleccion.checked = true;
-    // } else {
-    //   contratoPagoRecoleccion.checked = false;
-    // }
-    // if (medidor.pagoAlcanterillado == "Si") {
-    //   contratoPagoAlcanterillado.checked = true;
-    // } else {
-    //   contratoPagoAlcanterillado.checked = false;
-    // }
-    // if (medidor.pagoEscrituras == "Si") {
-    //   contratoPagoEscrituras.checked = true;
-    // } else {
-    //   contratoPagoEscrituras.checked = false;
-    // }
-    // if (medidor.pagoAguaPotable == "Si") {
-    //   contratoPagoAguaPotable.checked = true;
-    // } else {
-    //   contratoPagoAguaPotable.checked = false;
-    // }
+
     // medidorCodigo.value = medidor.codigo;
     // medidorInstalacion.value = formatearFecha(medidor.fechaInstalacion);
     // medidoresDisponibles.selectedIndex = 0;
@@ -1355,6 +1455,18 @@ const editContrato = async (id) => {
   seccion2.classList.remove("active");
   seccion1.classList.add("active");
 };
+async function cambiarContratoPrincipal(contratoId, socioId) {
+  try {
+    const cambioPrincipal = await ipcRenderer.invoke(
+      "updatePrincipal",
+      contratoId,
+      socioId
+    );
+    editContrato(contratoId);
+  } catch (error) {
+    console.log(error);
+  }
+}
 // ----------------------------------------------------------------
 // Funcion que carga los servicios contratados segun el id del contrato
 // y los muestra en el formulario para editarlos
@@ -1735,7 +1847,9 @@ async function generarCodigo() {
 // ----------------------------------------------------------------
 // La fecha de contrato siempre este en la fecha actual.
 // ----------------------------------------------------------------
+
 contratoFecha.value = formatearFecha(new Date());
+
 // ----------------------------------------------------------------
 // Cambiar de texto si el checkbox es 'Check' y viceversa.
 // ----------------------------------------------------------------
@@ -1765,6 +1879,10 @@ medidorSinMedidor.onchange = () => {
       '<i class="fs-1 fa-solid fa-file-signature mx-2 my-2"></i>';
   }
 };
+ipcRenderer.on("contrato-desde-socios", async (event, socioId, socioCedula) => {
+  console.log("Socio id recibido: " + socioId, socioCedula);
+  obtenerDatosSocioContratante(socioCedula);
+});
 ipcRenderer.on("Notificar", (event, response) => {
   if (response.title === "Borrado!") {
     resetForm();

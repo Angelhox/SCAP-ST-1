@@ -153,7 +153,11 @@
                   Salir
                 </button>
                 <div class="col-12 d-flex justify-content-end">
-                  <button  style="display: none;" class="btn btn-success mx-2" id="btnSeccion1">
+                  <button
+                    style="display: none"
+                    class="btn btn-success mx-2"
+                    id="btnSeccion1"
+                  >
                     Administrar Planillas
                   </button>
                   <!-- <button class="btn btn-success " onclick="generarPlanillas()" id="btnGenerarPlanillas"> -->
@@ -173,15 +177,16 @@
         >
           <div class="row mt-3 mb-1 encabezado-servicios">
             <div
-              class="col-12 mp-0 d-flex  align-items-center justify-content-between"
+              class="col-12 mp-0 d-flex align-items-center justify-content-between"
             >
               <p class="fs-1 mp-0">
                 Planillas
                 <i class="fs-1 fa-solid fa-file-invoice mx-2 my-2"></i>
               </p>
               <button class="btn btn-outline-light" onclick="generarPlanilla()">
-                Actualizar <i class="me-2 ms-1 fs-5 fa-solid fa-arrows-rotate"></i>
-              </button >
+                Actualizar
+                <i class="me-2 ms-1 fs-5 fa-solid fa-arrows-rotate"></i>
+              </button>
             </div>
             <div class="col-12">
               <div class="row">
@@ -193,15 +198,16 @@
                     aria-label="Default select example"
                   >
                     <option value="all" selected>Todas</option>
-                    <option value="cedula">Cédula del socio</option>
-                    <option value="apellidos">Apellidos del socio</option>
-                    <option value="código">Código</option>
+                    <option value="cedulaPasaporte">Cédula del socio</option>
+                    <option value="nombre">Nombres/Apellidos</option>
+                    <option value="codigo">Código</option>
                   </select>
                 </div>
-                <div class="col-3">
+                <div class="col-5">
                   <label class="trans">na</label>
                   <div class="input-group">
                     <input
+                      readonly
                       type="text"
                       class="form-control"
                       placeholder="Buscar..."
@@ -222,7 +228,9 @@
                           border-top-right-radius: 0;
                           border-bottom-right-radius: 0;
                         "
-                      ></select>
+                      >
+                        <option value="all">Todos los años</option>
+                      </select>
                     </div>
                     <div class="col-6 text-center mp-0">
                       <select
@@ -233,12 +241,35 @@
                         id="mesBusqueda"
                         class="form-select"
                       >
-                        <option value="all">Todos los meses</option>
+                        <option value="all" selected>Todos los meses</option>
                       </select>
                     </div>
                   </div>
                 </div>
 
+                <div class="col-3">
+                  <label for="estado">Estado</label>
+                  <select
+                    id="estado"
+                    class="form-select"
+                    aria-label="Default select example"
+                  >
+                    <option value="Por cobrar" selected>Sin cancelar</option>
+                    <option value="Cancelado">Cancelado</option>
+                  </select>
+                </div>
+                <div class="col-3">
+                  <label for="criterio">Tipo</label>
+                  <select
+                    id="tipo"
+                    class="form-select"
+                    aria-label="Default select example"
+                  >
+                    <option value="Por cobrar" selected>Planilla</option>
+                    <option value="Cancelado" disabled>Comprobante</option>
+                  </select>
+                </div>
+                <div class="col-4"></div>
                 <div class="col-2">
                   <label class="text-white" for="criterio"></label>
                   <button
@@ -249,30 +280,6 @@
                   >
                     <i class="fa fa-search mx-1"></i>
                   </button>
-                </div>
-                <div class="col-3">
-                  <label for="criterio">Estado</label>
-                  <select
-                    id="estado"
-                    class="form-select"
-                    aria-label="Default select example"
-                  >
-                    <option value="Por cobrar" selected>Sin cancelar</option>
-                    <option value="Cancelado">Cancelado</option>
-                    <option value="all">Todos</option>
-                  </select>
-                </div>
-                <div class="col-3">
-                  <label for="criterio">Tipo</label>
-                  <select
-                    id="estado"
-                    class="form-select"
-                    aria-label="Default select example"
-                  >
-                    <option value="Por cobrar" selected>Planilla</option>
-                    <option value="Cancelado">Comprobante</option>
-                    <option value="all">Todos</option>
-                  </select>
                 </div>
               </div>
             </div>
@@ -410,20 +417,18 @@
               <div class="col-12 d-flex mb-1">
                 <div class="col-3 d-flex mp-0">
                   <label for="cedula" class="fs-6 mp-0">Estado:</label>
-                  <p class="text-white mp-0" id="planillaEstado">
-                    Por cancelar
-                  </p>
+                  <p class="mp-0" id="planillaEstado">Por cancelar</p>
                 </div>
                 <div class="col-3 d-flex mp-0">
                   <label for="cedula" class="fs-6 mp-0">Recargo:</label>
-                  <p class="text-white mp-0" id="planillaEstado">
-                    Por cancelar
+                  <p class="text-white mp-0" id="planillaRecargo">
+                    Sin recargos
                   </p>
                 </div>
                 <div class="col-6 d-flex mp-0">
                   <label for="cedula" class="fs-6 mp-0">Comprobante:</label>
-                  <p class="text-white mp-0" id="planillaEstado">
-                    Por cancelar
+                  <p class="text-white mp-0" id="codigoComprobante">
+                    100200300400
                   </p>
                 </div>
               </div>
@@ -459,6 +464,7 @@
                 <div class="col-3">
                   <label for="cedula">Lectura Anterior</label>
                   <input
+                    readonly
                     type="text"
                     class="form-control"
                     placeholder="Lectura Anterior"
@@ -477,6 +483,7 @@
                 <div class="col-3">
                   <label for="lecturaActual">Tarifa de consumo</label>
                   <input
+                    readonly
                     type="text"
                     class="form-control"
                     placeholder="Tarifa de consumo"
@@ -486,6 +493,7 @@
                 <div class="col-3">
                   <label for="lecturaActual">Valor consumo</label>
                   <input
+                    readonly
                     type="text"
                     class="form-control"
                     placeholder="$0.0"
@@ -495,10 +503,10 @@
                 <div class="col-12 d-flex justify-content-center mt-2">
                   <button
                     type="button"
-                    class="btn btn-warning"
+                    class="btn-cancelar"
                     id="calcular-consumo"
                   >
-                    Calcular
+                    Cancelar
                   </button>
                 </div>
               </div>
@@ -742,10 +750,14 @@
                     />
                   </div>
                   <div class="col-12 d-flex justify-content-end mt-2">
-                    <button class="btn btn-danger" type="reset">
+                    <button
+                      class="btn btn-danger"
+                      type="button"
+                      id="cancelarForm"
+                    >
                       Cancelar
                     </button>
-                    <button class="btn  bg-secondary" type="submit">
+                    <button class="btn bg-secondary" type="submit">
                       Guardar
                     </button>
                   </div>

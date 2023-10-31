@@ -1,7 +1,11 @@
 "use strict";
 
 var _require = require("electron"),
-    ipcRenderer = _require.ipcRenderer; // ----------------------------------------------------------------
+    ipcRenderer = _require.ipcRenderer;
+
+var validator = require("validator");
+
+var Swal = require("sweetalert2"); // ----------------------------------------------------------------
 // Varibles de las planillas
 // ----------------------------------------------------------------
 
@@ -17,6 +21,8 @@ var planillasList = document.getElementById("planillas"); // -------------------
 // Varibles de busqueda de las planillas
 // ----------------------------------------------------------------
 
+var mesBusqueda = document.getElementById("mesBusqueda");
+var anioBusqueda = document.getElementById("anioBusqueda");
 var estadoBuscar = document.getElementById("estado");
 var criterioBuscar = document.getElementById("criterio");
 var criterioContent = document.getElementById("criterioContent");
@@ -36,22 +42,24 @@ var contratoCodigo = document.getElementById("contratatoCodigo"); // -----------
 var serviciosFijosList = document.getElementById("serviciosFijos");
 var otrosServiciosList = document.getElementById("otrosServicios");
 var otrosAplazablesList = document.getElementById("otrosAplazables");
-var mesBusqueda = document.getElementById("mesBusqueda");
-var anioBusqueda = document.getElementById("anioBusqueda"); // ----------------------------------------------------------------
+var errortextAbono = document.getElementById("errorTextAbono");
+var errContainer = document.getElementById("err-container"); // ----------------------------------------------------------------
 // Variables del los totales de la planilla
-// ----------------------------------------------------------------
 
 var totalFinal = 0.0;
 var totalConsumo = 0.0;
 var tarifaAplicada = "Familiar";
 var valorTarifa = 2.0;
+var lecturaActualEdit = 0;
+var lecturaAnteriorEdit = 0;
+var valorConsumoEdit = 0; // ----------------------------------------------------------------
+
 var valorSubtotal = document.getElementById("valorSubtotal");
 var valorTotalDescuento = document.getElementById("valorTotalDescuento");
-var valorTotalPagar = document.getElementById("valorTotalPagar"); // Variables del dialogo de los servicios
+var valorTotalPagar = document.getElementById("valorTotalPagar"); // ----------------------------------------------------------------
+// Variables del dialogo de los servicios
 
 var dialogServicios = document.getElementById("formServicios");
-var errortextAbono = document.getElementById("errorTextAbono");
-var errContainer = document.getElementById("err-container");
 var servicioDg = document.getElementById("title-dg");
 var descripcionDg = document.getElementById("descripcion-dg");
 var detallesDg = document.getElementById("detalles-dg");
@@ -71,7 +79,11 @@ var administrarDg = document.getElementById("btnAdministrar-dg"); //------------
 var mostrarLecturas = document.getElementById("mostrar-lecturas");
 var contenedorLecturas = document.getElementById("contenedor-lecturas");
 var collapse = document.getElementById("collapse");
-var calcularConsumoBt = document.getElementById("calcular-consumo"); // const socioNombre = document.getElementById("nombrecompleto");
+var calcularConsumoBt = document.getElementById("calcular-consumo");
+var cancelarForm = document.getElementById("cancelarForm"); // ----------------------------------------------------------------
+// Variables contenedoras
+
+var tarifasDisponibles = []; // const socioNombre = document.getElementById("nombrecompleto");
 // const medidorCodigo = document.getElementById("codigo");
 // const medidorMarca = document.getElementById("marca");
 // const medidorBarrio = document.getElementById("barrio");
@@ -86,11 +98,13 @@ var editingStatus = false;
 var planillaMedidorSn = false;
 var editPlanillaId = "";
 var editDetalleId = "";
-planillaForm.addEventListener("submit", function _callee(e) {
-  var newPlanilla, newDetalleServicio, result, resultDetalle;
-  return regeneratorRuntime.async(function _callee$(_context) {
+var fechaEmisionEdit = "";
+var editContratoId = "";
+planillaForm.addEventListener("submit", function _callee2(e) {
+  var newPlanilla, newDetalleServicio;
+  return regeneratorRuntime.async(function _callee2$(_context2) {
     while (1) {
-      switch (_context.prev = _context.next) {
+      switch (_context2.prev = _context2.next) {
         case 0:
           e.preventDefault();
           newPlanilla = {
@@ -104,94 +118,78 @@ planillaForm.addEventListener("submit", function _callee(e) {
           newDetalleServicio = {
             subtotal: valorConsumo.value,
             total: valorConsumo.value,
-            saldo: valorConsumo.value,
-            abono: 0.0
+            saldo: 0.0,
+            abono: valorConsumo.value
           };
 
-          if (editingStatus) {
-            _context.next = 7;
-            break;
+          if (!editingStatus) {
+            console.log("Can not create planilla");
+          } else {
+            if (!planillaMedidorSn) {
+              console.log("Guardado :) ");
+            } else {
+              Swal.fire({
+                title: "¿Quieres guardar los cambios?",
+                text: "No podrás deshacer esta acción.",
+                icon: "question",
+                iconColor: "#f8c471",
+                showCancelButton: true,
+                confirmButtonColor: "#2874A6",
+                cancelButtonColor: "#EC7063 ",
+                confirmButtonText: "Sí, continuar",
+                cancelButtonText: "Cancelar"
+              }).then(function _callee(result) {
+                var _result, resultDetalle;
+
+                return regeneratorRuntime.async(function _callee$(_context) {
+                  while (1) {
+                    switch (_context.prev = _context.next) {
+                      case 0:
+                        if (!result.isConfirmed) {
+                          _context.next = 9;
+                          break;
+                        }
+
+                        // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                        console.log("Update planilla wait...");
+                        _context.next = 4;
+                        return regeneratorRuntime.awrap(ipcRenderer.invoke("updatePlanilla", editPlanillaId, newPlanilla));
+
+                      case 4:
+                        _result = _context.sent;
+                        _context.next = 7;
+                        return regeneratorRuntime.awrap(ipcRenderer.invoke("updateDetalle", editDetalleId, newDetalleServicio));
+
+                      case 7:
+                        resultDetalle = _context.sent;
+                        console.log(_result, resultDetalle);
+
+                      case 9:
+                      case "end":
+                        return _context.stop();
+                    }
+                  }
+                });
+              });
+            }
           }
 
-          // const result = await ipcRenderer.invoke("createPlanilla");
-          // console.log(result);
-          console.log("Can not create planilla");
-          _context.next = 21;
-          break;
-
-        case 7:
-          if (planillaMedidorSn) {
-            _context.next = 11;
-            break;
-          }
-
-          console.log("Guardado :) ");
-          _context.next = 21;
-          break;
-
-        case 11:
-          console.log("Editing planilla with electron");
-          _context.next = 14;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("updatePlanilla", editPlanillaId, newPlanilla));
-
-        case 14:
-          result = _context.sent;
-          _context.next = 17;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("updateDetalle", editDetalleId, newDetalleServicio));
-
-        case 17:
-          resultDetalle = _context.sent;
-          editingStatus = false;
-          editPlanillaId = "";
-          console.log(result, resultDetalle);
-
-        case 21:
-          getPlanillas();
-          planillaForm.reset(); //medidorCodigo.focus();
-
-        case 23:
+        case 4:
         case "end":
-          return _context.stop();
+          return _context2.stop();
       }
     }
   });
-}); // function renderPlanillas(datosPlanillas) {
-//   planillasList.innerHTML = "";
-//   datosPlanillas.forEach((datosPlanilla) => {
-//     planillasList.innerHTML += `
-//        <tr>
-//        <td>${datosPlanilla.codigoPlanilla}</td>
-//        <td>${datosPlanilla.codigoMedidor}</td>
-//        <td>${datosPlanilla.nombre + " " + datosPlanilla.apellido}</td>
-//        <td>${datosPlanilla.cedula}</td>
-//        <td>${formatearFecha(datosPlanilla.fecha)}</td>
-//        <td>${datosPlanilla.valor}</td>
-//        <td>${datosPlanilla.estado}</td>
-//        <td>${datosPlanilla.lecturaAnterior}</td>
-//        <td>${datosPlanilla.lecturaActual}</td>
-//       <td>
-//       <button onclick="deleteMedidor('${datosPlanilla.id}')" class="btn ">
-//       <i class="fa-solid fa-user-minus"></i>
-//       </button>
-//       </td>
-//       <td>
-//       <button onclick="editPlanilla('${datosPlanilla.id}')" class="btn ">
-//       <i class="fa-solid fa-user-pen"></i>
-//       </button>
-//       </td>
-//    </tr>
-//       `;
-//   });
-// }
+});
 
 function renderPlanillas(datosPlanillas) {
   planillasList.innerHTML = "";
-  datosPlanillas.forEach(function _callee2(datosPlanilla) {
-    var divContainer, cardDiv, headerDiv, contratoDiv, contratoP, contratoValor, canceladoDiv, canceladoP, canceladoValor, bodyDiv, socioDiv, socioH5, socioP, fechaEmisionDiv, fechaEmisionP, fechaEmisionSp, fechaEmisionValor, serviciosDiv, serviciosP, serviciosTituloP, listaServiciosDiv, listaUl, datosServicios, valorAguaPotable, totalPagar, consumoDiv, consumoP, tarifaDiv, tarifaP, valorDiv, valorP, consumoValor, tarifaValor, valorValor, _consumoValor, _tarifaValor, _valorValor, footerDiv, totalDiv, totalP, totalValor, button, buttonIcon;
+  datosPlanillas.forEach(function _callee3(datosPlanilla) {
+    var divContainer, cardDiv, headerDiv, contratoDiv, contratoP, espace, contratoValor, canceladoDiv, canceladoP, canceladoValor, bodyDiv, socioDiv, socioH5, espace1, socioP, fechaEmisionDiv, fechaEmisionP, fechaEmisionSp, fechaEmisionValor, serviciosDiv, serviciosP, serviciosTituloP, listaServiciosDiv, listaUl, datosServicios, rpValorAguaPotable, rpTotalPagar, consumoDiv, consumoP, consumoSp, tarifaDiv, tarifaP, tarifaSp, valorDiv, valorP, valorSp, consumoValor, tarifaValor, valorValor, _consumoValor, _tarifaValor, _valorValor, _consumoValor2, _tarifaValor2, _valorValor2, alcantarilladoLi, alcantarilladoP, servicioSp, alcantarilladoValor, footerDiv, totalDiv, totalP, totalSp, totalValor, button, buttonIcon;
 
-    return regeneratorRuntime.async(function _callee2$(_context2) {
+    return regeneratorRuntime.async(function _callee3$(_context3) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context3.prev = _context3.next) {
           case 0:
             // Crear el elemento div principal con las clases y el estilo
             divContainer = document.createElement("div");
@@ -200,14 +198,15 @@ function renderPlanillas(datosPlanillas) {
             divContainer.style.maxHeight = "fit-content"; // divContainer.style.backgroundColor = "black";
 
             cardDiv = document.createElement("div");
-            cardDiv.className = "clase col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card ";
+            cardDiv.className = "clase col-xl-12 col-lg-12 col-md-12 col-sm-12 my-1 mx-1 card card-planilla";
             cardDiv.style.backgroundColor = "red";
             cardDiv.style.width = "100%"; // cardDiv.style.maxWidth = "100%";
 
             cardDiv.style.padding = "0.3em";
             cardDiv.style.backgroundColor = "#d6eaf8";
-            cardDiv.style.height = "fit-content";
-            cardDiv.style.maxHeight = "fit-content"; // Crear el elemento div para el encabezado de la tarjeta con la clase y el estilo
+            cardDiv.style.height = "30em";
+            cardDiv.style.minHeight = "30em";
+            cardDiv.style.maxHeight = "30em"; // Crear el elemento div para el encabezado de la tarjeta con la clase y el estilo
 
             headerDiv = document.createElement("div");
             headerDiv.className = "card-header d-flex ";
@@ -217,8 +216,14 @@ function renderPlanillas(datosPlanillas) {
             contratoDiv.className = "d-flex col-6 titulo-detalles header-planilla";
             contratoP = document.createElement("p");
             contratoP.textContent = "Contrato: ";
-            contratoValor = document.createTextNode(datosPlanilla.codigo);
+            espace = document.createElement("p");
+            espace.textContent = "-";
+            espace.className = "trans";
+            contratoValor = document.createElement("p");
+            contratoValor.textContent = datosPlanilla.codigo;
+            contratoValor.className = "title-contrato ";
             contratoDiv.appendChild(contratoP);
+            contratoDiv.appendChild(espace);
             contratoDiv.appendChild(contratoValor); // Crear el elemento div para la información de "Cancelado"
 
             canceladoDiv = document.createElement("div");
@@ -237,18 +242,26 @@ function renderPlanillas(datosPlanillas) {
             bodyDiv.style.backgroundColor = "white"; // Crear el elemento div para el título del socio
 
             socioDiv = document.createElement("div");
-            socioDiv.className = "card-title d-flex titulo-socio";
-            socioH5 = document.createElement("h5");
+            socioDiv.className = "card-title d-flex  mp-0";
+            socioH5 = document.createElement("p");
+            socioH5.className = "mp-0 titulos";
             socioH5.textContent = "Socio: ";
+            espace1 = document.createElement("p");
+            espace1.textContent = "-";
+            espace1.className = "trans mp-0";
             socioP = document.createTextNode(datosPlanilla.nombre);
             socioDiv.appendChild(socioH5);
+            socioDiv.appendChild(espace1);
             socioDiv.appendChild(socioP); // Crear el elemento para la fecha de emisión
 
             fechaEmisionDiv = document.createElement("div");
-            fechaEmisionDiv.className = "d-flex";
+            fechaEmisionDiv.className = "d-flex ";
             fechaEmisionP = document.createElement("p");
+            fechaEmisionP.className = "titulos mp-0";
             fechaEmisionP.textContent = "Fecha emisión: ";
-            fechaEmisionSp = document.createTextNode("-");
+            fechaEmisionSp = document.createElement("p");
+            fechaEmisionSp.textContent = "-";
+            fechaEmisionSp.className = "trans mp-0";
             fechaEmisionValor = document.createTextNode(formatearFecha(datosPlanilla.fechaEmision));
             fechaEmisionDiv.appendChild(fechaEmisionP);
             fechaEmisionDiv.appendChild(fechaEmisionSp);
@@ -273,32 +286,51 @@ function renderPlanillas(datosPlanillas) {
             listaUl = document.createElement("ul");
             listaUl.className = "list-group list-group-flush"; //Consulta los servicios a cancelar de acuerdo al id del contrato
 
-            _context2.next = 66;
+            _context3.next = 81;
             return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosServiciosByContratoId", datosPlanilla.contratosId, formatearFecha(datosPlanilla.fechaEmision), "all"));
 
-          case 66:
-            datosServicios = _context2.sent;
+          case 81:
+            datosServicios = _context3.sent;
             console.log("Servicios encontrados: " + datosServicios); // Crear elementos para los detalles de servicios (Consumo, Tarifa, Valor)
 
-            valorAguaPotable = null;
-            totalPagar = 0.0;
+            rpValorAguaPotable = null;
+            rpTotalPagar = 0.0; // Contenedor y contenido de consumo
+
             consumoDiv = document.createElement("div");
             consumoDiv.className = "col-4 d-flex titulo-detalles";
             consumoP = document.createElement("p");
             consumoP.textContent = "Consumo:";
+            consumoSp = document.createElement("p");
+            consumoSp.textContent = "-";
+            consumoSp.className = "trans mp-0"; // Contenedor y contenido de tarifa
+
             tarifaDiv = document.createElement("div");
             tarifaDiv.className = "col-4 d-flex titulo-detalles";
             tarifaP = document.createElement("p");
             tarifaP.textContent = "Tarifa:";
+            tarifaSp = document.createElement("p");
+            tarifaSp.textContent = "-";
+            tarifaSp.className = "trans mp-0"; // Contenedor y contenido de valor consumo
+
             valorDiv = document.createElement("div");
             valorDiv.className = "col-4 d-flex titulo-detalles";
             valorP = document.createElement("p");
-            valorP.textContent = "Valor: $";
+            valorP.textContent = "Valor:$ ";
+            valorSp = document.createElement("p");
+            valorSp.textContent = "-";
+            valorSp.className = "trans mp-0";
+
+            if (!(datosServicios.length > 0)) {
+              _context3.next = 146;
+              break;
+            }
+
             datosServicios.forEach(function (datosServicio) {
               if (datosServicio.nombre === "Agua Potable") {
-                valorAguaPotable = datosServicio.total;
-                tarifaAguaPotable = datosServicio.tarifa;
-                totalPagar += datosServicio.total;
+                rpValorAguaPotable = datosServicio.total;
+                tarifaAguaPotable = datosServicio.tarifa; // el total de servicio agua al total a pagar de rp
+
+                rpTotalPagar += datosServicio.total;
               } else {
                 // Crear elementos de la lista de servicios (Alcantarillado, Recolección de desechos, Riego Agrícola, Bomberos)
                 if (datosServicio.aplazableSn === "Si") {
@@ -306,10 +338,15 @@ function renderPlanillas(datosPlanillas) {
                   alcantarilladoLi.className = "titulo-detalles d-flex detalles";
                   var alcantarilladoP = document.createElement("p");
                   alcantarilladoP.textContent = datosServicio.nombre + ": ";
+                  var servicioSp = document.createElement("p");
+                  servicioSp.textContent = "-";
+                  servicioSp.className = "trans mp-0";
                   var alcantarilladoValor = document.createTextNode( // en esta parte esta seliendo null
-                  datosServicio.abono);
-                  totalPagar += datosServicio.abono;
+                  parseFloat(datosServicio.abono).toFixed(2) + "$"); // si el servicio es aplazable sumo el abono al total a pagar de rp
+
+                  rpTotalPagar += datosServicio.abono;
                   alcantarilladoLi.appendChild(alcantarilladoP);
+                  alcantarilladoLi.appendChild(servicioSp);
                   alcantarilladoLi.appendChild(alcantarilladoValor);
                   listaUl.appendChild(alcantarilladoLi);
                 } else {
@@ -321,11 +358,20 @@ function renderPlanillas(datosPlanillas) {
 
                   _alcantarilladoP.textContent = datosServicio.nombre + ": ";
 
-                  var _alcantarilladoValor = document.createTextNode(datosServicio.total);
+                  var _servicioSp = document.createElement("p");
 
-                  totalPagar += datosServicio.total;
+                  _servicioSp.textContent = "-";
+                  _servicioSp.className = "trans mp-0";
+
+                  var _alcantarilladoValor = document.createTextNode(parseFloat(datosServicio.total).toFixed(2) + "$"); // Si el servicio no es aplazable (fijo u ocacional) sumo el total al total
+                  // a pagar de rp
+
+
+                  rpTotalPagar += datosServicio.total;
 
                   _alcantarilladoLi.appendChild(_alcantarilladoP);
+
+                  _alcantarilladoLi.appendChild(_servicioSp);
 
                   _alcantarilladoLi.appendChild(_alcantarilladoValor);
 
@@ -340,53 +386,102 @@ function renderPlanillas(datosPlanillas) {
               serviciosDiv.appendChild(serviciosTituloP);
               listaServiciosDiv.appendChild(listaUl);
             });
-            console.log("valor agua: " + valorAguaPotable);
+            console.log("valor agua: " + rpValorAguaPotable);
 
-            if (!(valorAguaPotable === null || valorAguaPotable === undefined || valorAguaPotable === "null")) {
-              _context2.next = 98;
+            if (!(rpValorAguaPotable === null || rpValorAguaPotable === undefined || rpValorAguaPotable === "null")) {
+              _context3.next = 126;
               break;
             }
 
-            console.log("Valor de agua= " + valorAguaPotable);
+            // Si despues de almacenar el valor de agua potable la variable sique siendo null
+            // no existe el servicio de agua potable asignamos No aplica
+            console.log("Valor de agua= " + rpValorAguaPotable);
             console.log("Asignando NA");
             consumoValor = document.createTextNode("NA");
             consumoDiv.appendChild(consumoP);
+            consumoDiv.appendChild(consumoSp);
             consumoDiv.appendChild(consumoValor);
             tarifaValor = document.createTextNode("NA");
             tarifaDiv.appendChild(tarifaP);
+            tarifaDiv.appendChild(tarifaSp);
             tarifaDiv.appendChild(tarifaValor);
-            valorValor = document.createTextNode("NA");
+            valorValor = document.createTextNode("0.0");
             valorDiv.appendChild(valorP);
+            valorDiv.appendChild(valorSp);
             valorDiv.appendChild(valorValor);
-            _context2.next = 111;
+            _context3.next = 142;
             break;
 
-          case 98:
-            _context2.next = 100;
+          case 126:
+            _context3.next = 128;
             return regeneratorRuntime.awrap(getDatosLecturas(datosPlanilla.contratosId, formatearFecha(datosPlanilla.fechaEmision)));
 
-          case 100:
-            lectura = _context2.sent;
+          case 128:
+            lectura = _context3.sent;
             console.log("Datos Lecturas: ", lectura);
             _consumoValor = document.createTextNode(lectura[0].lecturaActual - lectura[0].lecturaAnterior);
             consumoDiv.appendChild(consumoP);
+            consumoDiv.appendChild(consumoSp);
             consumoDiv.appendChild(_consumoValor);
             _tarifaValor = document.createTextNode(" " + "(" + lectura[0].tarifaValor + ")"); // const tarifaValor = document.createTextNode(
             //   lectura[0].tarifa + "(" + lectura[0].tarifaValor + ")"
             // );
 
             tarifaDiv.appendChild(tarifaP);
+            tarifaDiv.appendChild(tarifaSp);
             tarifaDiv.appendChild(_tarifaValor); // tarifaDiv.className = "d-flex";
 
-            _valorValor = document.createTextNode(lectura[0].valor);
+            _valorValor = document.createTextNode(parseFloat(lectura[0].valor).toFixed(2));
             valorDiv.appendChild(valorP);
+            valorDiv.appendChild(valorSp);
             valorDiv.appendChild(_valorValor);
 
-          case 111:
+          case 142:
             // --->
             bodyDiv.appendChild(serviciosDiv);
-            bodyDiv.appendChild(listaServiciosDiv); // Crear el elemento para el pie de la tarjeta
+            bodyDiv.appendChild(listaServiciosDiv);
+            _context3.next = 179;
+            break;
 
+          case 146:
+            // En caso de que no existan servicios cargados a la planilla
+            console.log("Asignando NA para planillas vacias");
+            _consumoValor2 = document.createTextNode("NA");
+            consumoDiv.appendChild(consumoP);
+            consumoDiv.appendChild(consumoSp);
+            consumoDiv.appendChild(_consumoValor2);
+            _tarifaValor2 = document.createTextNode("NA");
+            tarifaDiv.appendChild(tarifaP);
+            tarifaDiv.appendChild(tarifaSp);
+            tarifaDiv.appendChild(_tarifaValor2);
+            _valorValor2 = document.createTextNode("NA");
+            valorDiv.appendChild(valorP);
+            valorDiv.appendChild(valorSp);
+            valorDiv.appendChild(_valorValor2);
+            alcantarilladoLi = document.createElement("li");
+            alcantarilladoLi.className = "titulo-detalles d-flex detalles";
+            alcantarilladoP = document.createElement("p");
+            alcantarilladoP.textContent = "Sin servicios adeudados" + ": ";
+            servicioSp = document.createElement("p");
+            servicioSp.textContent = "-";
+            servicioSp.className = "trans mp-0";
+            alcantarilladoValor = document.createTextNode(parseFloat(0).toFixed(2) + "$"); // El total a pagar de planillas sera cero
+
+            rpTotalPagar += 0.0;
+            alcantarilladoLi.appendChild(alcantarilladoP);
+            alcantarilladoLi.appendChild(servicioSp);
+            alcantarilladoLi.appendChild(alcantarilladoValor);
+            serviciosDiv.appendChild(consumoDiv);
+            serviciosDiv.appendChild(tarifaDiv);
+            serviciosDiv.appendChild(valorDiv);
+            serviciosDiv.appendChild(serviciosTituloP);
+            listaUl.appendChild(alcantarilladoLi);
+            listaServiciosDiv.appendChild(listaUl);
+            bodyDiv.appendChild(serviciosDiv);
+            bodyDiv.appendChild(listaServiciosDiv);
+
+          case 179:
+            // Crear el elemento para el pie de la tarjeta
             footerDiv = document.createElement("div");
             footerDiv.className = "card-footer row d-flex";
             footerDiv.style.border = "none"; // Crear elemento para el total
@@ -394,15 +489,29 @@ function renderPlanillas(datosPlanillas) {
             totalDiv = document.createElement("div");
             totalDiv.className = "col-6 titulo-detalles d-flex";
             totalP = document.createElement("p");
-            totalP.textContent = "Total: $";
-            totalValor = document.createTextNode(totalPagar);
+            totalP.textContent = "Total:$";
+            totalSp = document.createElement("p");
+            totalSp.textContent = "-";
+            totalSp.className = "trans mp-0"; // Mostramos en el pie de la planilla el total que se calculo durante rp
+
+            totalValor = document.createTextNode(parseFloat(rpTotalPagar).toFixed(2));
             totalDiv.appendChild(totalP);
+            totalDiv.appendChild(totalSp);
             totalDiv.appendChild(totalValor); // Crear el botón con la clase y el ícono
 
             button = document.createElement("button");
             button.className = "btn-planilla-positive col-6"; // Añadir un evento onclick
 
             button.onclick = function () {
+              // Elimina la clase "selected" de todos los elementos
+              var elementos = document.querySelectorAll(".clase"); // Reemplaza con la clase real de tus elementos
+
+              elementos.forEach(function (elemento) {
+                elemento.classList.remove("bg-secondary");
+              }); // Agrega la clase "selected" al elemento que se hizo clic
+
+              cardDiv.classList.add("bg-secondary"); // detallesContratos(datosContrato.contratosId);
+
               editPlanilla(datosPlanilla.planillasId, datosPlanilla.contratosId, formatearFecha(datosPlanilla.fechaEmision));
               console.log("¡Hiciste clic en el botón!", datosPlanilla.planillasId, datosPlanilla.contratosId, formatearFecha(datosPlanilla.fechaEmision));
             };
@@ -424,9 +533,9 @@ function renderPlanillas(datosPlanillas) {
 
             planillasList.appendChild(divContainer);
 
-          case 136:
+          case 206:
           case "end":
-            return _context2.stop();
+            return _context3.stop();
         }
       }
     });
@@ -435,21 +544,21 @@ function renderPlanillas(datosPlanillas) {
 
 var getDatosLecturas = function getDatosLecturas(contratoId, fechaEmision) {
   var lectura;
-  return regeneratorRuntime.async(function getDatosLecturas$(_context3) {
+  return regeneratorRuntime.async(function getDatosLecturas$(_context4) {
     while (1) {
-      switch (_context3.prev = _context3.next) {
+      switch (_context4.prev = _context4.next) {
         case 0:
           console.log("Parámetros de busqueda: " + contratoId, fechaEmision);
-          _context3.next = 3;
+          _context4.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getLecturasByFecha", contratoId, fechaEmision));
 
         case 3:
-          lectura = _context3.sent;
-          return _context3.abrupt("return", lectura);
+          lectura = _context4.sent;
+          return _context4.abrupt("return", lectura);
 
         case 5:
         case "end":
-          return _context3.stop();
+          return _context4.stop();
       }
     }
   });
@@ -457,21 +566,23 @@ var getDatosLecturas = function getDatosLecturas(contratoId, fechaEmision) {
 
 var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
   var planilla, serviciosFijos, otrosServicios;
-  return regeneratorRuntime.async(function editPlanilla$(_context4) {
+  return regeneratorRuntime.async(function editPlanilla$(_context5) {
     while (1) {
-      switch (_context4.prev = _context4.next) {
+      switch (_context5.prev = _context5.next) {
         case 0:
           editingStatus = true;
           editPlanillaId = planillaId;
-          console.log("Planilla a editar: " + planillaId);
+          fechaEmisionEdit = fechaEmision;
+          editContratoId = contratoId; // Resetea las variables globales del calculo del total final para editPlanilla (ep)
+
           totalFinal = 0.0;
           totalConsumo = 0.0;
           console.log("LLamando funcion editPlanilla: " + planillaId, contratoId, fechaEmision);
-          _context4.next = 8;
+          _context5.next = 9;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getPlanillaById", planillaId));
 
-        case 8:
-          planilla = _context4.sent;
+        case 9:
+          planilla = _context5.sent;
           // ----------------------------------------------------------------
           // Datos del encabezado de la planilla a editar
           planillaEmision.textContent = formatearFecha(planilla[0].fechaEmision);
@@ -483,11 +594,15 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
           if (planilla[0].medidorSn !== "No") {
             planillaMedidorSn = true;
             lecturaActual.value = planilla[0].lecturaActual;
+            lecturaActualEdit = planilla[0].lecturaActual;
             lecturaAnterior.value = planilla[0].lecturaAnterior;
+            lecturaAnteriorEdit = planilla[0].lecturaAnterior;
             valorConsumo.value = planilla[0].valor;
-            console.log("total consumo: ", totalConsumo);
+            valorConsumoEdit = planilla[0].valor;
+            console.log("total consumo reseteado: ", totalConsumo); // Asignamos a totalConsumo el valor de agua desde planilla
+
             totalConsumo += planilla[0].valor;
-            console.log("total consumo: ", totalConsumo);
+            console.log("total consumo con valor de ep: ", totalConsumo);
             console.log(planilla[0]);
             calcularConsumo();
             calcularConsumoBt.disabled = false;
@@ -505,8 +620,8 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
             lecturaAnterior.placeHolder = "NA";
             valorConsumo.value = "";
             valorConsumo.placeHolder = "NA";
-            tarifaConsumo.value = "";
-            calcularConsumo;
+            tarifaConsumo.value = ""; // calcularConsumo();
+
             console.log("total consumo: ", totalConsumo); // totalConsumo += planilla[0].valor;
 
             console.log("total consumo: ", totalConsumo);
@@ -524,11 +639,11 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
           serviciosFijosList.innerHTML = "";
           otrosServiciosList.innerHTML = "";
           otrosAplazablesList.innerHTML = "";
-          _context4.next = 20;
+          _context5.next = 21;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosServiciosByContratoId", contratoId, formatearFecha(fechaEmision), "fijos"));
 
-        case 20:
-          serviciosFijos = _context4.sent;
+        case 21:
+          serviciosFijos = _context5.sent;
 
           if (serviciosFijos[0] !== undefined) {
             renderServicios(serviciosFijos, "fijos");
@@ -536,11 +651,11 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
             serviciosFijosList.innerHTML = "";
           }
 
-          _context4.next = 24;
+          _context5.next = 25;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosServiciosByContratoId", contratoId, formatearFecha(fechaEmision), "otros"));
 
-        case 24:
-          otrosServicios = _context4.sent;
+        case 25:
+          otrosServicios = _context5.sent;
 
           if (otrosServicios[0] !== undefined) {
             renderServicios(otrosServicios, "otros");
@@ -548,11 +663,12 @@ var editPlanilla = function editPlanilla(planillaId, contratoId, fechaEmision) {
             otrosServiciosList.innerHTML = "";
           }
 
+          recalcularConsumo();
           valorTotalPagar.value = totalFinal + totalConsumo;
 
-        case 27:
+        case 29:
         case "end":
-          return _context4.stop();
+          return _context5.stop();
       }
     }
   });
@@ -570,13 +686,13 @@ function renderServicios(servicios, tipo) {
       var tdAplazable = document.createElement("td");
       tdAplazable.textContent = servicio.aplazableSn;
       var tdSubtotal = document.createElement("td");
-      tdSubtotal.textContent = servicio.valor;
+      tdSubtotal.textContent = servicio.valorIndividual;
       var tdDescuento = document.createElement("td");
-      tdDescuento.textContent = servicio.descuento;
+      tdDescuento.textContent = servicio.descuentoValor;
       var tdTotal = document.createElement("td");
       tdTotal.textContent = servicio.total;
       var tdSaldo = document.createElement("td");
-      tdSaldo.textContent = servicio.total;
+      tdSaldo.textContent = servicio.saldo;
       var tdAbono = document.createElement("td");
       tdAbono.textContent = servicio.abono;
 
@@ -632,169 +748,56 @@ function renderServicios(servicios, tipo) {
     }
   });
   totalFinal += totalPagarEdit;
-} // function renderServicios(servicios, tipo) {
-//   let totalPagarEdit = 0.0;
-//   console.log("Servicios a renderizard: ", servicios, tipo);
-//   servicios.forEach((servicio) => {
-//     // Crear el div principal
-//     if (servicio.nombre !== "Agua Potable") {
-//       const divPrincipal = document.createElement("div");
-//       divPrincipal.className = "col-12 card border-info mb-2 ";
-//       divPrincipal.style.maxWidth = "100%";
-//       divPrincipal.style.maxHeight = "45%";
-//       divPrincipal.style.minHeight = "45%";
-//       divPrincipal.style.padding = "0";
-//       // Crear el div para el encabezado
-//       const divEncabezado = document.createElement("div");
-//       divEncabezado.className = "card-header titulo-detalles";
-//       divEncabezado.style.margin = "0";
-//       divEncabezado.style.padding = "0.5%";
-//       divEncabezado.style.backgroundColor = "#85c1e9";
-//       const encabezadoTexto = document.createElement("p");
-//       encabezadoTexto.textContent = servicio.nombre;
-//       divEncabezado.appendChild(encabezadoTexto);
-//       // Crear el div para el cuerpo de la tarjeta
-//       const divCuerpo = document.createElement("div");
-//       divCuerpo.className = "card-body card-cuerpo card-s-cuerpo";
-//       divCuerpo.style.padding = "1em";
-//       // Crear el div con las columnas
-//       const divColumnas = document.createElement("div");
-//       divColumnas.className = "col-12";
-//       const divFila = document.createElement("div");
-//       divFila.className = "row";
-//       // Crear las columnas con sus contenidos
-//       totalPagarEdit += servicio.total;
-//       const columnas = [
-//         { titulo: "Valor:", contenido: servicio.valor },
-//         { titulo: "Desc:", contenido: servicio.tipodescuento },
-//         { titulo: "Valor desc:", contenido: servicio.descuento },
-//         { titulo: "Total:", contenido: servicio.total },
-//         { titulo: "Aplazable:", contenido: servicio.total },
-//         { titulo: "Abono:", contenido: servicio.total },
-//       ];
-//       columnas.forEach((columna) => {
-//         const divColumna = document.createElement("div");
-//         divColumna.className = "col-3 card-cuerpo";
-//         const pTitulo = document.createElement("p");
-//         pTitulo.textContent = columna.titulo;
-//         const pContenido = document.createElement("p");
-//         pContenido.textContent = columna.contenido;
-//         divColumna.appendChild(pTitulo);
-//         divColumna.appendChild(pContenido);
-//         divFila.appendChild(divColumna);
-//       });
-//       divColumnas.appendChild(divFila);
-//       divCuerpo.appendChild(divColumnas);
-//       // Agregar los elementos al div principal
-//       divPrincipal.appendChild(divEncabezado);
-//       divPrincipal.appendChild(divCuerpo);
-//       // Agregar el div principal al documento (por ejemplo, al cuerpo del documento)
-//       // document.body.appendChild(divPrincipal);
-//       if (tipo == "fijos") {
-//         serviciosFijosList.appendChild(divPrincipal);
-//       } else {
-//         otrosServiciosList.appendChild(divPrincipal);
-//       }
-//     } else if (servicio.nombre === "Agua Potable") {
-//       editDetalleId = servicio.id;
-//       console.log("Id del detalle Agua: " + editDetalleId);
-//     }
-//   });
-//   totalFinal += totalPagarEdit;
-// }
-
+  console.log("Total de edit: ", totalFinal);
+  recalcularConsumo();
+}
 
 var getPlanillas = function getPlanillas(criterio, criterioContent, estado, anio, mes) {
-  return regeneratorRuntime.async(function getPlanillas$(_context5) {
+  return regeneratorRuntime.async(function getPlanillas$(_context6) {
     while (1) {
-      switch (_context5.prev = _context5.next) {
+      switch (_context6.prev = _context6.next) {
         case 0:
-          _context5.next = 2;
+          _context6.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosPlanillas", criterio, criterioContent, estado, anio, mes));
 
         case 2:
-          planillas = _context5.sent;
+          planillas = _context6.sent;
           console.log(planillas);
           renderPlanillas(planillas);
 
         case 5:
         case "end":
-          return _context5.stop();
+          return _context6.stop();
       }
     }
   });
 };
 
 function init() {
-  var fechaActual, anioEnviar, mesEnviar, criterioEnviar, criterioContentEnviar, estadoEnviar;
-  return regeneratorRuntime.async(function init$(_context6) {
-    while (1) {
-      switch (_context6.prev = _context6.next) {
-        case 0:
-          fechaActual = new Date();
-          anioEnviar = fechaActual.getFullYear();
-          mesEnviar = fechaActual.getMonth() + 1;
-          criterioEnviar = criterioBuscar.value;
-          criterioContentEnviar = criterioContent.value;
-          estadoEnviar = estadoBuscar.value;
-          console.log("error", mesEnviar, anioEnviar);
-          _context6.next = 9;
-          return regeneratorRuntime.awrap(getPlanillas(criterioEnviar, criterioContentEnviar, estadoEnviar, anioEnviar, mesEnviar));
-
-        case 9:
-          cargarAnioBusquedas();
-          cargarMesActual();
-
-        case 11:
-        case "end":
-          return _context6.stop();
-      }
-    }
-  });
-}
-
-function calcularConsumo() {
-  var consumo, base, limitebase, tarifas;
-  return regeneratorRuntime.async(function calcularConsumo$(_context7) {
+  return regeneratorRuntime.async(function init$(_context7) {
     while (1) {
       switch (_context7.prev = _context7.next) {
         case 0:
-          console.log("Consultando tarifas ...");
-          consumo = Math.round(lecturaActual.value - lecturaAnterior.value);
-          base = 0.0;
-          limitebase = 15.0;
-          console.log("Consumo: " + consumo);
-          _context7.next = 7;
-          return regeneratorRuntime.awrap(ipcRenderer.invoke("getTarifas"));
+          // let fechaActual = new Date();
+          // let anioEnviar = fechaActual.getFullYear();
+          // let mesEnviar = fechaActual.getMonth() + 1;
+          // let criterioEnviar = criterioBuscar.value;
+          // let criterioContentEnviar = criterioContent.value;
+          // let estadoEnviar = estadoBuscar.value;
+          // console.log("error", mesEnviar, anioEnviar);
+          // await getPlanillas(
+          //   criterioEnviar,
+          //   criterioContentEnviar,
+          //   estadoEnviar,
+          //   anioEnviar,
+          //   mesEnviar
+          // );
+          buscarPlanillas();
+          getTarifasDisponibles();
+          cargarAnioBusquedas();
+          cargarMesActual();
 
-        case 7:
-          tarifas = _context7.sent;
-
-          if (tarifas[0] !== undefined) {
-            tarifas.forEach(function (tarifa) {
-              if (consumo >= tarifa.desde && consumo <= tarifa.hasta) {
-                tarifaAplicada = tarifa.tarifa;
-                valorTarifa = tarifa.valor;
-              }
-
-              if (tarifa.tarifa === "Familiar") {
-                base = tarifa.valor;
-                limitebase = tarifa.hasta;
-              }
-            });
-          }
-
-          if (tarifaAplicada === "Familiar") {
-            valorConsumo.value = valorTarifa.toFixed(2);
-          } else {
-            totalConsumo = (consumo - limitebase) * valorTarifa;
-            valorConsumo.value = (totalConsumo + base).toFixed(2);
-          }
-
-          tarifaConsumo.value = tarifaAplicada + "($" + valorTarifa + ")";
-          console.log("Tarifa: " + tarifaAplicada + "(" + valorTarifa + ")");
-
-        case 12:
+        case 4:
         case "end":
           return _context7.stop();
       }
@@ -802,26 +805,142 @@ function calcularConsumo() {
   });
 }
 
-function recalcularConsumo() {
-  var totalRecalculado;
-  return regeneratorRuntime.async(function recalcularConsumo$(_context8) {
+ipcRenderer.on("Notificar", function (event, response) {
+  if (response.title === "Borrado!") {// resetFormAfterSave();
+  } else if (response.title === "Actualizado!") {
+    resetFormAfterUpdate();
+  } else if (response.title === "Guardado!") {// resetFormAfterSave();
+  }
+
+  console.log("Response: " + response);
+
+  if (response.success) {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "success",
+      confirmButtonColor: "#f8c471"
+    });
+  } else {
+    Swal.fire({
+      title: response.title,
+      text: response.message,
+      icon: "error",
+      confirmButtonColor: "#f8c471"
+    });
+  }
+});
+lecturaActual.addEventListener("input", function () {
+  recalcularConsumo();
+});
+
+function getTarifasDisponibles() {
+  return regeneratorRuntime.async(function getTarifasDisponibles$(_context8) {
     while (1) {
       switch (_context8.prev = _context8.next) {
         case 0:
           _context8.next = 2;
-          return regeneratorRuntime.awrap(calcularConsumo());
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("getTarifas"));
 
         case 2:
+          tarifasDisponibles = _context8.sent;
+          console.log("Tartifas disponibles :", tarifasDisponibles);
+
+        case 4:
+        case "end":
+          return _context8.stop();
+      }
+    }
+  });
+}
+
+function calcularConsumo() {
+  var consumo, base, limitebase;
+  return regeneratorRuntime.async(function calcularConsumo$(_context9) {
+    while (1) {
+      switch (_context9.prev = _context9.next) {
+        case 0:
+          console.log("Consultando tarifas ...");
+          totalConsumo = 0;
+          consumo = Math.round(lecturaActual.value - lecturaAnterior.value);
+          base = 0.0;
+          limitebase = 15.0;
+          console.log("Consumo redondeado cC: " + consumo);
+          console.log("Tarifas: " + tarifasDisponibles);
+
+          if (tarifasDisponibles[0] !== undefined) {
+            tarifasDisponibles.forEach(function (tarifa) {
+              if (consumo >= tarifa.desde && consumo <= tarifa.hasta) {
+                tarifaAplicada = tarifa.tarifa;
+                valorTarifa = tarifa.valor;
+                console.log("VAlores que se asignaran: ", tarifaAplicada + "|" + valorTarifa);
+              }
+
+              if (tarifa.tarifa == "Familiar") {
+                base = tarifa.valor;
+                limitebase = tarifa.hasta;
+                console.log("Bases: ", base + "|" + limitebase);
+              }
+            });
+          }
+
+          if (tarifaAplicada === "Familiar") {
+            console.log("Aplicando tarifa familiar: " + valorTarifa.toFixed(2));
+            valorConsumo.value = valorTarifa.toFixed(2);
+          } else {
+            totalConsumo = (consumo - limitebase) * valorTarifa;
+            console.log("Total consumo que excede la base: ", totalConsumo + "|" + base);
+            valorConsumo.value = (totalConsumo + base).toFixed(2);
+          }
+
+          valorConsumo.value = (totalConsumo + base).toFixed(2);
+          tarifaConsumo.value = tarifaAplicada + "($" + valorTarifa + ")";
+          console.log("Tarifa: " + tarifaAplicada + "(" + valorTarifa + ")");
+
+        case 12:
+        case "end":
+          return _context9.stop();
+      }
+    }
+  });
+}
+
+function recalcularConsumo() {
+  var totalRecalculado, _totalRecalculado;
+
+  return regeneratorRuntime.async(function recalcularConsumo$(_context10) {
+    while (1) {
+      switch (_context10.prev = _context10.next) {
+        case 0:
+          if (!planillaMedidorSn) {
+            _context10.next = 11;
+            break;
+          }
+
+          _context10.next = 3;
+          return regeneratorRuntime.awrap(calcularConsumo());
+
+        case 3:
           console.log("tf-tc: " + totalFinal, totalConsumo);
           totalRecalculado = totalFinal;
           console.log("totalRecalculado: " + totalRecalculado);
           console.log("Valor consumo: " + valorConsumo.value);
           totalRecalculado += parseFloat(valorConsumo.value);
           valorTotalPagar.value = totalRecalculado.toFixed(2);
+          _context10.next = 17;
+          break;
 
-        case 8:
+        case 11:
+          console.log("tf-tc: " + totalFinal, totalConsumo);
+          _totalRecalculado = totalFinal;
+          console.log("totalRecalculado: " + _totalRecalculado);
+          console.log("Valor consumo: " + valorConsumo.value);
+          _totalRecalculado += parseFloat(valorConsumo.value);
+          valorTotalPagar.value = _totalRecalculado.toFixed(2);
+
+        case 17:
         case "end":
-          return _context8.stop();
+          return _context10.stop();
       }
     }
   });
@@ -839,40 +958,25 @@ function formatearFecha(fecha) {
 
 function generarPlanilla() {
   var result;
-  return regeneratorRuntime.async(function generarPlanilla$(_context9) {
+  return regeneratorRuntime.async(function generarPlanilla$(_context11) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context11.prev = _context11.next) {
         case 0:
           console.log("js");
-          _context9.next = 3;
+          _context11.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("createPlanilla"));
 
         case 3:
-          result = _context9.sent;
+          result = _context11.sent;
           console.log(result); //getPlanillas();
 
         case 5:
         case "end":
-          return _context9.stop();
+          return _context11.stop();
       }
     }
   });
-} // Funciones de los elementos
-// Obtener el elemento select
-// var selectAnio = document.getElementById("anio");
-// // Obtener el año actual
-// var anioActual = new Date().getFullYear();
-// // Crear opciones de años desde el año actual hacia atrás
-// for (var i = anioActual; i >= 2000; i--) {
-//   var option = document.createElement("option");
-//   option.value = i;
-//   option.text = i;
-//   if (i === anioActual) {
-//     option.selected = true;
-//   }
-//   selectAnio.appendChild(option);
-// }
-
+}
 
 function obtenerRangoFecha() {
   var anioD = parseInt(anioBusqueda.value);
@@ -894,7 +998,7 @@ function obtenerPrimerYUltimoDiaDeMes(anio, mes) {
 }
 
 function cargarMesActual() {
-  mesBusqueda.innerHTML = ""; // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
+  mesBusqueda.innerHTML = '<option value="all" selected>Todo mes</option>'; // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
 
   var mesActual = new Date().getMonth(); // Array de nombres de meses
 
@@ -902,24 +1006,22 @@ function cargarMesActual() {
 
   for (var i = 0; i < nombresMeses.length; i++) {
     var option = document.createElement("option");
-    option.value = i; // El valor es el índice del mes
+    option.value = i + 1; // El valor es el índice del mes
 
     option.textContent = nombresMeses[i];
 
     if (i === mesActual) {
-      console.log("seleccionando: " + mesActual);
-      option.selected = true;
+      console.log("seleccionando: " + mesActual); // option.selected = true;
     }
 
     mesBusqueda.appendChild(option);
   } // Establece el mes actual como seleccionado
+  // mesBusqueda.value = mesActual;
 
-
-  mesBusqueda.value = mesActual;
 }
 
 function cargarAnioBusquedas() {
-  anioBusqueda.innerHTML = ""; // Obtener el año actual
+  anioBusqueda.innerHTML = '<option value="all" selected>Todo año</option>'; // Obtener el año actual
 
   var anioActual = new Date().getFullYear(); // Crear opciones de años desde el año actual hacia atrás
 
@@ -928,38 +1030,72 @@ function cargarAnioBusquedas() {
     option.value = i;
     option.text = i;
 
-    if (i === anioActual) {
-      option.selected = true;
+    if (i === anioActual) {// option.selected = true;
     }
 
     anioBusqueda.appendChild(option);
   }
 }
 
-var administrarServicios = function administrarServicios(servicioId, tipo) {
-  return regeneratorRuntime.async(function administrarServicios$(_context10) {
+criterioBuscar.addEventListener("change", function () {
+  if (criterioBuscar.value == "all") {
+    buscarPlanillas();
+    criterioContent.value = "";
+    criterioContent.readOnly = true;
+  } else {
+    criterioContent.readOnly = false;
+  }
+});
+btnBuscar.addEventListener("click", function () {
+  buscarPlanillas();
+});
+
+function buscarPlanillas() {
+  var mesBuscar, anioBuscar, criterioABuscar, criterioContentABuscar, estadoABuscar;
+  return regeneratorRuntime.async(function buscarPlanillas$(_context12) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context12.prev = _context12.next) {
+        case 0:
+          mesBuscar = mesBusqueda.value;
+          anioBuscar = anioBusqueda.value;
+          criterioABuscar = criterioBuscar.value;
+          criterioContentABuscar = criterioContent.value;
+          estadoABuscar = estadoBuscar.value;
+          _context12.next = 7;
+          return regeneratorRuntime.awrap(getPlanillas(criterioABuscar, criterioContentABuscar, estadoABuscar, anioBuscar, mesBuscar));
+
+        case 7:
+        case "end":
+          return _context12.stop();
+      }
+    }
+  });
+}
+
+var administrarServicios = function administrarServicios(servicioId, tipo) {
+  return regeneratorRuntime.async(function administrarServicios$(_context13) {
+    while (1) {
+      switch (_context13.prev = _context13.next) {
         case 0:
           if (!(tipo === "Servicio fijo")) {
-            _context10.next = 5;
+            _context13.next = 5;
             break;
           }
 
-          _context10.next = 3;
+          _context13.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("datos-a-servicios", servicioId));
 
         case 3:
-          _context10.next = 7;
+          _context13.next = 7;
           break;
 
         case 5:
-          _context10.next = 7;
+          _context13.next = 7;
           return regeneratorRuntime.awrap(ipcRenderer.send("datos-a-ocacionales", servicioId));
 
         case 7:
         case "end":
-          return _context10.stop();
+          return _context13.stop();
       }
     }
   });
@@ -967,9 +1103,9 @@ var administrarServicios = function administrarServicios(servicioId, tipo) {
 
 var detallesServiciodg = function detallesServiciodg(servicio) {
   var aplazable, cancelados, pendientes, valorCancelado, valorAbonar, valorSaldo, pagosAnteriores;
-  return regeneratorRuntime.async(function detallesServiciodg$(_context12) {
+  return regeneratorRuntime.async(function detallesServiciodg$(_context15) {
     while (1) {
-      switch (_context12.prev = _context12.next) {
+      switch (_context15.prev = _context15.next) {
         case 0:
           errortextAbono.textContent = "Error";
           errContainer.style.display = "none";
@@ -998,11 +1134,11 @@ var detallesServiciodg = function detallesServiciodg(servicio) {
             pendientes + 1;
           }
 
-          _context12.next = 21;
+          _context15.next = 21;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDetallesByContratadoId", servicio.contratadosId));
 
         case 21:
-          pagosAnteriores = _context12.sent;
+          pagosAnteriores = _context15.sent;
           pagosAnteriores.forEach(function (pagoAnterior) {
             if (pagoAnterior !== null || pagoAnterior !== undefined) {
               if (pagoAnterior.estado === "Cancelado") {
@@ -1014,22 +1150,22 @@ var detallesServiciodg = function detallesServiciodg(servicio) {
             }
           });
 
-          administrarDg.onclick = function _callee3() {
+          administrarDg.onclick = function _callee4() {
             var servicioEnviar;
-            return regeneratorRuntime.async(function _callee3$(_context11) {
+            return regeneratorRuntime.async(function _callee4$(_context14) {
               while (1) {
-                switch (_context11.prev = _context11.next) {
+                switch (_context14.prev = _context14.next) {
                   case 0:
                     servicioEnviar = {
                       id: servicio.serviciosId
                     };
                     console.log("Administrar: " + servicioEnviar, servicio.tipo);
-                    _context11.next = 4;
+                    _context14.next = 4;
                     return regeneratorRuntime.awrap(administrarServicios(servicioEnviar, servicio.tipo));
 
                   case 4:
                   case "end":
-                    return _context11.stop();
+                    return _context14.stop();
                 }
               }
             });
@@ -1079,15 +1215,47 @@ var detallesServiciodg = function detallesServiciodg(servicio) {
 
         case 36:
         case "end":
-          return _context12.stop();
+          return _context15.stop();
       }
     }
   });
 };
 
-calcularConsumoBt.onclick = function () {
+function resetForm() {
+  planillaForm.reset();
+  lecturaActualEdit = 0;
+  lecturaAnteriorEdit = 0;
+  valorConsumoEdit = 0;
+  totalFinal = 0.0;
+  totalConsumo = 0.0;
+  tarifaAplicada = "Familiar";
+  valorTarifa = 2.0;
+  calcularConsumoBt.disabled = true;
+  editDetalleId = "";
+  editPlanillaId = "";
+  editContratoId = "";
+  fechaEmisionEdit = "";
+  editingStatus = false;
+  planillaMedidorSn = false;
+  serviciosFijosList.innerHTML = "";
+  otrosServiciosList.innerHTML = "";
+  otrosAplazablesList.innerHTML = "";
+  mostrarLecturas.innerHTML = "";
+  mostrarLecturas.innerHTML = "No aplica servicio de agua potable" + '<i id="collapse" class="fs-3 fa-solid fa-caret-down"></i>';
+  contenedorLecturas.style.display = "none";
+  collapse.classList.add("fa-caret-down");
+  collapse.classList.remove("fa-caret-up");
+}
+
+function resetFormAfterUpdate() {
+  editPlanilla(editPlanillaId, editContratoId, fechaEmisionEdit);
   recalcularConsumo();
-};
+}
+
+cancelarForm.addEventListener("click", function () {
+  console.log("Borrando form");
+  resetForm();
+});
 
 mostrarLecturas.onclick = function () {
   if (contenedorLecturas.style.display == "none") {
@@ -1101,16 +1269,11 @@ mostrarLecturas.onclick = function () {
   }
 };
 
-var administrarServiciosdg = function administrarServiciosdg(id) {
-  return regeneratorRuntime.async(function administrarServiciosdg$(_context13) {
-    while (1) {
-      switch (_context13.prev = _context13.next) {
-        case 0:
-        case "end":
-          return _context13.stop();
-      }
-    }
-  });
+calcularConsumoBt.onclick = function () {
+  lecturaActual.value = lecturaActualEdit;
+  lecturaAnterior.value = lecturaAnteriorEdit;
+  valorConsumo.value = valorConsumoEdit;
+  calcularConsumo();
 };
 
 function mostrarFormServicios() {
@@ -1123,6 +1286,12 @@ function mostrarFormServicios() {
 
 function CerrarFormServicios() {
   dialogServicios.close();
+}
+
+function aproximarDosDecimales(numero) {
+  // Redondea el número hacia arriba
+  var numeroRedondeado = Math.ceil(numero * 100) / 100;
+  return numeroRedondeado.toFixed(2);
 } // Transicion entre las secciones de la vista
 
 
@@ -1143,47 +1312,11 @@ btnSeccion2.addEventListener("click", function () {
 
 var abrirInicio = function abrirInicio() {
   var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context14) {
-    while (1) {
-      switch (_context14.prev = _context14.next) {
-        case 0:
-          url = "src/ui/principal.html";
-          _context14.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context14.stop();
-      }
-    }
-  });
-};
-
-var abrirSocios = function abrirSocios() {
-  var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context15) {
-    while (1) {
-      switch (_context15.prev = _context15.next) {
-        case 0:
-          url = "src/ui/socios.html";
-          _context15.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context15.stop();
-      }
-    }
-  });
-};
-
-var abrirUsuarios = function abrirUsuarios() {
-  var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context16) {
+  return regeneratorRuntime.async(function abrirInicio$(_context16) {
     while (1) {
       switch (_context16.prev = _context16.next) {
         case 0:
-          url = "src/ui/usuarios.html";
+          url = "src/ui/principal.html";
           _context16.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1195,13 +1328,13 @@ var abrirUsuarios = function abrirUsuarios() {
   });
 };
 
-var abrirPagos = function abrirPagos() {
+var abrirSocios = function abrirSocios() {
   var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context17) {
+  return regeneratorRuntime.async(function abrirSocios$(_context17) {
     while (1) {
       switch (_context17.prev = _context17.next) {
         case 0:
-          url = "src/ui/planillas.html";
+          url = "src/ui/socios.html";
           _context17.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1213,13 +1346,13 @@ var abrirPagos = function abrirPagos() {
   });
 };
 
-var abrirPlanillas = function abrirPlanillas() {
+var abrirUsuarios = function abrirUsuarios() {
   var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context18) {
+  return regeneratorRuntime.async(function abrirUsuarios$(_context18) {
     while (1) {
       switch (_context18.prev = _context18.next) {
         case 0:
-          url = "src/ui/planillas-cuotas.html";
+          url = "src/ui/usuarios.html";
           _context18.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1231,13 +1364,13 @@ var abrirPlanillas = function abrirPlanillas() {
   });
 };
 
-var abrirParametros = function abrirParametros() {
+var abrirPagos = function abrirPagos() {
   var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context19) {
+  return regeneratorRuntime.async(function abrirPagos$(_context19) {
     while (1) {
       switch (_context19.prev = _context19.next) {
         case 0:
-          url = "src/ui/parametros.html";
+          url = "src/ui/planillas.html";
           _context19.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1249,13 +1382,13 @@ var abrirParametros = function abrirParametros() {
   });
 };
 
-var abrirImplementos = function abrirImplementos() {
+var abrirPlanillas = function abrirPlanillas() {
   var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context20) {
+  return regeneratorRuntime.async(function abrirPlanillas$(_context20) {
     while (1) {
       switch (_context20.prev = _context20.next) {
         case 0:
-          url = "src/ui/implementos.html";
+          url = "src/ui/planillas-cuotas.html";
           _context20.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
@@ -1267,19 +1400,55 @@ var abrirImplementos = function abrirImplementos() {
   });
 };
 
-var abrirContratos = function abrirContratos() {
+var abrirParametros = function abrirParametros() {
   var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context21) {
+  return regeneratorRuntime.async(function abrirParametros$(_context21) {
     while (1) {
       switch (_context21.prev = _context21.next) {
         case 0:
-          url = "src/ui/medidores.html";
+          url = "src/ui/parametros.html";
           _context21.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
 
         case 3:
         case "end":
           return _context21.stop();
+      }
+    }
+  });
+};
+
+var abrirImplementos = function abrirImplementos() {
+  var url;
+  return regeneratorRuntime.async(function abrirImplementos$(_context22) {
+    while (1) {
+      switch (_context22.prev = _context22.next) {
+        case 0:
+          url = "src/ui/implementos.html";
+          _context22.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context22.stop();
+      }
+    }
+  });
+};
+
+var abrirContratos = function abrirContratos() {
+  var url;
+  return regeneratorRuntime.async(function abrirContratos$(_context23) {
+    while (1) {
+      switch (_context23.prev = _context23.next) {
+        case 0:
+          url = "src/ui/medidores.html";
+          _context23.next = 3;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+
+        case 3:
+        case "end":
+          return _context23.stop();
       }
     }
   });

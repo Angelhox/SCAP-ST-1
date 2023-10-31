@@ -554,6 +554,31 @@ ipcMain.on("datos-a-pagina3", function _callee13(event, datos, encabezado, recau
       }
     }
   });
+});
+ipcMain.on("contrato-desde-socios", function _callee14(event, socioId, socioCedula) {
+  return regeneratorRuntime.async(function _callee14$(_context14) {
+    while (1) {
+      switch (_context14.prev = _context14.next) {
+        case 0:
+          console.log("Datos a enviar: " + socioId, socioCedula); // pagina2Window = new BrowserWindow({ show: false });
+
+          _context14.next = 3;
+          return regeneratorRuntime.awrap(window.loadFile("src/ui/contratos.html"));
+
+        case 3:
+          _context14.next = 5;
+          return regeneratorRuntime.awrap(window.show());
+
+        case 5:
+          _context14.next = 7;
+          return regeneratorRuntime.awrap(window.webContents.send("contrato-desde-socios", socioId, socioCedula));
+
+        case 7:
+        case "end":
+          return _context14.stop();
+      }
+    }
+  });
 }); // Recibe la peticion de la pagina de planillas para
 // enviar a la pagina de servicios.
 // ipcMain.on("datos-a-servicios", async (event, servicio) => {
@@ -567,46 +592,21 @@ ipcMain.on("datos-a-pagina3", function _callee13(event, datos, encabezado, recau
 // Funciones de los cargos
 // ----------------------------------------------------------------
 
-ipcMain.handle("pido-datos", function _callee14() {
-  return regeneratorRuntime.async(function _callee14$(_context14) {
-    while (1) {
-      switch (_context14.prev = _context14.next) {
-        case 0:
-          return _context14.abrupt("return", servicioEnviar);
-
-        case 1:
-        case "end":
-          return _context14.stop();
-      }
-    }
-  });
-});
-ipcMain.handle("getCargos", function _callee15() {
-  var conn, results;
+ipcMain.handle("pido-datos", function _callee15() {
   return regeneratorRuntime.async(function _callee15$(_context15) {
     while (1) {
       switch (_context15.prev = _context15.next) {
         case 0:
-          _context15.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
+          return _context15.abrupt("return", servicioEnviar);
 
-        case 2:
-          conn = _context15.sent;
-          results = conn.query("SELECT * FROM cargosempleados");
-          console.log(results);
-          return _context15.abrupt("return", results);
-
-        case 6:
+        case 1:
         case "end":
           return _context15.stop();
       }
     }
   });
-}); // ----------------------------------------------------------------
-// Funciones de los accesos
-// ----------------------------------------------------------------
-
-ipcMain.handle("getAccesos", function _callee16() {
+});
+ipcMain.handle("getCargos", function _callee16() {
   var conn, results;
   return regeneratorRuntime.async(function _callee16$(_context16) {
     while (1) {
@@ -617,7 +617,7 @@ ipcMain.handle("getAccesos", function _callee16() {
 
         case 2:
           conn = _context16.sent;
-          results = conn.query("SELECT * FROM roles");
+          results = conn.query("SELECT * FROM cargosempleados");
           console.log(results);
           return _context16.abrupt("return", results);
 
@@ -628,12 +628,11 @@ ipcMain.handle("getAccesos", function _callee16() {
     }
   });
 }); // ----------------------------------------------------------------
-// Funciones de los usuarios
+// Funciones de los accesos
 // ----------------------------------------------------------------
 
-ipcMain.handle("getUsuarios", function _callee17(event, criterio, criterioContent) {
-  var conn, results, _results;
-
+ipcMain.handle("getAccesos", function _callee17() {
+  var conn, results;
   return regeneratorRuntime.async(function _callee17$(_context17) {
     while (1) {
       switch (_context17.prev = _context17.next) {
@@ -643,43 +642,22 @@ ipcMain.handle("getUsuarios", function _callee17(event, criterio, criterioConten
 
         case 2:
           conn = _context17.sent;
-          _context17.prev = 3;
-
-          if (!(criterio === "all")) {
-            _context17.next = 10;
-            break;
-          }
-
-          results = conn.query("SELECT * FROM viewUsuarios");
+          results = conn.query("SELECT * FROM roles");
           console.log(results);
           return _context17.abrupt("return", results);
 
-        case 10:
-          _results = conn.query("SELECT * FROM viewUsuarios WHERE " + criterio + " like '%" + criterioContent + "%';");
-          console.log(_results);
-          return _context17.abrupt("return", _results);
-
-        case 13:
-          _context17.next = 18;
-          break;
-
-        case 15:
-          _context17.prev = 15;
-          _context17.t0 = _context17["catch"](3);
-          console.log(_context17.t0);
-
-        case 18:
+        case 6:
         case "end":
           return _context17.stop();
       }
     }
-  }, null, null, [[3, 15]]);
+  });
 }); // ----------------------------------------------------------------
-// Obtenemos los datos de los empleados que no son usuarios del sistema
+// Funciones de los usuarios
 // ----------------------------------------------------------------
 
-ipcMain.handle("getEmpleados", function _callee18(event, criterio, criterioContent) {
-  var conn, results, _results2;
+ipcMain.handle("getUsuarios", function _callee18(event, criterio, criterioContent) {
+  var conn, _results, _results2;
 
   return regeneratorRuntime.async(function _callee18$(_context18) {
     while (1) {
@@ -697,12 +675,12 @@ ipcMain.handle("getEmpleados", function _callee18(event, criterio, criterioConte
             break;
           }
 
-          results = conn.query("SELECT * FROM viewEmpleados;");
-          console.log(results);
-          return _context18.abrupt("return", results);
+          _results = conn.query("SELECT * FROM viewUsuarios");
+          console.log(_results);
+          return _context18.abrupt("return", _results);
 
         case 10:
-          _results2 = conn.query("SELECT * FROM viewEmpleados WHERE " + criterio + " like '%" + criterioContent + "%';");
+          _results2 = conn.query("SELECT * FROM viewUsuarios WHERE " + criterio + " like '%" + criterioContent + "%';");
           console.log(_results2);
           return _context18.abrupt("return", _results2);
 
@@ -721,65 +699,56 @@ ipcMain.handle("getEmpleados", function _callee18(event, criterio, criterioConte
       }
     }
   }, null, null, [[3, 15]]);
-});
-ipcMain.handle("createUsuario", function _callee19(event, empleado, usuario) {
-  var conn, resultEmpleado, resultUsuario;
+}); // ----------------------------------------------------------------
+// Obtenemos los datos de los empleados que no son usuarios del sistema
+// ----------------------------------------------------------------
+
+ipcMain.handle("getEmpleados", function _callee19(event, criterio, criterioContent) {
+  var conn, _results3, _results4;
+
   return regeneratorRuntime.async(function _callee19$(_context19) {
     while (1) {
       switch (_context19.prev = _context19.next) {
         case 0:
-          _context19.prev = 0;
-          _context19.next = 3;
+          _context19.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 3:
+        case 2:
           conn = _context19.sent;
-          console.log("Recibido: ", usuario); //   product.price = parseFloat(product.price);
-          // const resultCargo = await conn.query(
-          //   "Insert into cargosempleados set ? ;",
-          //   cargo
-          // );
-          //empleado.cargosId = resultCargo.insertId;
+          _context19.prev = 3;
 
-          _context19.next = 7;
-          return regeneratorRuntime.awrap(conn.query("Insert into empleados set ? ;", empleado));
+          if (!(criterio === "all")) {
+            _context19.next = 10;
+            break;
+          }
 
-        case 7:
-          resultEmpleado = _context19.sent;
-          usuario.empleadosId = resultEmpleado.insertId;
-          _context19.next = 11;
-          return regeneratorRuntime.awrap(conn.query("Insert into usuarios set ?", usuario));
+          _results3 = conn.query("SELECT * FROM viewEmpleados;");
+          console.log(_results3);
+          return _context19.abrupt("return", _results3);
 
-        case 11:
-          resultUsuario = _context19.sent;
-          console.log(resultUsuario);
-          event.sender.send("Notificar", {
-            success: true,
-            title: "Guardado!",
-            message: "Se ha guardado el nuevo registro."
-          });
-          usuario.id = resultUsuario.insertId;
-          return _context19.abrupt("return", usuario);
+        case 10:
+          _results4 = conn.query("SELECT * FROM viewEmpleados WHERE " + criterio + " like '%" + criterioContent + "%';");
+          console.log(_results4);
+          return _context19.abrupt("return", _results4);
 
-        case 18:
-          _context19.prev = 18;
-          _context19.t0 = _context19["catch"](0);
-          event.sender.send("Notificar", {
-            success: false,
-            title: "Error!",
-            message: "Ha ocurrido un error al guardar el registro."
-          });
+        case 13:
+          _context19.next = 18;
+          break;
+
+        case 15:
+          _context19.prev = 15;
+          _context19.t0 = _context19["catch"](3);
           console.log(_context19.t0);
 
-        case 22:
+        case 18:
         case "end":
           return _context19.stop();
       }
     }
-  }, null, null, [[0, 18]]);
+  }, null, null, [[3, 15]]);
 });
-ipcMain.handle("createEmpleado", function _callee20(event, empleado) {
-  var conn, resultEmpleado;
+ipcMain.handle("createUsuario", function _callee20(event, empleado, usuario) {
+  var conn, resultEmpleado, resultUsuario;
   return regeneratorRuntime.async(function _callee20$(_context20) {
     while (1) {
       switch (_context20.prev = _context20.next) {
@@ -790,11 +759,11 @@ ipcMain.handle("createEmpleado", function _callee20(event, empleado) {
 
         case 3:
           conn = _context20.sent;
-          console.log("Recibido: ", empleado); // const resultCargo = await conn.query(
+          console.log("Recibido: ", usuario); //   product.price = parseFloat(product.price);
+          // const resultCargo = await conn.query(
           //   "Insert into cargosempleados set ? ;",
           //   cargo
           // );
-          // console.log("Se inserto el cargo" + resultCargo.insertId);
           //empleado.cargosId = resultCargo.insertId;
 
           _context20.next = 7;
@@ -802,6 +771,62 @@ ipcMain.handle("createEmpleado", function _callee20(event, empleado) {
 
         case 7:
           resultEmpleado = _context20.sent;
+          usuario.empleadosId = resultEmpleado.insertId;
+          _context20.next = 11;
+          return regeneratorRuntime.awrap(conn.query("Insert into usuarios set ?", usuario));
+
+        case 11:
+          resultUsuario = _context20.sent;
+          console.log(resultUsuario);
+          event.sender.send("Notificar", {
+            success: true,
+            title: "Guardado!",
+            message: "Se ha guardado el nuevo registro."
+          });
+          usuario.id = resultUsuario.insertId;
+          return _context20.abrupt("return", usuario);
+
+        case 18:
+          _context20.prev = 18;
+          _context20.t0 = _context20["catch"](0);
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "Ha ocurrido un error al guardar el registro."
+          });
+          console.log(_context20.t0);
+
+        case 22:
+        case "end":
+          return _context20.stop();
+      }
+    }
+  }, null, null, [[0, 18]]);
+});
+ipcMain.handle("createEmpleado", function _callee21(event, empleado) {
+  var conn, resultEmpleado;
+  return regeneratorRuntime.async(function _callee21$(_context21) {
+    while (1) {
+      switch (_context21.prev = _context21.next) {
+        case 0:
+          _context21.prev = 0;
+          _context21.next = 3;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 3:
+          conn = _context21.sent;
+          console.log("Recibido: ", empleado); // const resultCargo = await conn.query(
+          //   "Insert into cargosempleados set ? ;",
+          //   cargo
+          // );
+          // console.log("Se inserto el cargo" + resultCargo.insertId);
+          //empleado.cargosId = resultCargo.insertId;
+
+          _context21.next = 7;
+          return regeneratorRuntime.awrap(conn.query("Insert into empleados set ? ;", empleado));
+
+        case 7:
+          resultEmpleado = _context21.sent;
           console.log(resultEmpleado);
           event.sender.send("Notificar", {
             success: true,
@@ -809,21 +834,21 @@ ipcMain.handle("createEmpleado", function _callee20(event, empleado) {
             message: "Se ha guardado el nuevo registro."
           });
           empleado.id = resultEmpleado.insertId;
-          return _context20.abrupt("return", empleado);
+          return _context21.abrupt("return", empleado);
 
         case 14:
-          _context20.prev = 14;
-          _context20.t0 = _context20["catch"](0);
+          _context21.prev = 14;
+          _context21.t0 = _context21["catch"](0);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al guardar el registro."
           });
-          console.error("Ha ocurrido un error: ", _context20.t0);
+          console.error("Ha ocurrido un error: ", _context21.t0);
 
         case 18:
         case "end":
-          return _context20.stop();
+          return _context21.stop();
       }
     }
   }, null, null, [[0, 14]]);
@@ -831,32 +856,7 @@ ipcMain.handle("createEmpleado", function _callee20(event, empleado) {
 // Obtenemos los datos del empleado usuario del sistema
 // ----------------------------------------------------------------
 
-ipcMain.handle("getUsuarioById", function _callee21(event, id) {
-  var conn, result;
-  return regeneratorRuntime.async(function _callee21$(_context21) {
-    while (1) {
-      switch (_context21.prev = _context21.next) {
-        case 0:
-          _context21.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context21.sent;
-          result = conn.query("select empleados.id,empleados.cedula," + "empleados.primerNombre,empleados.segundoNombre,empleados.primerApellido," + "empleados.segundoApellido,empleados.telefono,empleados.correo," + "cargosempleados.id as cargosId,cargosempleados.cargo," + "cargosempleados.cargoDescripcion," + " usuarios.id as usuariosId,roles.id as rolesId,roles.rol,roles.rolDescripcion," + " usuarios.usuario,usuarios.clave,usuarios.fechaModificacion " + "from empleados join usuarios on empleados.id=usuarios.empleadosId join " + "cargosempleados on cargosempleados.id=empleados.cargosId " + "join roles on roles.id=usuarios.rolesId where empleados.id=?;", id);
-          console.log(result);
-          return _context21.abrupt("return", result);
-
-        case 6:
-        case "end":
-          return _context21.stop();
-      }
-    }
-  });
-}); // ----------------------------------------------------------------
-// Obtenemos los datos del empleado no usuario del sistema
-// ----------------------------------------------------------------
-
-ipcMain.handle("getEmpleadoById", function _callee22(event, id) {
+ipcMain.handle("getUsuarioById", function _callee22(event, id) {
   var conn, result;
   return regeneratorRuntime.async(function _callee22$(_context22) {
     while (1) {
@@ -867,7 +867,7 @@ ipcMain.handle("getEmpleadoById", function _callee22(event, id) {
 
         case 2:
           conn = _context22.sent;
-          result = conn.query("select empleados.id,empleados.cedula," + "empleados.primerNombre,empleados.segundoNombre,empleados.primerApellido," + "empleados.segundoApellido,empleados.telefono,empleados.correo," + "cargosempleados.id as cargosId,cargosempleados.cargo," + "cargosempleados.cargoDescripcion " + "from empleados join " + "cargosempleados on cargosempleados.id=empleados.cargosId where empleados.id=? ;", id);
+          result = conn.query("select empleados.id,empleados.cedula," + "empleados.primerNombre,empleados.segundoNombre,empleados.primerApellido," + "empleados.segundoApellido,empleados.telefono,empleados.correo," + "cargosempleados.id as cargosId,cargosempleados.cargo," + "cargosempleados.cargoDescripcion," + " usuarios.id as usuariosId,roles.id as rolesId,roles.rol,roles.rolDescripcion," + " usuarios.usuario,usuarios.clave,usuarios.fechaModificacion " + "from empleados join usuarios on empleados.id=usuarios.empleadosId join " + "cargosempleados on cargosempleados.id=empleados.cargosId " + "join roles on roles.id=usuarios.rolesId where empleados.id=?;", id);
           console.log(result);
           return _context22.abrupt("return", result);
 
@@ -877,10 +877,12 @@ ipcMain.handle("getEmpleadoById", function _callee22(event, id) {
       }
     }
   });
-});
-ipcMain.handle("updateUsuario", function _callee23(event, id, empleado, usuario) {
-  var conn, resultEmpleado, usuarioExist, resultUsuario, _resultUsuario;
+}); // ----------------------------------------------------------------
+// Obtenemos los datos del empleado no usuario del sistema
+// ----------------------------------------------------------------
 
+ipcMain.handle("getEmpleadoById", function _callee23(event, id) {
+  var conn, result;
   return regeneratorRuntime.async(function _callee23$(_context23) {
     while (1) {
       switch (_context23.prev = _context23.next) {
@@ -890,78 +892,20 @@ ipcMain.handle("updateUsuario", function _callee23(event, id, empleado, usuario)
 
         case 2:
           conn = _context23.sent;
-          _context23.prev = 3;
-          _context23.next = 6;
-          return regeneratorRuntime.awrap(conn.query("UPDATE empleados set ? where id = ?", [empleado, id]));
+          result = conn.query("select empleados.id,empleados.cedula," + "empleados.primerNombre,empleados.segundoNombre,empleados.primerApellido," + "empleados.segundoApellido,empleados.telefono,empleados.correo," + "cargosempleados.id as cargosId,cargosempleados.cargo," + "cargosempleados.cargoDescripcion " + "from empleados join " + "cargosempleados on cargosempleados.id=empleados.cargosId where empleados.id=? ;", id);
+          console.log(result);
+          return _context23.abrupt("return", result);
 
         case 6:
-          resultEmpleado = _context23.sent;
-          console.log(resultEmpleado);
-
-          if (!(usuario.usuario !== null && usuario.usuario !== " " && usuario.clave !== null && usuario.clave !== " " && usuario.rol !== null && usuario.rol !== " " && usuario.rolDescripcion !== null && usuario.rolDescripcion !== " ")) {
-            _context23.next = 25;
-            break;
-          }
-
-          _context23.next = 11;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM usuarios WHERE usuarios.empleadosId=? order by usuarios.id desc limit 1;", id));
-
-        case 11:
-          usuarioExist = _context23.sent;
-
-          if (!(usuarioExist.length > 0 && usuarioExist[0].id !== null)) {
-            _context23.next = 20;
-            break;
-          }
-
-          console.log("existe el usuario: " + usuarioExist[0].id);
-          _context23.next = 16;
-          return regeneratorRuntime.awrap(conn.query("UPDATE usuarios set ? where empleadosId = ?;", [usuario, id]));
-
-        case 16:
-          resultUsuario = _context23.sent;
-          console.log("Se actualizó el usuario", resultUsuario);
-          _context23.next = 25;
-          break;
-
-        case 20:
-          usuario.empleadosId = id;
-          _context23.next = 23;
-          return regeneratorRuntime.awrap(conn.query("INSERT INTO usuarios SET ?", usuario));
-
-        case 23:
-          _resultUsuario = _context23.sent;
-          console.log("Se creó el usuario", _resultUsuario);
-
-        case 25:
-          event.sender.send("Notificar", {
-            success: true,
-            title: "Actualizado!",
-            message: "Se ha actualizado el registro."
-          });
-          _context23.next = 31;
-          break;
-
-        case 28:
-          _context23.prev = 28;
-          _context23.t0 = _context23["catch"](3);
-          event.sender.send("Notificar", {
-            success: false,
-            title: "Error!",
-            message: "Ha ocurrido un error al actualizar el registro."
-          });
-
-        case 31:
         case "end":
           return _context23.stop();
       }
     }
-  }, null, null, [[3, 28]]);
-}); // ----------------------------------------------------------------
-// ----------------------------------------------------------------
+  });
+});
+ipcMain.handle("updateUsuario", function _callee24(event, id, empleado, usuario) {
+  var conn, resultEmpleado, usuarioExist, resultUsuario, _resultUsuario;
 
-ipcMain.handle("updateEmpleado", function _callee24(event, id, empleado) {
-  var conn, resultEmpleado, usuarioExist;
   return regeneratorRuntime.async(function _callee24$(_context24) {
     while (1) {
       switch (_context24.prev = _context24.next) {
@@ -971,37 +915,118 @@ ipcMain.handle("updateEmpleado", function _callee24(event, id, empleado) {
 
         case 2:
           conn = _context24.sent;
-          resultEmpleado = null;
-          _context24.prev = 4;
-          _context24.next = 7;
+          _context24.prev = 3;
+          _context24.next = 6;
+          return regeneratorRuntime.awrap(conn.query("UPDATE empleados set ? where id = ?", [empleado, id]));
+
+        case 6:
+          resultEmpleado = _context24.sent;
+          console.log(resultEmpleado);
+
+          if (!(usuario.usuario !== null && usuario.usuario !== " " && usuario.clave !== null && usuario.clave !== " " && usuario.rol !== null && usuario.rol !== " " && usuario.rolDescripcion !== null && usuario.rolDescripcion !== " ")) {
+            _context24.next = 25;
+            break;
+          }
+
+          _context24.next = 11;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM usuarios WHERE usuarios.empleadosId=? order by usuarios.id desc limit 1;", id));
 
-        case 7:
+        case 11:
           usuarioExist = _context24.sent;
 
           if (!(usuarioExist.length > 0 && usuarioExist[0].id !== null)) {
-            _context24.next = 17;
+            _context24.next = 20;
+            break;
+          }
+
+          console.log("existe el usuario: " + usuarioExist[0].id);
+          _context24.next = 16;
+          return regeneratorRuntime.awrap(conn.query("UPDATE usuarios set ? where empleadosId = ?;", [usuario, id]));
+
+        case 16:
+          resultUsuario = _context24.sent;
+          console.log("Se actualizó el usuario", resultUsuario);
+          _context24.next = 25;
+          break;
+
+        case 20:
+          usuario.empleadosId = id;
+          _context24.next = 23;
+          return regeneratorRuntime.awrap(conn.query("INSERT INTO usuarios SET ?", usuario));
+
+        case 23:
+          _resultUsuario = _context24.sent;
+          console.log("Se creó el usuario", _resultUsuario);
+
+        case 25:
+          event.sender.send("Notificar", {
+            success: true,
+            title: "Actualizado!",
+            message: "Se ha actualizado el registro."
+          });
+          _context24.next = 31;
+          break;
+
+        case 28:
+          _context24.prev = 28;
+          _context24.t0 = _context24["catch"](3);
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "Ha ocurrido un error al actualizar el registro."
+          });
+
+        case 31:
+        case "end":
+          return _context24.stop();
+      }
+    }
+  }, null, null, [[3, 28]]);
+}); // ----------------------------------------------------------------
+// ----------------------------------------------------------------
+
+ipcMain.handle("updateEmpleado", function _callee25(event, id, empleado) {
+  var conn, resultEmpleado, usuarioExist;
+  return regeneratorRuntime.async(function _callee25$(_context25) {
+    while (1) {
+      switch (_context25.prev = _context25.next) {
+        case 0:
+          _context25.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context25.sent;
+          resultEmpleado = null;
+          _context25.prev = 4;
+          _context25.next = 7;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM usuarios WHERE usuarios.empleadosId=? order by usuarios.id desc limit 1;", id));
+
+        case 7:
+          usuarioExist = _context25.sent;
+
+          if (!(usuarioExist.length > 0 && usuarioExist[0].id !== null)) {
+            _context25.next = 17;
             break;
           }
 
           console.log("existe el usuario: " + usuarioExist[0].id);
           empleado.usuariosn = "Si";
-          _context24.next = 13;
+          _context25.next = 13;
           return regeneratorRuntime.awrap(conn.query("UPDATE empleados set ? where id = ?", [empleado, id]));
 
         case 13:
-          resultEmpleado = _context24.sent;
+          resultEmpleado = _context25.sent;
           console.log(resultEmpleado);
-          _context24.next = 22;
+          _context25.next = 22;
           break;
 
         case 17:
           empleado.usuariosn = "No";
-          _context24.next = 20;
+          _context25.next = 20;
           return regeneratorRuntime.awrap(conn.query("UPDATE empleados set ? where id = ?", [empleado, id]));
 
         case 20:
-          resultEmpleado = _context24.sent;
+          resultEmpleado = _context25.sent;
           console.log(resultEmpleado);
 
         case 22:
@@ -1010,61 +1035,10 @@ ipcMain.handle("updateEmpleado", function _callee24(event, id, empleado) {
             title: "Actualizado!",
             message: "Se ha actualizado el registro."
           });
-          return _context24.abrupt("return", resultEmpleado);
-
-        case 26:
-          _context24.prev = 26;
-          _context24.t0 = _context24["catch"](4);
-          event.sender.send("Notificar", {
-            success: false,
-            title: "Error!",
-            message: "Ha ocurrido un error al actualizar el registro."
-          });
-          console.log(_context24.t0);
-
-        case 30:
-        case "end":
-          return _context24.stop();
-      }
-    }
-  }, null, null, [[4, 26]]);
-}); // ----------------------------------------------------------------
-// Eliminar un usuario del sistema
-// ----------------------------------------------------------------
-
-ipcMain.handle("deleteUsuario", function _callee25(event, id) {
-  var conn, resultUsuario, resultEmpleado;
-  return regeneratorRuntime.async(function _callee25$(_context25) {
-    while (1) {
-      switch (_context25.prev = _context25.next) {
-        case 0:
-          console.log("id from main.js: ", id);
-          _context25.next = 3;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 3:
-          conn = _context25.sent;
-          _context25.prev = 4;
-          _context25.next = 7;
-          return regeneratorRuntime.awrap(conn.query("DELETE FROM usuarios WHERE  empleadosId=?", id));
-
-        case 7:
-          resultUsuario = _context25.sent;
-          _context25.next = 10;
-          return regeneratorRuntime.awrap(conn.query("UPDATE empleados SET usuariosn='No' WHERE id =?;", id));
-
-        case 10:
-          resultEmpleado = _context25.sent;
-          console.log(resultEmpleado);
-          event.sender.send("Notificar", {
-            success: true,
-            title: "Usuario eliminado!",
-            message: "Se ha actualizado el registro."
-          });
           return _context25.abrupt("return", resultEmpleado);
 
-        case 16:
-          _context25.prev = 16;
+        case 26:
+          _context25.prev = 26;
           _context25.t0 = _context25["catch"](4);
           event.sender.send("Notificar", {
             success: false,
@@ -1073,18 +1047,18 @@ ipcMain.handle("deleteUsuario", function _callee25(event, id) {
           });
           console.log(_context25.t0);
 
-        case 20:
+        case 30:
         case "end":
           return _context25.stop();
       }
     }
-  }, null, null, [[4, 16]]);
+  }, null, null, [[4, 26]]);
 }); // ----------------------------------------------------------------
-// Eliminar un empleado
+// Eliminar un usuario del sistema
 // ----------------------------------------------------------------
 
-ipcMain.handle("deleteEmpleado", function _callee26(event, id) {
-  var conn, resultEmpleado;
+ipcMain.handle("deleteUsuario", function _callee26(event, id) {
+  var conn, resultUsuario, resultEmpleado;
   return regeneratorRuntime.async(function _callee26$(_context26) {
     while (1) {
       switch (_context26.prev = _context26.next) {
@@ -1097,21 +1071,72 @@ ipcMain.handle("deleteEmpleado", function _callee26(event, id) {
           conn = _context26.sent;
           _context26.prev = 4;
           _context26.next = 7;
+          return regeneratorRuntime.awrap(conn.query("DELETE FROM usuarios WHERE  empleadosId=?", id));
+
+        case 7:
+          resultUsuario = _context26.sent;
+          _context26.next = 10;
+          return regeneratorRuntime.awrap(conn.query("UPDATE empleados SET usuariosn='No' WHERE id =?;", id));
+
+        case 10:
+          resultEmpleado = _context26.sent;
+          console.log(resultEmpleado);
+          event.sender.send("Notificar", {
+            success: true,
+            title: "Usuario eliminado!",
+            message: "Se ha actualizado el registro."
+          });
+          return _context26.abrupt("return", resultEmpleado);
+
+        case 16:
+          _context26.prev = 16;
+          _context26.t0 = _context26["catch"](4);
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "Ha ocurrido un error al actualizar el registro."
+          });
+          console.log(_context26.t0);
+
+        case 20:
+        case "end":
+          return _context26.stop();
+      }
+    }
+  }, null, null, [[4, 16]]);
+}); // ----------------------------------------------------------------
+// Eliminar un empleado
+// ----------------------------------------------------------------
+
+ipcMain.handle("deleteEmpleado", function _callee27(event, id) {
+  var conn, resultEmpleado;
+  return regeneratorRuntime.async(function _callee27$(_context27) {
+    while (1) {
+      switch (_context27.prev = _context27.next) {
+        case 0:
+          console.log("id from main.js: ", id);
+          _context27.next = 3;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 3:
+          conn = _context27.sent;
+          _context27.prev = 4;
+          _context27.next = 7;
           return regeneratorRuntime.awrap(conn.query("DELETE FROM empleados WHERE id =?;", id));
 
         case 7:
-          resultEmpleado = _context26.sent;
+          resultEmpleado = _context27.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Borrado!",
             message: "Se ha eliminado el usuario."
           });
           console.log(resultEmpleado);
-          return _context26.abrupt("return", resultEmpleado);
+          return _context27.abrupt("return", resultEmpleado);
 
         case 13:
-          _context26.prev = 13;
-          _context26.t0 = _context26["catch"](4);
+          _context27.prev = 13;
+          _context27.t0 = _context27["catch"](4);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
@@ -1120,75 +1145,75 @@ ipcMain.handle("deleteEmpleado", function _callee26(event, id) {
 
         case 16:
         case "end":
-          return _context26.stop();
+          return _context27.stop();
       }
     }
   }, null, null, [[4, 13]]);
 }); // Funciones de los socios
 
-ipcMain.handle("getSocios", function _callee27(event, criterio, criterioContent) {
-  var conn, results, _results3;
-
-  return regeneratorRuntime.async(function _callee27$(_context27) {
-    while (1) {
-      switch (_context27.prev = _context27.next) {
-        case 0:
-          _context27.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context27.sent;
-          _context27.prev = 3;
-
-          if (!(criterio === "all" || criterio === undefined)) {
-            _context27.next = 10;
-            break;
-          }
-
-          results = conn.query("SELECT * FROM viewSocios order by primerApellido;");
-          console.log(results);
-          return _context27.abrupt("return", results);
-
-        case 10:
-          _results3 = conn.query("SELECT * FROM viewSocios where " + criterio + " like '%" + criterioContent + "%';");
-          console.log(_results3);
-          return _context27.abrupt("return", _results3);
-
-        case 13:
-          _context27.next = 18;
-          break;
-
-        case 15:
-          _context27.prev = 15;
-          _context27.t0 = _context27["catch"](3);
-          console.log(_context27.t0);
-
-        case 18:
-        case "end":
-          return _context27.stop();
-      }
-    }
-  }, null, null, [[3, 15]]);
-});
-ipcMain.handle("createSocio", function _callee28(event, socio) {
-  var conn, _result2;
+ipcMain.handle("getSocios", function _callee28(event, criterio, criterioContent) {
+  var conn, _results5, _results6;
 
   return regeneratorRuntime.async(function _callee28$(_context28) {
     while (1) {
       switch (_context28.prev = _context28.next) {
         case 0:
-          _context28.prev = 0;
-          _context28.next = 3;
+          _context28.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context28.sent;
+          _context28.prev = 3;
+
+          if (!(criterio === "all" || criterio === undefined)) {
+            _context28.next = 10;
+            break;
+          }
+
+          _results5 = conn.query("SELECT * FROM viewSocios order by primerApellido;");
+          console.log(_results5);
+          return _context28.abrupt("return", _results5);
+
+        case 10:
+          _results6 = conn.query("SELECT * FROM viewSocios where " + criterio + " like '%" + criterioContent + "%';");
+          console.log(_results6);
+          return _context28.abrupt("return", _results6);
+
+        case 13:
+          _context28.next = 18;
+          break;
+
+        case 15:
+          _context28.prev = 15;
+          _context28.t0 = _context28["catch"](3);
+          console.log(_context28.t0);
+
+        case 18:
+        case "end":
+          return _context28.stop();
+      }
+    }
+  }, null, null, [[3, 15]]);
+});
+ipcMain.handle("createSocio", function _callee29(event, socio) {
+  var conn, _result2;
+
+  return regeneratorRuntime.async(function _callee29$(_context29) {
+    while (1) {
+      switch (_context29.prev = _context29.next) {
+        case 0:
+          _context29.prev = 0;
+          _context29.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context28.sent;
+          conn = _context29.sent;
           console.log("Recibido: ", socio);
-          _context28.next = 7;
+          _context29.next = 7;
           return regeneratorRuntime.awrap(conn.query("INSERT INTO socios SET ?", socio));
 
         case 7:
-          _result2 = _context28.sent;
+          _result2 = _context29.sent;
           console.log(_result2); // new Notification({
           //   title: "Regístro guardado",
           //   body: "Se registró al nuevo socio con exito!",
@@ -1200,52 +1225,26 @@ ipcMain.handle("createSocio", function _callee28(event, socio) {
             message: "Se ha guardado el registro."
           });
           socio.id = _result2.insertId;
-          return _context28.abrupt("return", socio);
+          return _context29.abrupt("return", socio);
 
         case 14:
-          _context28.prev = 14;
-          _context28.t0 = _context28["catch"](0);
+          _context29.prev = 14;
+          _context29.t0 = _context29["catch"](0);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al guardar el registro."
           });
-          console.log(_context28.t0);
+          console.log(_context29.t0);
 
         case 18:
-        case "end":
-          return _context28.stop();
-      }
-    }
-  }, null, null, [[0, 14]]);
-});
-ipcMain.handle("getSocioById", function _callee29(event, id) {
-  var conn, result;
-  return regeneratorRuntime.async(function _callee29$(_context29) {
-    while (1) {
-      switch (_context29.prev = _context29.next) {
-        case 0:
-          _context29.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context29.sent;
-          _context29.next = 5;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM socios WHERE id = ?", id));
-
-        case 5:
-          result = _context29.sent;
-          console.log(result[0]);
-          return _context29.abrupt("return", result[0]);
-
-        case 8:
         case "end":
           return _context29.stop();
       }
     }
-  });
+  }, null, null, [[0, 14]]);
 });
-ipcMain.handle("getContratanteByCedula", function _callee30(event, cedula) {
+ipcMain.handle("getSocioById", function _callee30(event, id) {
   var conn, result;
   return regeneratorRuntime.async(function _callee30$(_context30) {
     while (1) {
@@ -1257,7 +1256,7 @@ ipcMain.handle("getContratanteByCedula", function _callee30(event, cedula) {
         case 2:
           conn = _context30.sent;
           _context30.next = 5;
-          return regeneratorRuntime.awrap(conn.query("Select * from socios where socios.cedulaPasaporte = ?", cedula));
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM socios WHERE id = ?", id));
 
         case 5:
           result = _context30.sent;
@@ -1271,9 +1270,8 @@ ipcMain.handle("getContratanteByCedula", function _callee30(event, cedula) {
     }
   });
 });
-ipcMain.handle("updateSocio", function _callee31(event, id, socio) {
-  var conn, _result3;
-
+ipcMain.handle("getContratanteByCedula", function _callee31(event, cedula) {
+  var conn, result;
   return regeneratorRuntime.async(function _callee31$(_context31) {
     while (1) {
       switch (_context31.prev = _context31.next) {
@@ -1283,24 +1281,51 @@ ipcMain.handle("updateSocio", function _callee31(event, id, socio) {
 
         case 2:
           conn = _context31.sent;
-          _context31.prev = 3;
-          _context31.next = 6;
+          _context31.next = 5;
+          return regeneratorRuntime.awrap(conn.query("Select * from socios where socios.cedulaPasaporte = ?", cedula));
+
+        case 5:
+          result = _context31.sent;
+          console.log(result[0]);
+          return _context31.abrupt("return", result[0]);
+
+        case 8:
+        case "end":
+          return _context31.stop();
+      }
+    }
+  });
+});
+ipcMain.handle("updateSocio", function _callee32(event, id, socio) {
+  var conn, _result3;
+
+  return regeneratorRuntime.async(function _callee32$(_context32) {
+    while (1) {
+      switch (_context32.prev = _context32.next) {
+        case 0:
+          _context32.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context32.sent;
+          _context32.prev = 3;
+          _context32.next = 6;
           return regeneratorRuntime.awrap(conn.query("UPDATE socios SET ? WHERE id = ?", [socio, id]));
 
         case 6:
-          _result3 = _context31.sent;
+          _result3 = _context32.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Actualizado!",
             message: "Se ha actualizado el registro."
           });
           console.log(_result3);
-          return _context31.abrupt("return", _result3);
+          return _context32.abrupt("return", _result3);
 
         case 12:
-          _context31.prev = 12;
-          _context31.t0 = _context31["catch"](3);
-          console.log(_context31.t0);
+          _context32.prev = 12;
+          _context32.t0 = _context32["catch"](3);
+          console.log(_context32.t0);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
@@ -1309,51 +1334,51 @@ ipcMain.handle("updateSocio", function _callee31(event, id, socio) {
 
         case 16:
         case "end":
-          return _context31.stop();
+          return _context32.stop();
       }
     }
   }, null, null, [[3, 12]]);
 });
-ipcMain.handle("deleteSocio", function _callee32(event, id) {
+ipcMain.handle("deleteSocio", function _callee33(event, id) {
   var conn, _result4;
 
-  return regeneratorRuntime.async(function _callee32$(_context32) {
+  return regeneratorRuntime.async(function _callee33$(_context33) {
     while (1) {
-      switch (_context32.prev = _context32.next) {
+      switch (_context33.prev = _context33.next) {
         case 0:
           console.log("id from main.js: ", id);
-          _context32.next = 3;
+          _context33.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context32.sent;
-          _context32.prev = 4;
-          _context32.next = 7;
+          conn = _context33.sent;
+          _context33.prev = 4;
+          _context33.next = 7;
           return regeneratorRuntime.awrap(conn.query("DELETE FROM socios WHERE id = ?", id));
 
         case 7:
-          _result4 = _context32.sent;
+          _result4 = _context33.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Borrado!",
             message: "Se ha eliminado el usuario."
           });
           console.log(_result4);
-          return _context32.abrupt("return", _result4);
+          return _context33.abrupt("return", _result4);
 
         case 13:
-          _context32.prev = 13;
-          _context32.t0 = _context32["catch"](4);
+          _context33.prev = 13;
+          _context33.t0 = _context33["catch"](4);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al elimiar el registro."
           });
-          console.log(_context32.t0);
+          console.log(_context33.t0);
 
         case 17:
         case "end":
-          return _context32.stop();
+          return _context33.stop();
       }
     }
   }, null, null, [[4, 13]]);
@@ -1362,186 +1387,186 @@ ipcMain.handle("deleteSocio", function _callee32(event, id) {
 // Esta tabla esta relacionada de uno a muchos con inventario
 // ----------------------------------------------------------------
 
-ipcMain.handle("getImplementos", function _callee33() {
+ipcMain.handle("getImplementos", function _callee34() {
   var conn, results;
-  return regeneratorRuntime.async(function _callee33$(_context33) {
-    while (1) {
-      switch (_context33.prev = _context33.next) {
-        case 0:
-          _context33.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context33.sent;
-          results = conn.query("SELECT * FROM viewimplementosinvenatrio order by implementosId desc;");
-          console.log(results);
-          return _context33.abrupt("return", results);
-
-        case 6:
-        case "end":
-          return _context33.stop();
-      }
-    }
-  });
-});
-ipcMain.handle("createImplemento", function _callee34(event, implemento, inventario) {
-  var conn, resultImplemento, resulInventario;
   return regeneratorRuntime.async(function _callee34$(_context34) {
     while (1) {
       switch (_context34.prev = _context34.next) {
         case 0:
-          _context34.prev = 0;
-          _context34.next = 3;
+          _context34.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context34.sent;
+          results = conn.query("SELECT * FROM viewimplementosinvenatrio order by implementosId desc;");
+          console.log(results);
+          return _context34.abrupt("return", results);
+
+        case 6:
+        case "end":
+          return _context34.stop();
+      }
+    }
+  });
+});
+ipcMain.handle("createImplemento", function _callee35(event, implemento, inventario) {
+  var conn, resultImplemento, resulInventario;
+  return regeneratorRuntime.async(function _callee35$(_context35) {
+    while (1) {
+      switch (_context35.prev = _context35.next) {
+        case 0:
+          _context35.prev = 0;
+          _context35.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context34.sent;
+          conn = _context35.sent;
           console.log("Recibido: ", implemento, inventario); //   product.price = parseFloat(product.price);
 
-          _context34.next = 7;
+          _context35.next = 7;
           return regeneratorRuntime.awrap(conn.query("INSERT INTO implementos set ?;", implemento));
 
         case 7:
-          resultImplemento = _context34.sent;
+          resultImplemento = _context35.sent;
           inventario.implementosId = resultImplemento.insertId;
-          _context34.next = 11;
+          _context35.next = 11;
           return regeneratorRuntime.awrap(conn.query("INSERT INTO inventario set ?;", inventario));
 
         case 11:
-          resulInventario = _context34.sent;
+          resulInventario = _context35.sent;
           console.log(resultImplemento, resulInventario);
           new Notification({
             title: "SCAP Santo Domingo No.1",
             body: implemento.nombre + " se há registrado :)"
           }).show();
           implemento.id = result.insertId;
-          return _context34.abrupt("return", resulInventario);
+          return _context35.abrupt("return", resulInventario);
 
         case 18:
-          _context34.prev = 18;
-          _context34.t0 = _context34["catch"](0);
-          console.log(_context34.t0);
+          _context35.prev = 18;
+          _context35.t0 = _context35["catch"](0);
+          console.log(_context35.t0);
 
         case 21:
-        case "end":
-          return _context34.stop();
-      }
-    }
-  }, null, null, [[0, 18]]);
-});
-ipcMain.handle("getImplementoById", function _callee35(event, id) {
-  var conn, result;
-  return regeneratorRuntime.async(function _callee35$(_context35) {
-    while (1) {
-      switch (_context35.prev = _context35.next) {
-        case 0:
-          _context35.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context35.sent;
-          _context35.next = 5;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewimplementosinvenatrio where implementosId = ?", id));
-
-        case 5:
-          result = _context35.sent;
-          console.log("Resultado", result[0]);
-          return _context35.abrupt("return", result[0]);
-
-        case 8:
         case "end":
           return _context35.stop();
       }
     }
-  });
+  }, null, null, [[0, 18]]);
 });
-ipcMain.handle("updateImplemento", function _callee36(event, id, implemento, inventario) {
-  var conn, resultImplemento, resultInventario;
+ipcMain.handle("getImplementoById", function _callee36(event, id) {
+  var conn, result;
   return regeneratorRuntime.async(function _callee36$(_context36) {
     while (1) {
       switch (_context36.prev = _context36.next) {
         case 0:
-          _context36.prev = 0;
-          _context36.next = 3;
+          _context36.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context36.sent;
+          _context36.next = 5;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewimplementosinvenatrio where implementosId = ?", id));
+
+        case 5:
+          result = _context36.sent;
+          console.log("Resultado", result[0]);
+          return _context36.abrupt("return", result[0]);
+
+        case 8:
+        case "end":
+          return _context36.stop();
+      }
+    }
+  });
+});
+ipcMain.handle("updateImplemento", function _callee37(event, id, implemento, inventario) {
+  var conn, resultImplemento, resultInventario;
+  return regeneratorRuntime.async(function _callee37$(_context37) {
+    while (1) {
+      switch (_context37.prev = _context37.next) {
+        case 0:
+          _context37.prev = 0;
+          _context37.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context36.sent;
-          _context36.next = 6;
+          conn = _context37.sent;
+          _context37.next = 6;
           return regeneratorRuntime.awrap(conn.query("UPDATE implementos SET ? where id = ?", [implemento, id]));
 
         case 6:
-          resultImplemento = _context36.sent;
-          _context36.next = 9;
+          resultImplemento = _context37.sent;
+          _context37.next = 9;
           return regeneratorRuntime.awrap(conn.query("UPDATE inventario SET ? where implementosId = ?", [inventario, id]));
 
         case 9:
-          resultInventario = _context36.sent;
+          resultInventario = _context37.sent;
           new Notification({
             title: "SCAP Santo Domingo No.1",
             body: implemento.nombre + " se ha actualizado :)"
           }).show();
           console.log(resultInventario, resultImplemento);
-          return _context36.abrupt("return", resultImplemento);
+          return _context37.abrupt("return", resultImplemento);
 
         case 15:
-          _context36.prev = 15;
-          _context36.t0 = _context36["catch"](0);
+          _context37.prev = 15;
+          _context37.t0 = _context37["catch"](0);
           new Notification({
             title: "SCAP Santo Domingo No.1",
             body: "Ha ocurrido un error en la actualización :("
           }).show();
-          console.log(_context36.t0);
+          console.log(_context37.t0);
 
         case 19:
         case "end":
-          return _context36.stop();
+          return _context37.stop();
       }
     }
   }, null, null, [[0, 15]]);
 });
-ipcMain.handle("deleteImplemento", function _callee37(event, id) {
+ipcMain.handle("deleteImplemento", function _callee38(event, id) {
   var conn, resultInventario, resultImplemento;
-  return regeneratorRuntime.async(function _callee37$(_context37) {
+  return regeneratorRuntime.async(function _callee38$(_context38) {
     while (1) {
-      switch (_context37.prev = _context37.next) {
+      switch (_context38.prev = _context38.next) {
         case 0:
           console.log("id from main.js: ", id);
-          _context37.prev = 1;
-          _context37.next = 4;
+          _context38.prev = 1;
+          _context38.next = 4;
           return regeneratorRuntime.awrap(getConnection());
 
         case 4:
-          conn = _context37.sent;
-          _context37.next = 7;
+          conn = _context38.sent;
+          _context38.next = 7;
           return regeneratorRuntime.awrap(conn.query("DELETE FROM inventario WHERE implementosId = ?", id));
 
         case 7:
-          resultInventario = _context37.sent;
-          _context37.next = 10;
+          resultInventario = _context38.sent;
+          _context38.next = 10;
           return regeneratorRuntime.awrap(conn.query("DELETE from implementos where id = ?", id));
 
         case 10:
-          resultImplemento = _context37.sent;
+          resultImplemento = _context38.sent;
           new Notification({
             title: "SCAP Santo Domingo No.1",
             body: "Se há eliminado el registro :)"
           }).show();
           console.log(resultInventario, resultImplemento);
-          return _context37.abrupt("return", resultInventario);
+          return _context38.abrupt("return", resultInventario);
 
         case 16:
-          _context37.prev = 16;
-          _context37.t0 = _context37["catch"](1);
+          _context38.prev = 16;
+          _context38.t0 = _context38["catch"](1);
           new Notification({
             title: "SCAP Santo Domingo No.1",
             body: "Ha ocurrido un error al eliminar el registro :("
           }).show();
-          console.log(_context37.t0);
+          console.log(_context38.t0);
 
         case 20:
         case "end":
-          return _context37.stop();
+          return _context38.stop();
       }
     }
   }, null, null, [[1, 16]]);
@@ -1549,85 +1574,41 @@ ipcMain.handle("deleteImplemento", function _callee37(event, id) {
 // Funciones de los servicios fijos
 // ----------------------------------------------------------------
 
-ipcMain.handle("getServiciosFijos", function _callee38(event, criterio, criterioContent) {
-  var conn, results, _results4;
+ipcMain.handle("getServiciosFijos", function _callee39(event, criterio, criterioContent) {
+  var conn, _results7, _results8;
 
-  return regeneratorRuntime.async(function _callee38$(_context38) {
-    while (1) {
-      switch (_context38.prev = _context38.next) {
-        case 0:
-          _context38.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context38.sent;
-          _context38.prev = 3;
-
-          if (!(criterio === "all")) {
-            _context38.next = 10;
-            break;
-          }
-
-          results = conn.query("SELECT * FROM viewServicios where tipo='Servicio fijo'order by id asc;");
-          console.log(results);
-          return _context38.abrupt("return", results);
-
-        case 10:
-          _results4 = conn.query("SELECT * FROM viewServicios where " + criterio + " like '%" + criterioContent + "%'" + " and tipo='Servicio fijo'order by id asc;");
-          console.log(_results4);
-          return _context38.abrupt("return", _results4);
-
-        case 13:
-          _context38.next = 18;
-          break;
-
-        case 15:
-          _context38.prev = 15;
-          _context38.t0 = _context38["catch"](3);
-          console.log(_context38.t0);
-
-        case 18:
-        case "end":
-          return _context38.stop();
-      }
-    }
-  }, null, null, [[3, 15]]);
-});
-ipcMain.handle("createServiciosFijos", function _callee39(event, servicio) {
-  var conn, resultServicio;
   return regeneratorRuntime.async(function _callee39$(_context39) {
     while (1) {
       switch (_context39.prev = _context39.next) {
         case 0:
-          _context39.prev = 0;
-          _context39.next = 3;
+          _context39.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 3:
+        case 2:
           conn = _context39.sent;
-          console.log("Recibido: ", servicio);
-          _context39.next = 7;
-          return regeneratorRuntime.awrap(conn.query("INSERT INTO servicios set ?;", servicio));
+          _context39.prev = 3;
 
-        case 7:
-          resultServicio = _context39.sent;
-          servicio.id = resultServicio.insertId;
-          console.log(resultServicio);
-          event.sender.send("Notificar", {
-            success: true,
-            title: "Guardado!",
-            message: "Se ha guardado un nuevo servicio fijo."
-          });
-          return _context39.abrupt("return", resultServicio);
+          if (!(criterio === "all")) {
+            _context39.next = 10;
+            break;
+          }
 
-        case 14:
-          _context39.prev = 14;
-          _context39.t0 = _context39["catch"](0);
-          event.sender.send("Notificar", {
-            success: false,
-            title: "Error!",
-            message: "Ha ocurrido un error al guardar el servicio."
-          });
+          _results7 = conn.query("SELECT * FROM viewServicios where tipo='Servicio fijo'order by id asc;");
+          console.log(_results7);
+          return _context39.abrupt("return", _results7);
+
+        case 10:
+          _results8 = conn.query("SELECT * FROM viewServicios where " + criterio + " like '%" + criterioContent + "%'" + " and tipo='Servicio fijo'order by id asc;");
+          console.log(_results8);
+          return _context39.abrupt("return", _results8);
+
+        case 13:
+          _context39.next = 18;
+          break;
+
+        case 15:
+          _context39.prev = 15;
+          _context39.t0 = _context39["catch"](3);
           console.log(_context39.t0);
 
         case 18:
@@ -1635,41 +1616,53 @@ ipcMain.handle("createServiciosFijos", function _callee39(event, servicio) {
           return _context39.stop();
       }
     }
-  }, null, null, [[0, 14]]);
+  }, null, null, [[3, 15]]);
 });
-ipcMain.handle("getServiciosFijosById", function _callee40(event, id) {
-  var conn, result;
+ipcMain.handle("createServiciosFijos", function _callee40(event, servicio) {
+  var conn, resultServicio;
   return regeneratorRuntime.async(function _callee40$(_context40) {
     while (1) {
       switch (_context40.prev = _context40.next) {
         case 0:
-          _context40.next = 2;
+          _context40.prev = 0;
+          _context40.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 2:
+        case 3:
           conn = _context40.sent;
-          _context40.next = 5;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServicios where id = ?", id));
+          console.log("Recibido: ", servicio);
+          _context40.next = 7;
+          return regeneratorRuntime.awrap(conn.query("INSERT INTO servicios set ?;", servicio));
 
-        case 5:
-          result = _context40.sent;
-          console.log("Resultado", result[0]);
-          return _context40.abrupt("return", result[0]);
+        case 7:
+          resultServicio = _context40.sent;
+          servicio.id = resultServicio.insertId;
+          console.log(resultServicio);
+          event.sender.send("Notificar", {
+            success: true,
+            title: "Guardado!",
+            message: "Se ha guardado un nuevo servicio fijo."
+          });
+          return _context40.abrupt("return", resultServicio);
 
-        case 8:
+        case 14:
+          _context40.prev = 14;
+          _context40.t0 = _context40["catch"](0);
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "Ha ocurrido un error al guardar el servicio."
+          });
+          console.log(_context40.t0);
+
+        case 18:
         case "end":
           return _context40.stop();
       }
     }
-  });
-}); // ipcMain.handle("getServiciosContratados", async (event) => {
-//   const conn = await getConnection();
-//   const result = await conn.query("SELECT * FROM viewServiciosFijos");
-//   console.log("Resultado", result);
-//   return result;
-// });
-
-ipcMain.handle("getServiciosDisponibles", function _callee41(event) {
+  }, null, null, [[0, 14]]);
+});
+ipcMain.handle("getServiciosFijosById", function _callee41(event, id) {
   var conn, result;
   return regeneratorRuntime.async(function _callee41$(_context41) {
     while (1) {
@@ -1681,12 +1674,12 @@ ipcMain.handle("getServiciosDisponibles", function _callee41(event) {
         case 2:
           conn = _context41.sent;
           _context41.next = 5;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServicios where tipo='Servicio fijo';"));
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServicios where id = ?", id));
 
         case 5:
           result = _context41.sent;
-          console.log("Resultado", result);
-          return _context41.abrupt("return", result);
+          console.log("Resultado", result[0]);
+          return _context41.abrupt("return", result[0]);
 
         case 8:
         case "end":
@@ -1694,117 +1687,122 @@ ipcMain.handle("getServiciosDisponibles", function _callee41(event) {
       }
     }
   });
-});
-ipcMain.handle("updateServiciosFijos", function _callee42(event, id, servicio) {
-  var conn, resultServicio;
+}); // ipcMain.handle("getServiciosContratados", async (event) => {
+//   const conn = await getConnection();
+//   const result = await conn.query("SELECT * FROM viewServiciosFijos");
+//   console.log("Resultado", result);
+//   return result;
+// });
+
+ipcMain.handle("getServiciosDisponibles", function _callee42(event) {
+  var conn, result;
   return regeneratorRuntime.async(function _callee42$(_context42) {
     while (1) {
       switch (_context42.prev = _context42.next) {
         case 0:
-          _context42.prev = 0;
-          _context42.next = 3;
+          _context42.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 3:
+        case 2:
           conn = _context42.sent;
-          _context42.next = 6;
-          return regeneratorRuntime.awrap(conn.query("UPDATE servicios SET ? where id = ?", [servicio, id]));
+          _context42.next = 5;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServicios where tipo='Servicio fijo';"));
 
-        case 6:
-          resultServicio = _context42.sent;
-          new Notification({
-            title: "SCAP Santo Domingo No.1",
-            body: servicio.nombre + " se ha actualizado :)"
-          }).show();
-          console.log(resultServicio);
-          return _context42.abrupt("return", resultServicio);
+        case 5:
+          result = _context42.sent;
+          console.log("Resultado", result);
+          return _context42.abrupt("return", result);
 
-        case 12:
-          _context42.prev = 12;
-          _context42.t0 = _context42["catch"](0);
-          new Notification({
-            title: "SCAP Santo Domingo No.1",
-            body: "Ha ocurrido un error en la actualización :("
-          }).show();
-          console.log(_context42.t0);
-
-        case 16:
+        case 8:
         case "end":
           return _context42.stop();
       }
     }
-  }, null, null, [[0, 12]]);
+  });
 });
-ipcMain.handle("deleteServiciosFijos", function _callee43(event, id) {
+ipcMain.handle("updateServiciosFijos", function _callee43(event, id, servicio) {
   var conn, resultServicio;
   return regeneratorRuntime.async(function _callee43$(_context43) {
     while (1) {
       switch (_context43.prev = _context43.next) {
         case 0:
+          _context43.prev = 0;
+          _context43.next = 3;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 3:
+          conn = _context43.sent;
+          _context43.next = 6;
+          return regeneratorRuntime.awrap(conn.query("UPDATE servicios SET ? where id = ?", [servicio, id]));
+
+        case 6:
+          resultServicio = _context43.sent;
+          new Notification({
+            title: "SCAP Santo Domingo No.1",
+            body: servicio.nombre + " se ha actualizado :)"
+          }).show();
+          console.log(resultServicio);
+          return _context43.abrupt("return", resultServicio);
+
+        case 12:
+          _context43.prev = 12;
+          _context43.t0 = _context43["catch"](0);
+          new Notification({
+            title: "SCAP Santo Domingo No.1",
+            body: "Ha ocurrido un error en la actualización :("
+          }).show();
+          console.log(_context43.t0);
+
+        case 16:
+        case "end":
+          return _context43.stop();
+      }
+    }
+  }, null, null, [[0, 12]]);
+});
+ipcMain.handle("deleteServiciosFijos", function _callee44(event, id) {
+  var conn, resultServicio;
+  return regeneratorRuntime.async(function _callee44$(_context44) {
+    while (1) {
+      switch (_context44.prev = _context44.next) {
+        case 0:
           console.log("id from main.js: ", id);
-          _context43.prev = 1;
-          _context43.next = 4;
+          _context44.prev = 1;
+          _context44.next = 4;
           return regeneratorRuntime.awrap(getConnection());
 
         case 4:
-          conn = _context43.sent;
-          _context43.next = 7;
+          conn = _context44.sent;
+          _context44.next = 7;
           return regeneratorRuntime.awrap(conn.query("DELETE FROM servicios WHERE id = ?", id));
 
         case 7:
-          resultServicio = _context43.sent;
+          resultServicio = _context44.sent;
           new Notification({
             title: "SCAP Santo Domingo No.1",
             body: "Se há eliminado el registro :)"
           }).show();
           console.log(resultServicio);
-          return _context43.abrupt("return", resultServicio);
+          return _context44.abrupt("return", resultServicio);
 
         case 13:
-          _context43.prev = 13;
-          _context43.t0 = _context43["catch"](1);
+          _context44.prev = 13;
+          _context44.t0 = _context44["catch"](1);
           new Notification({
             title: "SCAP Santo Domingo No.1",
             body: "Ha ocurrido un error al eliminar el registro :("
           }).show();
-          console.log(_context43.t0);
+          console.log(_context44.t0);
 
         case 17:
-        case "end":
-          return _context43.stop();
-      }
-    }
-  }, null, null, [[1, 13]]);
-});
-ipcMain.handle("getServiciosContratadosById", function _callee44(event, id) {
-  var conn, result;
-  return regeneratorRuntime.async(function _callee44$(_context44) {
-    while (1) {
-      switch (_context44.prev = _context44.next) {
-        case 0:
-          _context44.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context44.sent;
-          _context44.next = 5;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServiciosContratados where id =" + id + " and tipo='Servicio fijo' and estado='Activo';"));
-
-        case 5:
-          result = _context44.sent;
-          console.log("Resultado", result);
-          return _context44.abrupt("return", result);
-
-        case 8:
         case "end":
           return _context44.stop();
       }
     }
-  });
+  }, null, null, [[1, 13]]);
 });
-ipcMain.handle("getContratos", function _callee45(event, criterio, criterioContent) {
-  var conn, _result5, _result6;
-
+ipcMain.handle("getServiciosContratadosById", function _callee45(event, id) {
+  var conn, result;
   return regeneratorRuntime.async(function _callee45$(_context45) {
     while (1) {
       switch (_context45.prev = _context45.next) {
@@ -1814,48 +1812,24 @@ ipcMain.handle("getContratos", function _callee45(event, criterio, criterioConte
 
         case 2:
           conn = _context45.sent;
-          _context45.prev = 3;
+          _context45.next = 5;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServiciosContratados where id =" + id + " and tipo='Servicio fijo' and estado='Activo';"));
 
-          if (!(criterio === "all" || criterio === undefined)) {
-            _context45.next = 12;
-            break;
-          }
+        case 5:
+          result = _context45.sent;
+          console.log("Resultado", result);
+          return _context45.abrupt("return", result);
 
-          _context45.next = 7;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewContratos ;"));
-
-        case 7:
-          _result5 = _context45.sent;
-          console.log("Resultado: ", _result5);
-          return _context45.abrupt("return", _result5);
-
-        case 12:
-          _context45.next = 14;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewContratos  WHERE " + criterio + " like '%" + criterioContent + "%';"));
-
-        case 14:
-          _result6 = _context45.sent;
-          console.log("Resultado: ", _result6);
-          return _context45.abrupt("return", _result6);
-
-        case 17:
-          _context45.next = 22;
-          break;
-
-        case 19:
-          _context45.prev = 19;
-          _context45.t0 = _context45["catch"](3);
-          console.log(_context45.t0);
-
-        case 22:
+        case 8:
         case "end":
           return _context45.stop();
       }
     }
-  }, null, null, [[3, 19]]);
+  });
 });
-ipcMain.handle("getContratadosById", function _callee46(event, servicioId) {
-  var conn, result;
+ipcMain.handle("getContratos", function _callee46(event, criterio, criterioContent) {
+  var conn, _result5, _result6;
+
   return regeneratorRuntime.async(function _callee46$(_context46) {
     while (1) {
       switch (_context46.prev = _context46.next) {
@@ -1865,24 +1839,48 @@ ipcMain.handle("getContratadosById", function _callee46(event, servicioId) {
 
         case 2:
           conn = _context46.sent;
-          _context46.next = 5;
-          return regeneratorRuntime.awrap(conn.query("SELECT contratosId FROM serviciosContratados WHERE NOT estado='Innactivo' and " + "serviciosId=? ;", servicioId));
+          _context46.prev = 3;
 
-        case 5:
-          result = _context46.sent;
-          console.log("Resultado: ", result);
-          return _context46.abrupt("return", result);
+          if (!(criterio === "all" || criterio === undefined)) {
+            _context46.next = 12;
+            break;
+          }
 
-        case 8:
+          _context46.next = 7;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewContratos ;"));
+
+        case 7:
+          _result5 = _context46.sent;
+          console.log("Resultado: ", _result5);
+          return _context46.abrupt("return", _result5);
+
+        case 12:
+          _context46.next = 14;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewContratos  WHERE " + criterio + " like '%" + criterioContent + "%';"));
+
+        case 14:
+          _result6 = _context46.sent;
+          console.log("Resultado: ", _result6);
+          return _context46.abrupt("return", _result6);
+
+        case 17:
+          _context46.next = 22;
+          break;
+
+        case 19:
+          _context46.prev = 19;
+          _context46.t0 = _context46["catch"](3);
+          console.log(_context46.t0);
+
+        case 22:
         case "end":
           return _context46.stop();
       }
     }
-  });
+  }, null, null, [[3, 19]]);
 });
-ipcMain.handle("getRecaudaciones", function _callee47(event, servicioId, desde, hasta) {
-  var conn, _result7, _result8;
-
+ipcMain.handle("getContratadosById", function _callee47(event, servicioId) {
+  var conn, result;
   return regeneratorRuntime.async(function _callee47$(_context47) {
     while (1) {
       switch (_context47.prev = _context47.next) {
@@ -1892,52 +1890,24 @@ ipcMain.handle("getRecaudaciones", function _callee47(event, servicioId, desde, 
 
         case 2:
           conn = _context47.sent;
-          console.log("Buscando: " + desde + " " + hasta);
-          _context47.prev = 4;
+          _context47.next = 5;
+          return regeneratorRuntime.awrap(conn.query("SELECT contratosId FROM serviciosContratados WHERE NOT estado='Innactivo' and " + "serviciosId=? ;", servicioId));
 
-          if (!(desde === "all" || desde === undefined)) {
-            _context47.next = 13;
-            break;
-          }
-
-          _context47.next = 8;
-          return regeneratorRuntime.awrap(conn.query("CALL selectRecaudaciones(" + servicioId + ",'2023-01-01',now()); "));
+        case 5:
+          result = _context47.sent;
+          console.log("Resultado: ", result);
+          return _context47.abrupt("return", result);
 
         case 8:
-          _result7 = _context47.sent;
-          console.log("Resultado: ", _result7[0]);
-          return _context47.abrupt("return", _result7[0]);
-
-        case 13:
-          _context47.next = 15;
-          return regeneratorRuntime.awrap(conn.query("CALL selectRecaudaciones(" + servicioId + ",'" + desde + "','" + hasta + "'); "));
-
-        case 15:
-          _result8 = _context47.sent;
-          console.log("Resultado: ", _result8[0]);
-          return _context47.abrupt("return", _result8[0]);
-
-        case 18:
-          _context47.next = 23;
-          break;
-
-        case 20:
-          _context47.prev = 20;
-          _context47.t0 = _context47["catch"](4);
-          console.log(_context47.t0);
-
-        case 23:
         case "end":
           return _context47.stop();
       }
     }
-  }, null, null, [[4, 20]]);
-}); // ----------------------------------------------------------------
-// Funciones de las cuotas
-// ----------------------------------------------------------------
+  });
+});
+ipcMain.handle("getRecaudaciones", function _callee48(event, servicioId, desde, hasta) {
+  var conn, _result7, _result8;
 
-ipcMain.handle("getCuotas", function _callee48() {
-  var conn, results;
   return regeneratorRuntime.async(function _callee48$(_context48) {
     while (1) {
       switch (_context48.prev = _context48.next) {
@@ -1947,19 +1917,52 @@ ipcMain.handle("getCuotas", function _callee48() {
 
         case 2:
           conn = _context48.sent;
-          results = conn.query("SELECT * FROM viewServicios where tipo='Cuota'order by id asc;");
-          console.log(results);
-          return _context48.abrupt("return", results);
+          console.log("Buscando: " + desde + " " + hasta);
+          _context48.prev = 4;
 
-        case 6:
+          if (!(desde === "all" || desde === undefined)) {
+            _context48.next = 13;
+            break;
+          }
+
+          _context48.next = 8;
+          return regeneratorRuntime.awrap(conn.query("CALL selectRecaudaciones(" + servicioId + ",'2023-01-01',now()); "));
+
+        case 8:
+          _result7 = _context48.sent;
+          console.log("Resultado: ", _result7[0]);
+          return _context48.abrupt("return", _result7[0]);
+
+        case 13:
+          _context48.next = 15;
+          return regeneratorRuntime.awrap(conn.query("CALL selectRecaudaciones(" + servicioId + ",'" + desde + "','" + hasta + "'); "));
+
+        case 15:
+          _result8 = _context48.sent;
+          console.log("Resultado: ", _result8[0]);
+          return _context48.abrupt("return", _result8[0]);
+
+        case 18:
+          _context48.next = 23;
+          break;
+
+        case 20:
+          _context48.prev = 20;
+          _context48.t0 = _context48["catch"](4);
+          console.log(_context48.t0);
+
+        case 23:
         case "end":
           return _context48.stop();
       }
     }
-  });
-});
-ipcMain.handle("getCuotasById", function _callee49(event, id) {
-  var conn, result;
+  }, null, null, [[4, 20]]);
+}); // ----------------------------------------------------------------
+// Funciones de las cuotas
+// ----------------------------------------------------------------
+
+ipcMain.handle("getCuotas", function _callee49() {
+  var conn, results;
   return regeneratorRuntime.async(function _callee49$(_context49) {
     while (1) {
       switch (_context49.prev = _context49.next) {
@@ -1969,67 +1972,45 @@ ipcMain.handle("getCuotasById", function _callee49(event, id) {
 
         case 2:
           conn = _context49.sent;
-          _context49.next = 5;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServicios where id = ?", id));
+          results = conn.query("SELECT * FROM viewServicios where tipo='Cuota'order by id asc;");
+          console.log(results);
+          return _context49.abrupt("return", results);
 
-        case 5:
-          result = _context49.sent;
-          console.log("Resultado", result[0]);
-          return _context49.abrupt("return", result[0]);
-
-        case 8:
+        case 6:
         case "end":
           return _context49.stop();
       }
     }
   });
 });
-ipcMain.handle("createCuotas", function _callee50(event, cuota) {
-  var conn, resultServicio;
+ipcMain.handle("getCuotasById", function _callee50(event, id) {
+  var conn, result;
   return regeneratorRuntime.async(function _callee50$(_context50) {
     while (1) {
       switch (_context50.prev = _context50.next) {
         case 0:
-          _context50.prev = 0;
-          _context50.next = 3;
+          _context50.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 3:
+        case 2:
           conn = _context50.sent;
-          console.log("Recibido: ", cuota);
-          _context50.next = 7;
-          return regeneratorRuntime.awrap(conn.query("INSERT INTO servicios set ?;", cuota));
+          _context50.next = 5;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServicios where id = ?", id));
 
-        case 7:
-          resultServicio = _context50.sent;
-          cuota.id = resultServicio.insertId;
-          console.log(resultServicio);
-          event.sender.send("Notificar", {
-            success: true,
-            title: "Guardado!",
-            message: "Se ha guardado un nuevo servicio ocacional."
-          });
-          return _context50.abrupt("return", resultServicio);
+        case 5:
+          result = _context50.sent;
+          console.log("Resultado", result[0]);
+          return _context50.abrupt("return", result[0]);
 
-        case 14:
-          _context50.prev = 14;
-          _context50.t0 = _context50["catch"](0);
-          event.sender.send("Notificar", {
-            success: false,
-            title: "Error!",
-            message: "Ha ocurrido un error al guardar el servicio ocacional."
-          });
-          console.log(_context50.t0);
-
-        case 18:
+        case 8:
         case "end":
           return _context50.stop();
       }
     }
-  }, null, null, [[0, 14]]);
+  });
 });
-ipcMain.handle("createServicioContratado", function _callee51(event, contratar) {
-  var conn, contratadoExiste, resultServicio;
+ipcMain.handle("createCuotas", function _callee51(event, cuota) {
+  var conn, resultServicio;
   return regeneratorRuntime.async(function _callee51$(_context51) {
     while (1) {
       switch (_context51.prev = _context51.next) {
@@ -2040,23 +2021,88 @@ ipcMain.handle("createServicioContratado", function _callee51(event, contratar) 
 
         case 3:
           conn = _context51.sent;
-          console.log("Recibido: ", contratar);
+          console.log("Recibido: ", cuota);
           _context51.next = 7;
-          return regeneratorRuntime.awrap(conn.query("SELECT count(id) as existe FROM serviciosContratados WHERE " + "serviciosId= " + contratar.serviciosId + " AND " + "contratosId= " + contratar.contratosId + ";"));
+          return regeneratorRuntime.awrap(conn.query("INSERT INTO servicios set ?;", cuota));
 
         case 7:
-          contratadoExiste = _context51.sent;
+          resultServicio = _context51.sent;
+          cuota.id = resultServicio.insertId;
+          console.log(resultServicio);
+          event.sender.send("Notificar", {
+            success: true,
+            title: "Guardado!",
+            message: "Se ha guardado un nuevo servicio ocacional."
+          });
+          return _context51.abrupt("return", resultServicio);
 
-          if (!(!contratadoExiste[0].existe > 0)) {
-            _context51.next = 18;
+        case 14:
+          _context51.prev = 14;
+          _context51.t0 = _context51["catch"](0);
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "Ha ocurrido un error al guardar el servicio ocacional."
+          });
+          console.log(_context51.t0);
+
+        case 18:
+        case "end":
+          return _context51.stop();
+      }
+    }
+  }, null, null, [[0, 14]]);
+});
+ipcMain.handle("createServicioContratado", function _callee52(event, contratar, socioId, individualSn) {
+  var conn, socioContratanteExiste, contratadoExiste, resultServicio, _contratadoExiste, _resultServicio;
+
+  return regeneratorRuntime.async(function _callee52$(_context52) {
+    while (1) {
+      switch (_context52.prev = _context52.next) {
+        case 0:
+          _context52.prev = 0;
+          _context52.next = 3;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 3:
+          conn = _context52.sent;
+          console.log("Recibido: ", contratar, " ", individualSn);
+
+          if (!(individualSn == "No")) {
+            _context52.next = 28;
             break;
           }
 
-          _context51.next = 11;
+          console.log("No es individual "); // consultamos si ya existe un contrato con el id del socio que presente este valor
+
+          _context52.next = 9;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServiciosContratados WHERE serviciosId=" + contratar.serviciosId + " AND sociosId=" + socioId + " ;"));
+
+        case 9:
+          socioContratanteExiste = _context52.sent;
+
+          if (!(!socioContratanteExiste.length > 0)) {
+            _context52.next = 26;
+            break;
+          }
+
+          console.log("No lo encontro");
+          _context52.next = 14;
+          return regeneratorRuntime.awrap(conn.query("SELECT count(id) as existe FROM serviciosContratados WHERE " + "serviciosId= " + contratar.serviciosId + " AND " + "contratosId= " + contratar.contratosId + ";"));
+
+        case 14:
+          contratadoExiste = _context52.sent;
+
+          if (!(!contratadoExiste[0].existe > 0)) {
+            _context52.next = 25;
+            break;
+          }
+
+          _context52.next = 18;
           return regeneratorRuntime.awrap(conn.query("INSERT INTO serviciosContratados set ?;", contratar));
 
-        case 11:
-          resultServicio = _context51.sent;
+        case 18:
+          resultServicio = _context52.sent;
           console.log(resultServicio);
           event.sender.send("Notificar", {
             success: true,
@@ -2064,60 +2110,98 @@ ipcMain.handle("createServicioContratado", function _callee51(event, contratar) 
             message: "Contratado."
           });
           contratar.id = resultServicio.insertId;
-          return _context51.abrupt("return", resultServicio);
+          return _context52.abrupt("return", resultServicio);
 
-        case 18:
+        case 25:
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "El servicio ya ha sido registrado en este contrato."
           });
 
-        case 19:
-          _context51.next = 25;
+        case 26:
+          _context52.next = 43;
           break;
 
-        case 21:
-          _context51.prev = 21;
-          _context51.t0 = _context51["catch"](0);
+        case 28:
+          console.log("Es individual");
+          _context52.next = 31;
+          return regeneratorRuntime.awrap(conn.query("SELECT count(id) as existe FROM serviciosContratados WHERE " + "serviciosId= " + contratar.serviciosId + " AND " + "contratosId= " + contratar.contratosId + ";"));
+
+        case 31:
+          _contratadoExiste = _context52.sent;
+
+          if (!(!_contratadoExiste[0].existe > 0)) {
+            _context52.next = 42;
+            break;
+          }
+
+          _context52.next = 35;
+          return regeneratorRuntime.awrap(conn.query("INSERT INTO serviciosContratados set ?;", contratar));
+
+        case 35:
+          _resultServicio = _context52.sent;
+          console.log(_resultServicio);
+          event.sender.send("Notificar", {
+            success: true,
+            title: "Guardado!",
+            message: "Contratado."
+          });
+          contratar.id = _resultServicio.insertId;
+          return _context52.abrupt("return", _resultServicio);
+
+        case 42:
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "El servicio ya ha sido registrado en este contrato."
+          });
+
+        case 43:
+          _context52.next = 49;
+          break;
+
+        case 45:
+          _context52.prev = 45;
+          _context52.t0 = _context52["catch"](0);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al contratar."
           });
-          console.log(_context51.t0);
+          console.log(_context52.t0);
 
-        case 25:
+        case 49:
         case "end":
-          return _context51.stop();
+          return _context52.stop();
       }
     }
-  }, null, null, [[0, 21]]);
+  }, null, null, [[0, 45]]);
 });
-ipcMain.handle("deleteContratadoDetalle", function _callee53(event, descontratar) {
+ipcMain.handle("deleteContratadoDetalle", function _callee54(event, descontratar) {
   var canceladoSn, cancelados, conn, detallesServicio, canceladoExiste, resultContratado, _resultContratado;
 
-  return regeneratorRuntime.async(function _callee53$(_context53) {
+  return regeneratorRuntime.async(function _callee54$(_context54) {
     while (1) {
-      switch (_context53.prev = _context53.next) {
+      switch (_context54.prev = _context54.next) {
         case 0:
           canceladoSn = false;
           cancelados = 0;
-          _context53.prev = 2;
-          _context53.next = 5;
+          _context54.prev = 2;
+          _context54.next = 5;
           return regeneratorRuntime.awrap(getConnection());
 
         case 5:
-          conn = _context53.sent;
+          conn = _context54.sent;
           console.log("Recibido: ", descontratar);
-          _context53.next = 9;
+          _context54.next = 9;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM detallesServicio WHERE serviciosContratadosId =" + descontratar + ";"));
 
         case 9:
-          detallesServicio = _context53.sent;
+          detallesServicio = _context54.sent;
 
           if (!(detallesServicio.length > 0)) {
-            _context53.next = 27;
+            _context54.next = 27;
             break;
           }
 
@@ -2127,7 +2211,7 @@ ipcMain.handle("deleteContratadoDetalle", function _callee53(event, descontratar
           });
 
           if (!canceladoExiste) {
-            _context53.next = 18;
+            _context54.next = 18;
             break;
           }
 
@@ -2137,198 +2221,198 @@ ipcMain.handle("deleteContratadoDetalle", function _callee53(event, descontratar
             title: "Error!",
             message: "Este servicio ya ha sido cancelado por lo que no puedes eliminarlo."
           });
-          _context53.next = 25;
+          _context54.next = 25;
           break;
 
         case 18:
           console.log("Ningún detalle cancelado fue encontrado.");
-          detallesServicio.forEach(function _callee52(detalleServicio) {
+          detallesServicio.forEach(function _callee53(detalleServicio) {
             var resultDetalle;
-            return regeneratorRuntime.async(function _callee52$(_context52) {
+            return regeneratorRuntime.async(function _callee53$(_context53) {
               while (1) {
-                switch (_context52.prev = _context52.next) {
+                switch (_context53.prev = _context53.next) {
                   case 0:
-                    _context52.next = 2;
+                    _context53.next = 2;
                     return regeneratorRuntime.awrap(conn.query("DELETE FROM detallesServicio WHERE id=" + detalleServicio.id + ";"));
 
                   case 2:
-                    resultDetalle = _context52.sent;
+                    resultDetalle = _context53.sent;
                     console.log(resultDetalle);
 
                   case 4:
                   case "end":
-                    return _context52.stop();
+                    return _context53.stop();
                 }
               }
             });
           });
-          _context53.next = 22;
+          _context54.next = 22;
           return regeneratorRuntime.awrap(conn.query("DELETE FROM serviciosContratados WHERE id=" + descontratar + ";"));
 
         case 22:
-          resultContratado = _context53.sent;
+          resultContratado = _context54.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Borrado!",
             message: "Se ha eliminado este servicio para este contrato."
           });
-          return _context53.abrupt("return", resultContratado);
+          return _context54.abrupt("return", resultContratado);
 
         case 25:
-          _context53.next = 34;
+          _context54.next = 34;
           break;
 
         case 27:
           console.log("Array sin datos");
-          _context53.next = 30;
+          _context54.next = 30;
           return regeneratorRuntime.awrap(conn.query("DELETE FROM serviciosContratados WHERE id= " + descontratar + ";"));
 
         case 30:
-          _resultContratado = _context53.sent;
+          _resultContratado = _context54.sent;
           console.log(_resultContratado);
           event.sender.send("Notificar", {
             success: true,
             title: "Borrado!",
             message: "Se ha eliminado este servicio para este contrato."
           });
-          return _context53.abrupt("return", _resultContratado);
+          return _context54.abrupt("return", _resultContratado);
 
         case 34:
-          _context53.next = 40;
+          _context54.next = 40;
           break;
 
         case 36:
-          _context53.prev = 36;
-          _context53.t0 = _context53["catch"](2);
+          _context54.prev = 36;
+          _context54.t0 = _context54["catch"](2);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al descontratar el servicio."
           });
-          console.log(_context53.t0);
+          console.log(_context54.t0);
 
         case 40:
         case "end":
-          return _context53.stop();
+          return _context54.stop();
       }
     }
   }, null, null, [[2, 36]]);
 });
-ipcMain.handle("updateCuotas", function _callee54(event, id, cuota) {
+ipcMain.handle("updateCuotas", function _callee55(event, id, cuota) {
   var conn, resultServicio;
-  return regeneratorRuntime.async(function _callee54$(_context54) {
+  return regeneratorRuntime.async(function _callee55$(_context55) {
     while (1) {
-      switch (_context54.prev = _context54.next) {
+      switch (_context55.prev = _context55.next) {
         case 0:
-          _context54.prev = 0;
-          _context54.next = 3;
+          _context55.prev = 0;
+          _context55.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context54.sent;
-          _context54.next = 6;
+          conn = _context55.sent;
+          _context55.next = 6;
           return regeneratorRuntime.awrap(conn.query("UPDATE servicios SET ? where id = ?", [cuota, id]));
 
         case 6:
-          resultServicio = _context54.sent;
+          resultServicio = _context55.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Actualizado!",
             message: "Se ha actualizado el servicio ocacional."
           });
           console.log(resultServicio);
-          return _context54.abrupt("return", resultServicio);
+          return _context55.abrupt("return", resultServicio);
 
         case 12:
-          _context54.prev = 12;
-          _context54.t0 = _context54["catch"](0);
+          _context55.prev = 12;
+          _context55.t0 = _context55["catch"](0);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al actualizar el servicio ocacional."
           });
-          console.log(_context54.t0);
+          console.log(_context55.t0);
 
         case 16:
         case "end":
-          return _context54.stop();
+          return _context55.stop();
       }
     }
   }, null, null, [[0, 12]]);
 });
-ipcMain.handle("deleteCuotas", function _callee55(event, id) {
+ipcMain.handle("deleteCuotas", function _callee56(event, id) {
   var conn, _result9;
 
-  return regeneratorRuntime.async(function _callee55$(_context55) {
+  return regeneratorRuntime.async(function _callee56$(_context56) {
     while (1) {
-      switch (_context55.prev = _context55.next) {
+      switch (_context56.prev = _context56.next) {
         case 0:
           console.log("id from main.js: ", id);
-          _context55.next = 3;
+          _context56.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context55.sent;
-          _context55.prev = 4;
-          _context55.next = 7;
+          conn = _context56.sent;
+          _context56.prev = 4;
+          _context56.next = 7;
           return regeneratorRuntime.awrap(conn.query("DELETE FROM servicios WHERE id = ?", id));
 
         case 7:
-          _result9 = _context55.sent;
+          _result9 = _context56.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Borrado!",
             message: "Se ha eliminado el servicio ocacional."
           });
           console.log(_result9);
-          return _context55.abrupt("return", _result9);
+          return _context56.abrupt("return", _result9);
 
         case 13:
-          _context55.prev = 13;
-          _context55.t0 = _context55["catch"](4);
+          _context56.prev = 13;
+          _context56.t0 = _context56["catch"](4);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al elimiar el registro."
           });
-          console.log(_context55.t0);
+          console.log(_context56.t0);
 
         case 17:
         case "end":
-          return _context55.stop();
+          return _context56.stop();
       }
     }
   }, null, null, [[4, 13]]);
 });
-ipcMain.handle("getContratadoByServicioContrato", function _callee56(event, servicioId, contratoId) {
+ipcMain.handle("getContratadoByServicioContrato", function _callee57(event, servicioId, contratoId) {
   var conn, _result10;
 
-  return regeneratorRuntime.async(function _callee56$(_context56) {
+  return regeneratorRuntime.async(function _callee57$(_context57) {
     while (1) {
-      switch (_context56.prev = _context56.next) {
+      switch (_context57.prev = _context57.next) {
         case 0:
-          _context56.prev = 0;
-          _context56.next = 3;
+          _context57.prev = 0;
+          _context57.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context56.sent;
-          _context56.next = 6;
+          conn = _context57.sent;
+          _context57.next = 6;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServiciosContratados WHERE " + "serviciosId=" + servicioId + " AND id=" + contratoId + " ;"));
 
         case 6:
-          _result10 = _context56.sent;
+          _result10 = _context57.sent;
           console.log("Resultado de contratado: " + _result10[0]);
-          return _context56.abrupt("return", _result10);
+          return _context57.abrupt("return", _result10);
 
         case 11:
-          _context56.prev = 11;
-          _context56.t0 = _context56["catch"](0);
-          console.log("Error :" + _context56.t0);
+          _context57.prev = 11;
+          _context57.t0 = _context57["catch"](0);
+          console.log("Error :" + _context57.t0);
 
         case 14:
         case "end":
-          return _context56.stop();
+          return _context57.stop();
       }
     }
   }, null, null, [[0, 11]]);
@@ -2336,32 +2420,7 @@ ipcMain.handle("getContratadoByServicioContrato", function _callee56(event, serv
 //   funciones de los Descuentos
 // ----------------------------------------------------------------
 
-ipcMain.handle("getDescuentos", function _callee57() {
-  var conn, results;
-  return regeneratorRuntime.async(function _callee57$(_context57) {
-    while (1) {
-      switch (_context57.prev = _context57.next) {
-        case 0:
-          _context57.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context57.sent;
-          results = conn.query("SELECT * FROM tiposDescuento;");
-          console.log(results);
-          return _context57.abrupt("return", results);
-
-        case 6:
-        case "end":
-          return _context57.stop();
-      }
-    }
-  });
-}); // ----------------------------------------------------------------
-//   funciones de los Medidores
-// ----------------------------------------------------------------
-
-ipcMain.handle("getMedidores", function _callee58() {
+ipcMain.handle("getDescuentos", function _callee58() {
   var conn, results;
   return regeneratorRuntime.async(function _callee58$(_context58) {
     while (1) {
@@ -2372,7 +2431,7 @@ ipcMain.handle("getMedidores", function _callee58() {
 
         case 2:
           conn = _context58.sent;
-          results = conn.query("Select * from medidores order by id desc;");
+          results = conn.query("SELECT * FROM tiposDescuento;");
           console.log(results);
           return _context58.abrupt("return", results);
 
@@ -2382,8 +2441,11 @@ ipcMain.handle("getMedidores", function _callee58() {
       }
     }
   });
-});
-ipcMain.handle("getMedidoresDisponibles", function _callee59() {
+}); // ----------------------------------------------------------------
+//   funciones de los Medidores
+// ----------------------------------------------------------------
+
+ipcMain.handle("getMedidores", function _callee59() {
   var conn, results;
   return regeneratorRuntime.async(function _callee59$(_context59) {
     while (1) {
@@ -2394,7 +2456,7 @@ ipcMain.handle("getMedidoresDisponibles", function _callee59() {
 
         case 2:
           conn = _context59.sent;
-          results = conn.query("Select * from implementos where implementos.nombre='Medidor' and implementos.stock>0 order by id desc;");
+          results = conn.query("Select * from medidores order by id desc;");
           console.log(results);
           return _context59.abrupt("return", results);
 
@@ -2405,8 +2467,8 @@ ipcMain.handle("getMedidoresDisponibles", function _callee59() {
     }
   });
 });
-ipcMain.handle("getMedidorDisponibleById", function _callee60(event, id) {
-  var conn, result;
+ipcMain.handle("getMedidoresDisponibles", function _callee60() {
+  var conn, results;
   return regeneratorRuntime.async(function _callee60$(_context60) {
     while (1) {
       switch (_context60.prev = _context60.next) {
@@ -2416,17 +2478,39 @@ ipcMain.handle("getMedidorDisponibleById", function _callee60(event, id) {
 
         case 2:
           conn = _context60.sent;
-          _context60.next = 5;
+          results = conn.query("Select * from implementos where implementos.nombre='Medidor' and implementos.stock>0 order by id desc;");
+          console.log(results);
+          return _context60.abrupt("return", results);
+
+        case 6:
+        case "end":
+          return _context60.stop();
+      }
+    }
+  });
+});
+ipcMain.handle("getMedidorDisponibleById", function _callee61(event, id) {
+  var conn, result;
+  return regeneratorRuntime.async(function _callee61$(_context61) {
+    while (1) {
+      switch (_context61.prev = _context61.next) {
+        case 0:
+          _context61.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context61.sent;
+          _context61.next = 5;
           return regeneratorRuntime.awrap(conn.query("Select * from implementos where id = ?", id));
 
         case 5:
-          result = _context60.sent;
+          result = _context61.sent;
           console.log(result[0]);
-          return _context60.abrupt("return", result[0]);
+          return _context61.abrupt("return", result[0]);
 
         case 8:
         case "end":
-          return _context60.stop();
+          return _context61.stop();
       }
     }
   });
@@ -2449,28 +2533,28 @@ ipcMain.handle("getMedidorDisponibleById", function _callee60(event, id) {
 //   }
 // });
 
-ipcMain.handle("getMedidorById", function _callee61(event, id) {
+ipcMain.handle("getMedidorById", function _callee62(event, id) {
   var conn, result;
-  return regeneratorRuntime.async(function _callee61$(_context61) {
+  return regeneratorRuntime.async(function _callee62$(_context62) {
     while (1) {
-      switch (_context61.prev = _context61.next) {
+      switch (_context62.prev = _context62.next) {
         case 0:
-          _context61.next = 2;
+          _context62.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
         case 2:
-          conn = _context61.sent;
-          _context61.next = 5;
+          conn = _context62.sent;
+          _context62.next = 5;
           return regeneratorRuntime.awrap(conn.query("Select * from medidores where id = ?", id));
 
         case 5:
-          result = _context61.sent;
+          result = _context62.sent;
           console.log(result[0]);
-          return _context61.abrupt("return", result[0]);
+          return _context62.abrupt("return", result[0]);
 
         case 8:
         case "end":
-          return _context61.stop();
+          return _context62.stop();
       }
     }
   });
@@ -2505,58 +2589,6 @@ ipcMain.handle("getMedidorById", function _callee61(event, id) {
 //   return result[0];
 // });
 
-ipcMain.handle("getDatosContratosById", function _callee62(event, id) {
-  var conn, mensaje, result;
-  return regeneratorRuntime.async(function _callee62$(_context62) {
-    while (1) {
-      switch (_context62.prev = _context62.next) {
-        case 0:
-          _context62.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context62.sent;
-          mensaje = "NM: ";
-          result = "";
-          _context62.next = 7;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewcontratosconmedidor where id=" + id + ";"));
-
-        case 7:
-          result = _context62.sent;
-
-          if (!(!result.length == 0)) {
-            _context62.next = 12;
-            break;
-          }
-
-          mensaje = "Datos contrato con medidor: ";
-          _context62.next = 16;
-          break;
-
-        case 12:
-          _context62.next = 14;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewcontratossinmedidor where id=" + id + ";"));
-
-        case 14:
-          result = _context62.sent;
-
-          if (!result.length == 0) {
-            mensaje = "Datos contrato sin medidor: ";
-          } else {
-            mensaje = "No se encontraron datos: ";
-          }
-
-        case 16:
-          console.log(mensaje, result[0]);
-          return _context62.abrupt("return", result[0]);
-
-        case 18:
-        case "end":
-          return _context62.stop();
-      }
-    }
-  });
-});
 ipcMain.handle("deleteMedidor", function _callee63(event, id) {
   var conn, result;
   return regeneratorRuntime.async(function _callee63$(_context63) {
@@ -2736,7 +2768,7 @@ ipcMain.handle("getContratosSinMedidor", function _callee67() {
   }, null, null, [[0, 7]]);
 });
 ipcMain.handle("createContrato", function _callee68(event, contrato, numero, sectorId) {
-  var conn, _result11;
+  var conn, contratosAnteriores, _result11;
 
   return regeneratorRuntime.async(function _callee68$(_context68) {
     while (1) {
@@ -2749,11 +2781,23 @@ ipcMain.handle("createContrato", function _callee68(event, contrato, numero, sec
 
         case 4:
           conn = _context68.sent;
+          _context68.next = 7;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM contratos WHERE  sociosId= ?", contrato.sociosId));
+
+        case 7:
+          contratosAnteriores = _context68.sent;
+
+          if (contratosAnteriores.length > 0) {
+            contrato.principalSn = "No";
+          } else {
+            contrato.principalSn = "Si";
+          }
+
           console.log("Recibido: ", contrato);
-          _context68.next = 8;
+          _context68.next = 12;
           return regeneratorRuntime.awrap(conn.query("Insert into contratos set ?", contrato));
 
-        case 8:
+        case 12:
           _result11 = _context68.sent;
           sumarSociosSectores(numero, sectorId);
           console.log(_result11);
@@ -2761,16 +2805,12 @@ ipcMain.handle("createContrato", function _callee68(event, contrato, numero, sec
             success: true,
             title: "Guardado!",
             message: "Se ha registrado el nuevo contrato."
-          }); // new Notification({
-          //   title: "Registró guardado",
-          //   body: "Se registró un nuevo contrato con éxito",
-          // }).show();
-
+          });
           contrato.id = _result11.insertId;
           return _context68.abrupt("return", contrato);
 
-        case 16:
-          _context68.prev = 16;
+        case 20:
+          _context68.prev = 20;
           _context68.t0 = _context68["catch"](0);
           console.log(_context68.t0);
           event.sender.send("Notificar", {
@@ -2779,81 +2819,97 @@ ipcMain.handle("createContrato", function _callee68(event, contrato, numero, sec
             message: "Ha ocurrido un error al registrar el contrato."
           });
 
-        case 20:
+        case 24:
         case "end":
           return _context68.stop();
       }
     }
-  }, null, null, [[0, 16]]);
+  }, null, null, [[0, 20]]);
 });
-
-function sumarSociosSectores(numero, sectorId) {
-  var conn, _result12;
-
-  return regeneratorRuntime.async(function sumarSociosSectores$(_context69) {
+ipcMain.handle("getDatosContratosById", function _callee69(event, id) {
+  var conn, mensaje, result;
+  return regeneratorRuntime.async(function _callee69$(_context69) {
     while (1) {
       switch (_context69.prev = _context69.next) {
         case 0:
-          console.log("Recibido sectores: " + numero + " " + sectorId);
-          _context69.prev = 1;
-          _context69.next = 4;
+          _context69.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 4:
+        case 2:
           conn = _context69.sent;
+          mensaje = "NM: ";
+          result = "";
           _context69.next = 7;
-          return regeneratorRuntime.awrap(conn.query("Update sectores set numeroSocios=? WHERE id= ?", [numero, sectorId]));
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewcontratosconmedidor where id=" + id + ";"));
 
         case 7:
-          _result12 = _context69.sent;
-          console.log(_result12);
-          new Notification({
-            title: "Registró guardado",
-            body: "Se registró un nuevo usuario para sectores"
-          }).show();
-          return _context69.abrupt("return", _result12);
+          result = _context69.sent;
 
-        case 13:
-          _context69.prev = 13;
-          _context69.t0 = _context69["catch"](1);
-          console.log(_context69.t0);
+          if (!(!result.length == 0)) {
+            _context69.next = 12;
+            break;
+          }
+
+          mensaje = "Datos contrato con medidor: ";
+          _context69.next = 16;
+          break;
+
+        case 12:
+          _context69.next = 14;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewcontratossinmedidor where id=" + id + ";"));
+
+        case 14:
+          result = _context69.sent;
+
+          if (!result.length == 0) {
+            mensaje = "Datos contrato sin medidor: ";
+          } else {
+            mensaje = "No se encontraron datos: ";
+          }
 
         case 16:
+          console.log(mensaje, result[0]);
+          return _context69.abrupt("return", result[0]);
+
+        case 18:
         case "end":
           return _context69.stop();
       }
     }
-  }, null, null, [[1, 13]]);
-}
-
-ipcMain.handle("updateContrato", function _callee69(event, id, contrato) {
-  var conn, result;
-  return regeneratorRuntime.async(function _callee69$(_context70) {
+  });
+});
+ipcMain.handle("updatePrincipal", function _callee70(event, contratoId, socioId) {
+  var conn, resultSecundarios, resultPrincipales;
+  return regeneratorRuntime.async(function _callee70$(_context70) {
     while (1) {
       switch (_context70.prev = _context70.next) {
         case 0:
-          _context70.next = 2;
+          _context70.prev = 0;
+          _context70.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 2:
+        case 3:
           conn = _context70.sent;
-          _context70.prev = 3;
           _context70.next = 6;
-          return regeneratorRuntime.awrap(conn.query("UPDATE contratos  set ? where id = ?", [contrato, id]));
+          return regeneratorRuntime.awrap(conn.query("UPDATE contratos SET principalSn='No' WHERE NOT contratos.id=" + contratoId + " AND contratos.sociosId=" + socioId + " ;"));
 
         case 6:
-          result = _context70.sent;
+          resultSecundarios = _context70.sent;
+          _context70.next = 9;
+          return regeneratorRuntime.awrap(conn.query("UPDATE contratos SET principalSn='Si' WHERE contratos.id=" + contratoId + " AND contratos.sociosId=" + socioId + " ;"));
+
+        case 9:
+          resultPrincipales = _context70.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Actualizado!",
-            message: "Se han actualizado el registro del contrato.",
-            contratoId: id
+            message: "Se han actualizado el registro del contrato."
           });
-          return _context70.abrupt("return", result);
+          return _context70.abrupt("return", contratoId);
 
-        case 11:
-          _context70.prev = 11;
-          _context70.t0 = _context70["catch"](3);
+        case 14:
+          _context70.prev = 14;
+          _context70.t0 = _context70["catch"](0);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
@@ -2861,43 +2917,125 @@ ipcMain.handle("updateContrato", function _callee69(event, id, contrato) {
           });
           console.log(_context70.t0);
 
-        case 15:
+        case 18:
         case "end":
           return _context70.stop();
       }
     }
-  }, null, null, [[3, 11]]);
+  }, null, null, [[0, 14]]);
 });
-ipcMain.handle("updateMedidor", function _callee70(event, id, medidor) {
-  var conn, medidorExistente, result;
-  return regeneratorRuntime.async(function _callee70$(_context71) {
+
+function sumarSociosSectores(numero, sectorId) {
+  var conn, _result12;
+
+  return regeneratorRuntime.async(function sumarSociosSectores$(_context71) {
     while (1) {
       switch (_context71.prev = _context71.next) {
         case 0:
-          _context71.prev = 0;
-          _context71.next = 3;
+          console.log("Recibido sectores: " + numero + " " + sectorId);
+          _context71.prev = 1;
+          _context71.next = 4;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 4:
+          conn = _context71.sent;
+          _context71.next = 7;
+          return regeneratorRuntime.awrap(conn.query("Update sectores set numeroSocios=? WHERE id= ?", [numero, sectorId]));
+
+        case 7:
+          _result12 = _context71.sent;
+          console.log(_result12);
+          new Notification({
+            title: "Registró guardado",
+            body: "Se registró un nuevo usuario para sectores"
+          }).show();
+          return _context71.abrupt("return", _result12);
+
+        case 13:
+          _context71.prev = 13;
+          _context71.t0 = _context71["catch"](1);
+          console.log(_context71.t0);
+
+        case 16:
+        case "end":
+          return _context71.stop();
+      }
+    }
+  }, null, null, [[1, 13]]);
+}
+
+ipcMain.handle("updateContrato", function _callee71(event, id, contrato) {
+  var conn, result;
+  return regeneratorRuntime.async(function _callee71$(_context72) {
+    while (1) {
+      switch (_context72.prev = _context72.next) {
+        case 0:
+          _context72.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context72.sent;
+          _context72.prev = 3;
+          _context72.next = 6;
+          return regeneratorRuntime.awrap(conn.query("UPDATE contratos  set ? where id = ?", [contrato, id]));
+
+        case 6:
+          result = _context72.sent;
+          event.sender.send("Notificar", {
+            success: true,
+            title: "Actualizado!",
+            message: "Se han actualizado el registro del contrato.",
+            contratoId: id
+          });
+          return _context72.abrupt("return", result);
+
+        case 11:
+          _context72.prev = 11;
+          _context72.t0 = _context72["catch"](3);
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "Ha ocurrido un error al actualizar el contrato."
+          });
+          console.log(_context72.t0);
+
+        case 15:
+        case "end":
+          return _context72.stop();
+      }
+    }
+  }, null, null, [[3, 11]]);
+});
+ipcMain.handle("updateMedidor", function _callee72(event, id, medidor) {
+  var conn, medidorExistente, result;
+  return regeneratorRuntime.async(function _callee72$(_context73) {
+    while (1) {
+      switch (_context73.prev = _context73.next) {
+        case 0:
+          _context73.prev = 0;
+          _context73.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context71.sent;
-          _context71.next = 6;
+          conn = _context73.sent;
+          _context73.next = 6;
           return regeneratorRuntime.awrap(conn.query("SELECT id FROM medidores  WHERE contratosId=" + id + ";"));
 
         case 6:
-          medidorExistente = _context71.sent;
+          medidorExistente = _context73.sent;
 
           if (!(medidorExistente[0] !== undefined)) {
-            _context71.next = 18;
+            _context73.next = 18;
             break;
           }
 
           console.log("resultado de buscar el medidor: " + medidorExistente[0]);
           console.log("ejecutando if");
-          _context71.next = 12;
+          _context73.next = 12;
           return regeneratorRuntime.awrap(conn.query("UPDATE medidores set ? where id = ?", [medidor, medidorExistente[0].id]));
 
         case 12:
-          result = _context71.sent;
+          result = _context73.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Actualizado!",
@@ -2905,15 +3043,15 @@ ipcMain.handle("updateMedidor", function _callee70(event, id, medidor) {
             contratoId: id
           });
           console.log(result);
-          return _context71.abrupt("return", medidorExistente[0]);
+          return _context73.abrupt("return", medidorExistente[0]);
 
         case 18:
           console.log("ejecutando else: ", medidor);
-          _context71.next = 21;
+          _context73.next = 21;
           return regeneratorRuntime.awrap(conn.query("INSERT INTO medidores set ?", medidor));
 
         case 21:
-          result = _context71.sent;
+          result = _context73.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Guardado!",
@@ -2922,47 +3060,47 @@ ipcMain.handle("updateMedidor", function _callee70(event, id, medidor) {
           });
           medidor.id = result.insertId;
           console.log(result);
-          return _context71.abrupt("return", medidor);
+          return _context73.abrupt("return", medidor);
 
         case 26:
-          _context71.next = 32;
+          _context73.next = 32;
           break;
 
         case 28:
-          _context71.prev = 28;
-          _context71.t0 = _context71["catch"](0);
+          _context73.prev = 28;
+          _context73.t0 = _context73["catch"](0);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al actualizar el medidor."
           });
-          console.log("Error al actualizar el medidor: ", _context71.t0);
+          console.log("Error al actualizar el medidor: ", _context73.t0);
 
         case 32:
         case "end":
-          return _context71.stop();
+          return _context73.stop();
       }
     }
   }, null, null, [[0, 28]]);
 });
-ipcMain.handle("createServiciosContratados", function _callee71(event, servicioId, contratoId, descuentosId, adquiridoSn) {
+ipcMain.handle("createServiciosContratados", function _callee73(event, servicioId, contratoId, descuentosId, adquiridoSn) {
   var conn, resultContratarServicio;
-  return regeneratorRuntime.async(function _callee71$(_context72) {
+  return regeneratorRuntime.async(function _callee73$(_context74) {
     while (1) {
-      switch (_context72.prev = _context72.next) {
+      switch (_context74.prev = _context74.next) {
         case 0:
-          _context72.prev = 0;
-          _context72.next = 3;
+          _context74.prev = 0;
+          _context74.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context72.sent;
+          conn = _context74.sent;
           console.log("Recibido: ", servicioId);
-          _context72.next = 7;
+          _context74.next = 7;
           return regeneratorRuntime.awrap(conn.query("CALL insertServiciosContratados (" + servicioId + "," + contratoId + "," + descuentosId + ",'" + adquiridoSn + "');"));
 
         case 7:
-          resultContratarServicio = _context72.sent;
+          resultContratarServicio = _context74.sent;
           console.log(resultContratarServicio); // new Notification({
           //   title: "Regístro guardado",
           //   body: "Se registro el servicio",
@@ -2970,49 +3108,49 @@ ipcMain.handle("createServiciosContratados", function _callee71(event, servicioI
 
           event.sender.send("notifyContratarServicios");
           resultContratarServicio.id = resultContratarServicio.insertId;
-          return _context72.abrupt("return", resultContratarServicio);
+          return _context74.abrupt("return", resultContratarServicio);
 
         case 14:
-          _context72.prev = 14;
-          _context72.t0 = _context72["catch"](0);
-          console.log(_context72.t0);
+          _context74.prev = 14;
+          _context74.t0 = _context74["catch"](0);
+          console.log(_context74.t0);
 
         case 17:
         case "end":
-          return _context72.stop();
+          return _context74.stop();
       }
     }
   }, null, null, [[0, 14]]);
 });
-ipcMain.handle("createServicioFijoContratado", function _callee72(event, servicioId, contratoId, descuentosId, adquiridoSn) {
+ipcMain.handle("createServicioFijoContratado", function _callee74(event, servicioId, contratoId, descuentosId, adquiridoSn) {
   var servicioValorPagos, servicioValor, servicioNumPagos, valorDescuento, conn, datosServicio, datosDescuento, contratadoExiste, newContratado, resultServicioContratado, _resultServicioContratado;
 
-  return regeneratorRuntime.async(function _callee72$(_context73) {
+  return regeneratorRuntime.async(function _callee74$(_context75) {
     while (1) {
-      switch (_context73.prev = _context73.next) {
+      switch (_context75.prev = _context75.next) {
         case 0:
           servicioValorPagos = 0;
           servicioValor = 0;
           servicioNumPagos = 1;
           valorDescuento = 0;
-          _context73.prev = 4;
-          _context73.next = 7;
+          _context75.prev = 4;
+          _context75.next = 7;
           return regeneratorRuntime.awrap(getConnection());
 
         case 7:
-          conn = _context73.sent;
+          conn = _context75.sent;
           console.log("Recibido: ", servicioId); // Verificamos si existe el servicio en servicios contratados del contrato.
 
-          _context73.next = 11;
+          _context75.next = 11;
           return regeneratorRuntime.awrap(conn.query("SELECT * from servicios WHERE id=" + servicioId + ";"));
 
         case 11:
-          datosServicio = _context73.sent;
-          _context73.next = 14;
+          datosServicio = _context75.sent;
+          _context75.next = 14;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM tiposDescuento WHERE id=" + descuentosId + ";"));
 
         case 14:
-          datosDescuento = _context73.sent;
+          datosDescuento = _context75.sent;
 
           if (datosServicio[0] !== undefined) {
             console.log("Si hay datos: " + datosServicio[0].id);
@@ -3026,11 +3164,11 @@ ipcMain.handle("createServicioFijoContratado", function _callee72(event, servici
             valorDescuento = datosDescuento[0].valor;
           }
 
-          _context73.next = 19;
+          _context75.next = 19;
           return regeneratorRuntime.awrap(conn.query("SELECT * from serviciosContratados WHERE serviciosId=" + servicioId + " AND contratosId=" + contratoId + ";"));
 
         case 19:
-          contratadoExiste = _context73.sent;
+          contratadoExiste = _context75.sent;
           newContratado = {
             estado: adquiridoSn,
             descuentosId: descuentosId,
@@ -3041,15 +3179,15 @@ ipcMain.handle("createServicioFijoContratado", function _callee72(event, servici
           };
 
           if (!(contratadoExiste[0] !== undefined)) {
-            _context73.next = 30;
+            _context75.next = 30;
             break;
           }
 
-          _context73.next = 24;
+          _context75.next = 24;
           return regeneratorRuntime.awrap(conn.query("UPDATE serviciosContratados SET ?" + " WHERE " + "serviciosId=? AND contratosId=? ;", [newContratado, servicioId, contratoId]));
 
         case 24:
-          resultServicioContratado = _context73.sent;
+          resultServicioContratado = _context75.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Actualizado!",
@@ -3057,16 +3195,16 @@ ipcMain.handle("createServicioFijoContratado", function _callee72(event, servici
             contratoId: contratoId
           });
           console.log("Contratado actualizado: " + resultServicioContratado);
-          return _context73.abrupt("return", resultServicioContratado);
+          return _context75.abrupt("return", resultServicioContratado);
 
         case 30:
           newContratado.serviciosId = servicioId;
           newContratado.contratosId = contratoId;
-          _context73.next = 34;
+          _context75.next = 34;
           return regeneratorRuntime.awrap(conn.query("INSERT INTO serviciosContratados SET ?" + ";", newContratado));
 
         case 34:
-          _resultServicioContratado = _context73.sent;
+          _resultServicioContratado = _context75.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Actualizado!",
@@ -3074,25 +3212,25 @@ ipcMain.handle("createServicioFijoContratado", function _callee72(event, servici
             contratoId: contratoId
           });
           console.log("Contratado creado: " + _resultServicioContratado);
-          return _context73.abrupt("return", _resultServicioContratado);
+          return _context75.abrupt("return", _resultServicioContratado);
 
         case 38:
-          _context73.next = 44;
+          _context75.next = 44;
           break;
 
         case 40:
-          _context73.prev = 40;
-          _context73.t0 = _context73["catch"](4);
+          _context75.prev = 40;
+          _context75.t0 = _context75["catch"](4);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al registrar los servicios contratados."
           });
-          console.log(_context73.t0);
+          console.log(_context75.t0);
 
         case 44:
         case "end":
-          return _context73.stop();
+          return _context75.stop();
       }
     }
   }, null, null, [[4, 40]]);
@@ -3120,70 +3258,70 @@ ipcMain.handle("createServicioFijoContratado", function _callee72(event, servici
 // Funciones de las planillas
 // ----------------------------------------------------------------
 
-ipcMain.handle("createPlanilla", function _callee74(event) {
+ipcMain.handle("createPlanilla", function _callee76(event) {
   var conn;
-  return regeneratorRuntime.async(function _callee74$(_context75) {
+  return regeneratorRuntime.async(function _callee76$(_context77) {
     while (1) {
-      switch (_context75.prev = _context75.next) {
+      switch (_context77.prev = _context77.next) {
         case 0:
-          _context75.next = 2;
+          _context77.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
         case 2:
-          conn = _context75.sent;
-          _context75.prev = 3;
-          _context75.next = 6;
-          return regeneratorRuntime.awrap(conn.query("select medidores.id,medidores.codigo,medidores.fechaInstalacion,contratos.id as contratosId " + "from medidores join contratos on contratos.id=medidores.contratosId " + "where contratos.estado='Activo'; " // "where contratos.medidorSn='Si' AND contratos.estado='Activo'; "
+          conn = _context77.sent;
+          _context77.prev = 3;
+          _context77.next = 6;
+          return regeneratorRuntime.awrap(conn.query("select medidores.id,medidores.codigo,medidores.fechaInstalacion,contratos.id as contratosId,contratos.medidorSn " + "from medidores join contratos on contratos.id=medidores.contratosId " + "where contratos.estado='Activo'; " // "where contratos.medidorSn='Si' AND contratos.estado='Activo'; "
           ));
 
         case 6:
-          medidoresActivos = _context75.sent;
+          medidoresActivos = _context77.sent;
 
           if (medidoresActivos[0] !== undefined) {
-            medidoresActivos.forEach(function _callee73(contratoActivo) {
+            medidoresActivos.forEach(function _callee75(contratoActivo) {
               var lecturaAnterior, lecturaConsulta, tarifaBase, newPlanilla, resultadoPlanillas, _newPlanilla, _resultadoPlanillas;
 
-              return regeneratorRuntime.async(function _callee73$(_context74) {
+              return regeneratorRuntime.async(function _callee75$(_context76) {
                 while (1) {
-                  switch (_context74.prev = _context74.next) {
+                  switch (_context76.prev = _context76.next) {
                     case 0:
                       console.log("Contrato a buscar: " + contratoActivo.id);
 
                       if (!(contratoActivo.medidorSn == "Si")) {
-                        _context74.next = 22;
+                        _context76.next = 22;
                         break;
                       }
 
-                      _context74.next = 4;
+                      _context76.next = 4;
                       return regeneratorRuntime.awrap(conn.query("SELECT count(planillas.id) as existe from planillas where month" + "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " + "and  planillas.medidoresId=" + contratoActivo.id + ";"));
 
                     case 4:
-                      planillaExiste = _context74.sent;
+                      planillaExiste = _context76.sent;
                       console.log("existe: " + planillaExiste[0].existe); // Si no existe la planilla correspondiente a la fecha se crea a planilla
 
                       if (!(planillaExiste[0].existe === 0)) {
-                        _context74.next = 20;
+                        _context76.next = 20;
                         break;
                       }
 
                       // Obtenemos el valor de la lectura anterior en caso de existir
                       lecturaAnterior = 0.0;
-                      _context74.next = 10;
+                      _context76.next = 10;
                       return regeneratorRuntime.awrap(conn.query(" SELECT planillas.lecturaActual from planillas where " + "medidoresId=" + contratoActivo.id + " order by planillas.fechaEmision desc limit 1;"));
 
                     case 10:
-                      lecturaConsulta = _context74.sent;
+                      lecturaConsulta = _context76.sent;
 
                       if (lecturaConsulta[0] !== undefined) {
                         console.log("lectura Anterior: " + lecturaConsulta[0].lecturaActual);
                         lecturaAnterior = lecturaConsulta[0].lecturaActual;
                       }
 
-                      _context74.next = 14;
+                      _context76.next = 14;
                       return regeneratorRuntime.awrap(conn.query("SELECT * FROM tarifas where tarifa='Familiar';"));
 
                     case 14:
-                      tarifaBase = _context74.sent;
+                      tarifaBase = _context76.sent;
                       newPlanilla = {
                         //fechaEmision: "now()",
                         valor: tarifaBase[0].valor,
@@ -3195,27 +3333,27 @@ ipcMain.handle("createPlanilla", function _callee74(event) {
                         tarifa: "Familiar",
                         tarifaValor: tarifaBase[0].valor
                       };
-                      _context74.next = 18;
+                      _context76.next = 18;
                       return regeneratorRuntime.awrap(conn.query("INSERT INTO planillas set ?", newPlanilla));
 
                     case 18:
-                      resultadoPlanillas = _context74.sent;
+                      resultadoPlanillas = _context76.sent;
                       console.log("Resultado de crear planillas: " + resultadoPlanillas); // return resultadoPlanillas;
 
                     case 20:
-                      _context74.next = 33;
+                      _context76.next = 33;
                       break;
 
                     case 22:
-                      _context74.next = 24;
+                      _context76.next = 24;
                       return regeneratorRuntime.awrap(conn.query("SELECT count(planillas.id) as existe from planillas where month" + "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " + "and  planillas.medidoresId=" + contratoActivo.id + ";"));
 
                     case 24:
-                      planillaExiste = _context74.sent;
+                      planillaExiste = _context76.sent;
                       console.log("existe: " + planillaExiste[0].existe); // Si no existe la planilla correspondiente a la fecha se crea a planilla
 
                       if (!(planillaExiste[0].existe == 0)) {
-                        _context74.next = 33;
+                        _context76.next = 33;
                         break;
                       }
 
@@ -3239,7 +3377,7 @@ ipcMain.handle("createPlanilla", function _callee74(event) {
                       _newPlanilla = {
                         //fechaEmision: "now()",
                         valor: 0.0,
-                        estado: "NA",
+                        estado: "Por cobrar",
                         lecturaActual: 0.0,
                         lecturaAnterior: lecturaAnterior,
                         Observacion: "NA",
@@ -3247,11 +3385,11 @@ ipcMain.handle("createPlanilla", function _callee74(event) {
                         tarifa: "NA",
                         tarifaValor: 0.0
                       };
-                      _context74.next = 31;
+                      _context76.next = 31;
                       return regeneratorRuntime.awrap(conn.query("INSERT INTO planillas set ?", _newPlanilla));
 
                     case 31:
-                      _resultadoPlanillas = _context74.sent;
+                      _resultadoPlanillas = _context76.sent;
                       console.log("Resultado de crear planillas: " + _resultadoPlanillas); // return resultadoPlanillas;
 
                     case 33:
@@ -3259,24 +3397,24 @@ ipcMain.handle("createPlanilla", function _callee74(event) {
 
                     case 34:
                     case "end":
-                      return _context74.stop();
+                      return _context76.stop();
                   }
                 }
               });
             });
           }
 
-          _context75.next = 13;
+          _context77.next = 13;
           break;
 
         case 10:
-          _context75.prev = 10;
-          _context75.t0 = _context75["catch"](3);
-          console.log("Error al crear planillas: " + _context75.t0);
+          _context77.prev = 10;
+          _context77.t0 = _context77["catch"](3);
+          console.log("Error al crear planillas: " + _context77.t0);
 
         case 13:
         case "end":
-          return _context75.stop();
+          return _context77.stop();
       }
     }
   }, null, null, [[3, 10]]);
@@ -3284,25 +3422,25 @@ ipcMain.handle("createPlanilla", function _callee74(event) {
 
 function createCuentaServicios(contratoId) {
   var conn, encabezadoId, encabezadoExiste, resultEncabezado, serviciosContratados, otrosValores;
-  return regeneratorRuntime.async(function createCuentaServicios$(_context76) {
+  return regeneratorRuntime.async(function createCuentaServicios$(_context78) {
     while (1) {
-      switch (_context76.prev = _context76.next) {
+      switch (_context78.prev = _context78.next) {
         case 0:
           console.log("Consultando encabezado para: " + contratoId);
-          _context76.next = 3;
+          _context78.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context76.sent;
-          _context76.prev = 4;
-          _context76.next = 7;
+          conn = _context78.sent;
+          _context78.prev = 4;
+          _context78.next = 7;
           return regeneratorRuntime.awrap(conn.query("select count(id) as existe, id from viewEncabezados WHERE tipo='planilla' and   " + "month(fechaEmisionEncabezado)=month(now())" + " and year(fechaEmisionEncabezado)=year(now()) and contratosId=" + contratoId + ";"));
 
         case 7:
-          encabezadoExiste = _context76.sent;
+          encabezadoExiste = _context78.sent;
 
           if (!(encabezadoExiste[0].existe === 0)) {
-            _context76.next = 17;
+            _context78.next = 17;
             break;
           }
 
@@ -3312,13 +3450,13 @@ function createCuentaServicios(contratoId) {
             fechaPago: null,
             tipo: "planilla"
           };
-          _context76.next = 13;
+          _context78.next = 13;
           return regeneratorRuntime.awrap(conn.query("INSERT INTO encabezado set ?;", newEncabezado));
 
         case 13:
-          resultEncabezado = _context76.sent;
+          resultEncabezado = _context78.sent;
           encabezadoId = resultEncabezado.insertId;
-          _context76.next = 18;
+          _context78.next = 18;
           break;
 
         case 17:
@@ -3326,11 +3464,11 @@ function createCuentaServicios(contratoId) {
           encabezadoId = encabezadoExiste[0].id;
 
         case 18:
-          _context76.next = 20;
+          _context78.next = 20;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewServiciosCancelar WHERE contratosId=" + contratoId + " AND estado='Activo' AND tipo='Servicio fijo' AND aplazableSn='No';"));
 
         case 20:
-          serviciosContratados = _context76.sent;
+          serviciosContratados = _context78.sent;
           createDetallesServicios(serviciosContratados, encabezadoId); // Consultamos los servicios ocacionales, las cuotas y las multas que no son aplazables para
           // incluirlas en el detalle de servicios y relacionarlos con un encabezado correspondiente a la
           // cuenta de servicios de cada mes.
@@ -3348,7 +3486,7 @@ function createCuentaServicios(contratoId) {
           //     " month(now()) and year(servicioscontratados.fechaEmision)= year(now());"
           // );
 
-          _context76.next = 24;
+          _context78.next = 24;
           return regeneratorRuntime.awrap(conn.query( // "SELECT serviciosContratados.id,serviciosContratados.estado," +
           //   "serviciosContratados.fechaEmision,serviciosContratados.valorIndividual,servicios.id as serviciosId," +
           //   "servicios.aplazableSn,servicios.nombre,servicios.descripcion,servicios.tipo,servicios.valor,servicios.valorPagos," +
@@ -3362,19 +3500,19 @@ function createCuentaServicios(contratoId) {
           " AND NOT tipo='Servicio fijo';"));
 
         case 24:
-          otrosValores = _context76.sent;
+          otrosValores = _context78.sent;
           createDetallesServicios(otrosValores, encabezadoId);
-          _context76.next = 31;
+          _context78.next = 31;
           break;
 
         case 28:
-          _context76.prev = 28;
-          _context76.t0 = _context76["catch"](4);
-          console.log("Error al crear cuentaservicios: " + _context76.t0);
+          _context78.prev = 28;
+          _context78.t0 = _context78["catch"](4);
+          console.log("Error al crear cuentaservicios: " + _context78.t0);
 
         case 31:
         case "end":
-          return _context76.stop();
+          return _context78.stop();
       }
     }
   }, null, null, [[4, 28]]);
@@ -3382,33 +3520,33 @@ function createCuentaServicios(contratoId) {
 
 function createDetallesServicios(serviciosContratados, encabezadoId) {
   var conn;
-  return regeneratorRuntime.async(function createDetallesServicios$(_context78) {
+  return regeneratorRuntime.async(function createDetallesServicios$(_context80) {
     while (1) {
-      switch (_context78.prev = _context78.next) {
+      switch (_context80.prev = _context80.next) {
         case 0:
-          _context78.next = 2;
+          _context80.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
         case 2:
-          conn = _context78.sent;
-          serviciosContratados.forEach(function _callee75(servicioContratado) {
-            var valorPagos, total, abonado, abono, abonosAplicados, totalPagar, newDetalleServicios, aplicadosAnteriores, faltante, pagosRestantes, resultadoDetalleServicio, modificaEstado;
-            return regeneratorRuntime.async(function _callee75$(_context77) {
+          conn = _context80.sent;
+          serviciosContratados.forEach(function _callee77(servicioContratado) {
+            var valorPagos, total, abonado, abono, abonosAplicados, totalPagar, newDetalleServicios, saldo, aplicadosAnteriores, faltante, pagosRestantes, resultadoDetalleServicio, modificaEstado;
+            return regeneratorRuntime.async(function _callee77$(_context79) {
               while (1) {
-                switch (_context77.prev = _context77.next) {
+                switch (_context79.prev = _context79.next) {
                   case 0:
                     console.log("Servicio contratado a buscar: " + servicioContratado.id); // Mediante la fecha consultamos si ya se ha creado un detalle para el servicio en determinado mes.
                     // para evitar que el servicio se aplique dos veces.
 
-                    _context77.next = 3;
+                    _context79.next = 3;
                     return regeneratorRuntime.awrap(conn.query("SELECT count(detallesServicio.id) as existe from detallesServicio where month" + "(detallesServicio.fechaEmision)=month(now()) and year(detallesServicio.fechaEmision)=year(now()) " + "and  detallesServicio.serviciosContratadosId=" + servicioContratado.id + ";"));
 
                   case 3:
-                    detalleServicioExiste = _context77.sent;
+                    detalleServicioExiste = _context79.sent;
                     console.log("Detalle servicio existe: " + detalleServicioExiste[0].existe); // Si no existen los detalles de servicios correspondiente a la fecha se crean y se añaden al encabezado
 
                     if (!(detalleServicioExiste[0].existe === 0)) {
-                      _context77.next = 53;
+                      _context79.next = 55;
                       break;
                     }
 
@@ -3419,21 +3557,22 @@ function createDetallesServicios(serviciosContratados, encabezadoId) {
                     abono = 0;
                     abonosAplicados = 0;
                     totalPagar = servicioContratado.valorIndividual - servicioContratado.descuentoValor;
-                    newDetalleServicios = {}; // if (servicioContratado.valoresDistintos === "Si") {
+                    newDetalleServicios = {};
+                    saldo = 0; // if (servicioContratado.valoresDistintos === "Si") {
 
                     if (!(servicioContratado.aplazableSn === "Si")) {
-                      _context77.next = 36;
+                      _context79.next = 38;
                       break;
                     }
 
-                    _context77.next = 17;
+                    _context79.next = 18;
                     return regeneratorRuntime.awrap(conn.query("SELECT * FROM detallesServicio WHERE serviciosContratadosId=" + servicioContratado.id + " ;"));
 
-                  case 17:
-                    aplicadosAnteriores = _context77.sent;
+                  case 18:
+                    aplicadosAnteriores = _context79.sent;
 
                     if (!(aplicadosAnteriores[0] !== undefined)) {
-                      _context77.next = 32;
+                      _context79.next = 34;
                       break;
                     }
 
@@ -3442,11 +3581,11 @@ function createDetallesServicios(serviciosContratados, encabezadoId) {
                     aplicadosAnteriores.forEach(function (aplicadoAnterior) {
                       //Sumo los valores aplicados
                       abonado += aplicadoAnterior.abono;
-                      abonosAplicados++;
+                      abonosAplicados++; // saldo=aplicadoAnterior.saldo;
                     }); // total = servicioContratado.valorIndividual;
 
                     if (!(abonado < totalPagar)) {
-                      _context77.next = 28;
+                      _context79.next = 30;
                       break;
                     }
 
@@ -3460,8 +3599,9 @@ function createDetallesServicios(serviciosContratados, encabezadoId) {
                     } else {
                       console.log("Entro a los aplazables con faltante menor a la cuota");
                       abono = faltante;
-                    } // valorPagos = servicioContratado.valorPagosindividual;
+                    }
 
+                    saldo = totalPagar - abonado; // valorPagos = servicioContratado.valorPagosindividual;
 
                     newDetalleServicios = {
                       serviciosContratadosId: servicioContratado.id,
@@ -3470,25 +3610,25 @@ function createDetallesServicios(serviciosContratados, encabezadoId) {
                       total: totalPagar,
                       // El saldo debe ser calculado
                       // saldo: total - servicioContratado.valorDescuento,
-                      saldo: totalPagar - abonado,
+                      saldo: saldo - abono,
                       // El abono debe ser calculado
                       abono: abono,
                       encabezadosId: encabezadoId,
                       estado: "Por cancelar" //fechaEmision
 
                     };
-                    _context77.next = 30;
+                    _context79.next = 32;
                     break;
-
-                  case 28:
-                    console.log("Entro a los aplazables que superan el abonado");
-                    return _context77.abrupt("return", null);
 
                   case 30:
-                    _context77.next = 34;
-                    break;
+                    console.log("Entro a los aplazables que superan el abonado");
+                    return _context79.abrupt("return", null);
 
                   case 32:
+                    _context79.next = 36;
+                    break;
+
+                  case 34:
                     console.log("Entro a los aplazables sin anteriores");
                     newDetalleServicios = {
                       serviciosContratadosId: servicioContratado.id,
@@ -3504,11 +3644,11 @@ function createDetallesServicios(serviciosContratados, encabezadoId) {
 
                     };
 
-                  case 34:
-                    _context77.next = 38;
+                  case 36:
+                    _context79.next = 40;
                     break;
 
-                  case 36:
+                  case 38:
                     console.log("Entro a los no aplazables"); //total = servicioContratado.valorIndividual;
                     // valorPagos = servicioContratado.valorPagosindividual;
 
@@ -3526,35 +3666,35 @@ function createDetallesServicios(serviciosContratados, encabezadoId) {
 
                     };
 
-                  case 38:
-                    _context77.next = 40;
+                  case 40:
+                    _context79.next = 42;
                     return regeneratorRuntime.awrap(conn.query("INSERT INTO detallesServicio set ?", newDetalleServicios));
 
-                  case 40:
-                    resultadoDetalleServicio = _context77.sent;
+                  case 42:
+                    resultadoDetalleServicio = _context79.sent;
                     console.log("servicioContratado.tipo: ", servicioContratado.tipo);
 
                     if (!(servicioContratado.tipo !== "Servicio fijo")) {
-                      _context77.next = 51;
+                      _context79.next = 53;
                       break;
                     }
 
                     console.log("entrando a cambiar estado");
-                    _context77.next = 46;
+                    _context79.next = 48;
                     return regeneratorRuntime.awrap(conn.query("UPDATE serviciosContratados SET estado='Aplicado' WHERE serviciosContratados.id=" + servicioContratado.id + ";"));
 
-                  case 46:
-                    modificaEstado = _context77.sent;
+                  case 48:
+                    modificaEstado = _context79.sent;
                     console.log("Resultado de crear planillas: " + resultadoDetalleServicio);
-                    return _context77.abrupt("return", resultadoDetalleServicio);
-
-                  case 51:
-                    console.log("Resultado de crear planillas: " + resultadoDetalleServicio);
-                    return _context77.abrupt("return", resultadoDetalleServicio);
+                    return _context79.abrupt("return", resultadoDetalleServicio);
 
                   case 53:
+                    console.log("Resultado de crear planillas: " + resultadoDetalleServicio);
+                    return _context79.abrupt("return", resultadoDetalleServicio);
+
+                  case 55:
                   case "end":
-                    return _context77.stop();
+                    return _context79.stop();
                 }
               }
             });
@@ -3562,89 +3702,229 @@ function createDetallesServicios(serviciosContratados, encabezadoId) {
 
         case 4:
         case "end":
-          return _context78.stop();
+          return _context80.stop();
       }
     }
   });
 } // Cargamos las planillas disponibles
 
 
-ipcMain.handle("getDatosPlanillas", function _callee76(event, criterio, criterioContent, estado, anio, mes) {
-  var conn, results, _results5;
+ipcMain.handle("getDatosPlanillas", function _callee78(event, criterio, criterioContent, estado, anio, mes) {
+  var conn, _results9, _results10, _results11, _results12, _results13, _results14, _results15, _results16;
 
-  return regeneratorRuntime.async(function _callee76$(_context79) {
+  return regeneratorRuntime.async(function _callee78$(_context81) {
     while (1) {
-      switch (_context79.prev = _context79.next) {
+      switch (_context81.prev = _context81.next) {
         case 0:
           console.log("Recibo parametros planillas: " + criterio, criterioContent, estado, anio, mes);
-          _context79.prev = 1;
-          _context79.next = 4;
+          _context81.prev = 1;
+          _context81.next = 4;
           return regeneratorRuntime.awrap(getConnection());
 
         case 4:
-          conn = _context79.sent;
+          conn = _context81.sent;
 
-          if (estado === "all" || estado == undefined) {
-            estado = "";
+          if (estado == undefined) {
+            estado = "Por cobrar";
           }
 
-          if (!(criterio === "all" || criterio == undefined)) {
-            _context79.next = 14;
+          if (criterio == undefined) {
+            criterio = "all";
+          }
+
+          if (anio == undefined) {
+            anio = "all";
+          }
+
+          if (mes == undefined) {
+            mes = "all";
+          }
+
+          if (!(criterio == "all")) {
+            _context81.next = 46;
             break;
           }
 
-          _context79.next = 9;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + "estado='" + estado + "' and " + " year(fechaEmision) = '" + anio + "' and month(fechaEmision) = '" + mes + "' order by fechaEmision desc"));
+          if (!(anio == "all" && mes == "all")) {
+            _context81.next = 19;
+            break;
+          }
 
-        case 9:
-          results = _context79.sent;
-          console.log(results);
-          return _context79.abrupt("return", results);
+          console.log("anio all mes all");
+          _context81.next = 14;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + "estado='" + estado + "' order by fechaEmision desc"));
 
         case 14:
-          _context79.next = 16;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + criterio + " = " + criterioContent + " and estado='" + estado + "' and " + " year(fechaEmision) = '" + anio + "' and month(fechaEmision) = '" + mes + "' order by fechaEmision desc"));
-
-        case 16:
-          _results5 = _context79.sent;
-          console.log("Con parametros", _results5);
-          return _context79.abrupt("return", _results5);
+          _results9 = _context81.sent;
+          console.log(_results9);
+          return _context81.abrupt("return", _results9);
 
         case 19:
-          _context79.next = 24;
+          if (!(anio == "all" && mes !== "all")) {
+            _context81.next = 28;
+            break;
+          }
+
+          console.log("anio all mes df", mes);
+          _context81.next = 23;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + "estado='" + estado + "' and month(fechaEmision) = '" + mes + "' order by fechaEmision desc ;"));
+
+        case 23:
+          _results10 = _context81.sent;
+          console.log(_results10);
+          return _context81.abrupt("return", _results10);
+
+        case 28:
+          if (!(anio !== "all" && mes == "all")) {
+            _context81.next = 37;
+            break;
+          }
+
+          console.log("mes all anio df", anio);
+          _context81.next = 32;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + "estado='" + estado + "' and " + " year(fechaEmision) = '" + anio + "' order by fechaEmision desc ;"));
+
+        case 32:
+          _results11 = _context81.sent;
+          console.log(_results11);
+          return _context81.abrupt("return", _results11);
+
+        case 37:
+          if (!(anio !== "all" && mes !== "all")) {
+            _context81.next = 44;
+            break;
+          }
+
+          console.log("mes df anio df ", mes, anio);
+          _context81.next = 41;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + "estado='" + estado + "' and " + " year(fechaEmision) = '" + anio + "' and month(fechaEmision) = '" + mes + "' order by fechaEmision desc ;"));
+
+        case 41:
+          _results12 = _context81.sent;
+          console.log(_results12);
+          return _context81.abrupt("return", _results12);
+
+        case 44:
+          _context81.next = 85;
           break;
 
-        case 21:
-          _context79.prev = 21;
-          _context79.t0 = _context79["catch"](1);
-          console.log("Error en la busqueda de planillas: " + _context79.t0);
+        case 46:
+          if (!(anio == "all" && mes == "all")) {
+            _context81.next = 55;
+            break;
+          }
 
-        case 24:
+          console.log("C mes all anio all");
+          _context81.next = 50;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + criterio + " like '%" + criterioContent + "%' and estado='" + estado + "' order by fechaEmision desc ;"));
+
+        case 50:
+          _results13 = _context81.sent;
+          console.log(_results13);
+          return _context81.abrupt("return", _results13);
+
+        case 55:
+          if (!(anio == "all" && mes !== "all")) {
+            _context81.next = 64;
+            break;
+          }
+
+          console.log("C anio all mes df ", mes);
+          _context81.next = 59;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + criterio + " like '%" + criterioContent + "%' and estado='" + estado + "' and month(fechaEmision) = '" + mes + "' order by fechaEmision desc ;"));
+
+        case 59:
+          _results14 = _context81.sent;
+          console.log(_results14);
+          return _context81.abrupt("return", _results14);
+
+        case 64:
+          if (!(anio !== "all" && mes == "all")) {
+            _context81.next = 73;
+            break;
+          }
+
+          console.log("C anio df mes all ", anio);
+          _context81.next = 68;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + criterio + " like '%" + criterioContent + "%' and estado='" + estado + "' and " + " year(fechaEmision) = '" + anio + "' order by fechaEmision desc ;"));
+
+        case 68:
+          _results15 = _context81.sent;
+          console.log(_results15);
+          return _context81.abrupt("return", _results15);
+
+        case 73:
+          if (!(anio !== "all" && mes !== "all")) {
+            _context81.next = 82;
+            break;
+          }
+
+          console.log("anio df mes df", anio, mes);
+          _context81.next = 77;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewPlanillas WHERE " + criterio + " like '%" + criterioContent + "%' and estado='" + estado + "' and " + " year(fechaEmision) = '" + anio + "' and month(fechaEmision) = '" + mes + "' order by fechaEmision desc ;"));
+
+        case 77:
+          _results16 = _context81.sent;
+          console.log(_results16);
+          return _context81.abrupt("return", _results16);
+
+        case 82:
+          Console.log("?");
+
+        case 83:
+          // const results = await conn.query(
+          //   "SELECT * FROM viewPlanillas WHERE " +
+          //     criterio +
+          //     " = " +
+          //     criterioContent +
+          //     " and estado='" +
+          //     estado +
+          //     "' and " +
+          //     " year(fechaEmision) = '" +
+          //     anio +
+          //     "' and month(fechaEmision) = '" +
+          //     mes +
+          //     "' order by fechaEmision desc"
+          // );
+          // results = await conn.query("SELECT * FROM viewPlanillas");
+          console.log("Con parametros", results);
+          return _context81.abrupt("return", results);
+
+        case 85:
+          _context81.next = 90;
+          break;
+
+        case 87:
+          _context81.prev = 87;
+          _context81.t0 = _context81["catch"](1);
+          console.log("Error en la busqueda de planillas: " + _context81.t0);
+
+        case 90:
         case "end":
-          return _context79.stop();
+          return _context81.stop();
       }
     }
-  }, null, null, [[1, 21]]);
+  }, null, null, [[1, 87]]);
 }); // Funcion que carga los datos de la planilla para editarlos
 
-ipcMain.handle("getPlanillaById", function _callee77(event, planillaId) {
+ipcMain.handle("getPlanillaById", function _callee79(event, planillaId) {
   var conn, results;
-  return regeneratorRuntime.async(function _callee77$(_context80) {
+  return regeneratorRuntime.async(function _callee79$(_context82) {
     while (1) {
-      switch (_context80.prev = _context80.next) {
+      switch (_context82.prev = _context82.next) {
         case 0:
-          _context80.next = 2;
+          _context82.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
         case 2:
-          conn = _context80.sent;
+          conn = _context82.sent;
           results = conn.query("SELECT * FROM viewPlanillas where planillasId=" + planillaId + ";");
           console.log(results);
-          return _context80.abrupt("return", results);
+          return _context82.abrupt("return", results);
 
         case 6:
         case "end":
-          return _context80.stop();
+          return _context82.stop();
       }
     }
   });
@@ -3717,86 +3997,8 @@ ipcMain.handle("getPlanillaById", function _callee77(event, planillaId) {
 // Funciones de las lecturas(Planillas)
 // ----------------------------------------------------------------
 
-ipcMain.handle("getLecturasByFecha", function _callee78(event, contratosId, fechaEmision) {
-  var conn, results;
-  return regeneratorRuntime.async(function _callee78$(_context81) {
-    while (1) {
-      switch (_context81.prev = _context81.next) {
-        case 0:
-          _context81.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context81.sent;
-          _context81.prev = 3;
-          _context81.next = 6;
-          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewplanillas WHERE contratosId=" + contratosId + " and month(fechaEmision)=month('" + fechaEmision + "') and " + " year(fechaEmision)=year('" + fechaEmision + "');"));
-
-        case 6:
-          results = _context81.sent;
-          console.log(results[0]);
-          return _context81.abrupt("return", results);
-
-        case 11:
-          _context81.prev = 11;
-          _context81.t0 = _context81["catch"](3);
-          console.log(_context81.t0);
-
-        case 14:
-        case "end":
-          return _context81.stop();
-      }
-    }
-  }, null, null, [[3, 11]]);
-}); // ----------------------------------------------------------------
-// Funcion que relaiza un filtro entre las cuotas de acuerdo al codigo del medidor
-
-ipcMain.handle("getDatosCuotasByCodigo", function _callee79(event, codigoMedidor) {
-  var conn, results, notification, _notification3;
-
-  return regeneratorRuntime.async(function _callee79$(_context82) {
-    while (1) {
-      switch (_context82.prev = _context82.next) {
-        case 0:
-          _context82.prev = 0;
-          _context82.next = 3;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 3:
-          conn = _context82.sent;
-          conn.query("SET lc_time_names = 'es_ES';");
-          results = conn.query("select servicios.id,servicios.fecha,servicios.servicio,servicios.descripcion,servicios.valor," + "servicios.estado from servicios join extrasplanilla on servicios.Id=extrasplanilla.serviciosId " + "join planillas on planillas.id=extrasplanilla.planillasId join " + "contratos on contratos.id=planillas.contratosId join medidores " + "on contratos.id=medidores.contratosId where servicios.tipo='cuota'and medidores.codigo='" + codigoMedidor + "'; ");
-          notification = new Notification({
-            title: "Exito",
-            body: "Se muestran los datos del medidor"
-          });
-          notification.show();
-          console.log(results);
-          return _context82.abrupt("return", results);
-
-        case 12:
-          _context82.prev = 12;
-          _context82.t0 = _context82["catch"](0);
-          _notification3 = new Notification({
-            title: "Error",
-            body: "Es posible que el medidor proporcionado no exista"
-          });
-
-          _notification3.show();
-
-        case 16:
-        case "end":
-          return _context82.stop();
-      }
-    }
-  }, null, null, [[0, 12]]);
-}); // ----------------------------------------------------------------
-// Funciones de los detalles
-// ----------------------------------------------------------------
-// Funcion que carga los servicios de acuerdo al id de la planilla
-
-ipcMain.handle("getDatosServiciosByContratoId", function _callee80(event, contratoId, fechaEmision, criterio) {
-  var conn, _result13, _result14, _result15;
+ipcMain.handle("getLecturasByFecha", function _callee80(event, contratosId, fechaEmision) {
+  var conn, _results17;
 
   return regeneratorRuntime.async(function _callee80$(_context83) {
     while (1) {
@@ -3807,42 +4009,121 @@ ipcMain.handle("getDatosServiciosByContratoId", function _callee80(event, contra
 
         case 2:
           conn = _context83.sent;
+          _context83.prev = 3;
+          _context83.next = 6;
+          return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewplanillas WHERE contratosId=" + contratosId + " and month(fechaEmision)=month('" + fechaEmision + "') and " + " year(fechaEmision)=year('" + fechaEmision + "');"));
+
+        case 6:
+          _results17 = _context83.sent;
+          console.log(_results17[0]);
+          return _context83.abrupt("return", _results17);
+
+        case 11:
+          _context83.prev = 11;
+          _context83.t0 = _context83["catch"](3);
+          console.log(_context83.t0);
+
+        case 14:
+        case "end":
+          return _context83.stop();
+      }
+    }
+  }, null, null, [[3, 11]]);
+}); // ----------------------------------------------------------------
+// Funcion que relaiza un filtro entre las cuotas de acuerdo al codigo del medidor
+
+ipcMain.handle("getDatosCuotasByCodigo", function _callee81(event, codigoMedidor) {
+  var conn, _results18, notification, _notification3;
+
+  return regeneratorRuntime.async(function _callee81$(_context84) {
+    while (1) {
+      switch (_context84.prev = _context84.next) {
+        case 0:
+          _context84.prev = 0;
+          _context84.next = 3;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 3:
+          conn = _context84.sent;
+          conn.query("SET lc_time_names = 'es_ES';");
+          _results18 = conn.query("select servicios.id,servicios.fecha,servicios.servicio,servicios.descripcion,servicios.valor," + "servicios.estado from servicios join extrasplanilla on servicios.Id=extrasplanilla.serviciosId " + "join planillas on planillas.id=extrasplanilla.planillasId join " + "contratos on contratos.id=planillas.contratosId join medidores " + "on contratos.id=medidores.contratosId where servicios.tipo='cuota'and medidores.codigo='" + codigoMedidor + "'; ");
+          notification = new Notification({
+            title: "Exito",
+            body: "Se muestran los datos del medidor"
+          });
+          notification.show();
+          console.log(_results18);
+          return _context84.abrupt("return", _results18);
+
+        case 12:
+          _context84.prev = 12;
+          _context84.t0 = _context84["catch"](0);
+          _notification3 = new Notification({
+            title: "Error",
+            body: "Es posible que el medidor proporcionado no exista"
+          });
+
+          _notification3.show();
+
+        case 16:
+        case "end":
+          return _context84.stop();
+      }
+    }
+  }, null, null, [[0, 12]]);
+}); // ----------------------------------------------------------------
+// Funciones de los detalles
+// ----------------------------------------------------------------
+// Funcion que carga los servicios de acuerdo al id de la planilla
+
+ipcMain.handle("getDatosServiciosByContratoId", function _callee82(event, contratoId, fechaEmision, criterio) {
+  var conn, _result13, _result14, _result15;
+
+  return regeneratorRuntime.async(function _callee82$(_context85) {
+    while (1) {
+      switch (_context85.prev = _context85.next) {
+        case 0:
+          _context85.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context85.sent;
 
           if (!(criterio === "otros")) {
-            _context83.next = 11;
+            _context85.next = 11;
             break;
           }
 
-          _context83.next = 6;
+          _context85.next = 6;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewDetallesServicio WHERE contratosId = " + contratoId + " and month(fechaEmision) = month('" + fechaEmision + "') and year(fechaEmision)= year('" + fechaEmision + "') and not tipo='Servicio fijo';"));
 
         case 6:
-          _result13 = _context83.sent;
+          _result13 = _context85.sent;
           console.log("resultado de buscar servicios: ", _result13);
-          return _context83.abrupt("return", _result13);
+          return _context85.abrupt("return", _result13);
 
         case 11:
           if (!(criterio === "fijos")) {
-            _context83.next = 19;
+            _context85.next = 19;
             break;
           }
 
-          _context83.next = 14;
+          _context85.next = 14;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewDetallesServicio WHERE contratosId = " + contratoId + " and month(fechaEmision) = month('" + fechaEmision + "') and year(fechaEmision)= year('" + fechaEmision + "') and  tipo='Servicio fijo';"));
 
         case 14:
-          _result14 = _context83.sent;
+          _result14 = _context85.sent;
           console.log("resultado de buscar servicios: ", _result14);
-          return _context83.abrupt("return", _result14);
+          return _context85.abrupt("return", _result14);
 
         case 19:
-          _context83.next = 21;
+          _context85.next = 21;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM viewDetallesServicio WHERE contratosId = " + contratoId + " and month(fechaEmision) = month('" + fechaEmision + "') and year(fechaEmision)= year('" + fechaEmision + "');"));
 
         case 21:
-          _result15 = _context83.sent;
+          _result15 = _context85.sent;
           console.log("resultado de buscar servicios: ", _result15);
-          return _context83.abrupt("return", _result15);
+          return _context85.abrupt("return", _result15);
 
         case 24:
           console.log("fechaEmision recibida: ", fechaEmision, contratoId); // const result = await conn.query(
@@ -3855,60 +4136,60 @@ ipcMain.handle("getDatosServiciosByContratoId", function _callee80(event, contra
 
         case 25:
         case "end":
-          return _context83.stop();
+          return _context85.stop();
       }
     }
   });
 });
-ipcMain.handle("updateDetalle", function _callee81(event, id, detalle) {
+ipcMain.handle("updateDetalle", function _callee83(event, id, detalle) {
   var conn, result;
-  return regeneratorRuntime.async(function _callee81$(_context84) {
+  return regeneratorRuntime.async(function _callee83$(_context86) {
     while (1) {
-      switch (_context84.prev = _context84.next) {
+      switch (_context86.prev = _context86.next) {
         case 0:
-          _context84.next = 2;
+          _context86.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
         case 2:
-          conn = _context84.sent;
+          conn = _context86.sent;
           console.log("Actualizando detalle: " + id + detalle);
-          _context84.next = 6;
+          _context86.next = 6;
           return regeneratorRuntime.awrap(conn.query("UPDATE detallesServicio set ? where id = ?", [detalle, id]));
 
         case 6:
-          result = _context84.sent;
+          result = _context86.sent;
           console.log(result);
-          return _context84.abrupt("return", result);
+          return _context86.abrupt("return", result);
 
         case 9:
         case "end":
-          return _context84.stop();
+          return _context86.stop();
       }
     }
   });
 });
-ipcMain.handle("getDetallesByContratadoId", function _callee82(event, contratadoId) {
+ipcMain.handle("getDetallesByContratadoId", function _callee84(event, contratadoId) {
   var conn, result;
-  return regeneratorRuntime.async(function _callee82$(_context85) {
+  return regeneratorRuntime.async(function _callee84$(_context87) {
     while (1) {
-      switch (_context85.prev = _context85.next) {
+      switch (_context87.prev = _context87.next) {
         case 0:
-          _context85.next = 2;
+          _context87.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
         case 2:
-          conn = _context85.sent;
-          _context85.next = 5;
+          conn = _context87.sent;
+          _context87.next = 5;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM detallesServicio WHERE detallesServicio.serviciosContratadosId=" + contratadoId + ";"));
 
         case 5:
-          result = _context85.sent;
+          result = _context87.sent;
           console.log(result);
-          return _context85.abrupt("return", result);
+          return _context87.abrupt("return", result);
 
         case 8:
         case "end":
-          return _context85.stop();
+          return _context87.stop();
       }
     }
   });
@@ -3916,25 +4197,25 @@ ipcMain.handle("getDetallesByContratadoId", function _callee82(event, contratado
 // Funcion de cancelado
 // ----------------------------------------------------------------
 
-ipcMain.handle("cancelarServicios", function _callee84(event, planillaCancelarId, encabezadoCancelarId, serviciosCancelar) {
+ipcMain.handle("cancelarServicios", function _callee86(event, planillaCancelarId, encabezadoCancelarId, serviciosCancelar) {
   var conn, _result16;
 
-  return regeneratorRuntime.async(function _callee84$(_context87) {
+  return regeneratorRuntime.async(function _callee86$(_context89) {
     while (1) {
-      switch (_context87.prev = _context87.next) {
+      switch (_context89.prev = _context89.next) {
         case 0:
-          _context87.prev = 0;
-          _context87.next = 3;
+          _context89.prev = 0;
+          _context89.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context87.sent;
+          conn = _context89.sent;
           console.log("Actualizando detalle: ", planillaCancelarId, encabezadoCancelarId, serviciosCancelar);
-          serviciosCancelar.forEach(function _callee83(servicioCancelar) {
+          serviciosCancelar.forEach(function _callee85(servicioCancelar) {
             var abono;
-            return regeneratorRuntime.async(function _callee83$(_context86) {
+            return regeneratorRuntime.async(function _callee85$(_context88) {
               while (1) {
-                switch (_context86.prev = _context86.next) {
+                switch (_context88.prev = _context88.next) {
                   case 0:
                     abono = 0;
 
@@ -3942,46 +4223,46 @@ ipcMain.handle("cancelarServicios", function _callee84(event, planillaCancelarId
                       abono = parseFloat(servicioCancelar.abono).toFixed(2);
                     }
 
-                    _context86.next = 4;
+                    _context88.next = 4;
                     return regeneratorRuntime.awrap(conn.query("UPDATE detallesServicio set estado='Cancelado',abono=" + abono + " WHERE id = ? ;", servicioCancelar.id));
 
                   case 4:
                   case "end":
-                    return _context86.stop();
+                    return _context88.stop();
                 }
               }
             });
           });
-          _context87.next = 8;
+          _context89.next = 8;
           return regeneratorRuntime.awrap(conn.query("UPDATE planillas set estado='Cancelado' WHERE id = ? ;", planillaCancelarId));
 
         case 8:
-          _context87.next = 10;
+          _context89.next = 10;
           return regeneratorRuntime.awrap(conn.query("UPDATE encabezado set estado='Cancelado',fechaPago=Now() WHERE id = ? ;", encabezadoCancelarId));
 
         case 10:
-          _result16 = _context87.sent;
+          _result16 = _context89.sent;
           event.sender.send("Notificar", {
             success: true,
             title: "Actualizado!",
             message: "Se ha cancelado la planilla."
           });
           console.log(_result16);
-          return _context87.abrupt("return", _result16);
+          return _context89.abrupt("return", _result16);
 
         case 16:
-          _context87.prev = 16;
-          _context87.t0 = _context87["catch"](0);
+          _context89.prev = 16;
+          _context89.t0 = _context89["catch"](0);
           event.sender.send("Notificar", {
             success: false,
             title: "Error!",
             message: "Ha ocurrido un error al cancelar la planilla."
           });
-          console.log("Error al cancelar: ", _context87.t0);
+          console.log("Error al cancelar: ", _context89.t0);
 
         case 20:
         case "end":
-          return _context87.stop();
+          return _context89.stop();
       }
     }
   }, null, null, [[0, 16]]);
@@ -3992,114 +4273,35 @@ ipcMain.handle("cancelarServicios", function _callee84(event, planillaCancelarId
 // Funcion que carga los servicios de acuerdo al id de la planilla
 // ----------------------------------------------------------------
 
-ipcMain.handle("getTarifas", function _callee85() {
+ipcMain.handle("getTarifas", function _callee87() {
   var conn, result;
-  return regeneratorRuntime.async(function _callee85$(_context88) {
+  return regeneratorRuntime.async(function _callee87$(_context90) {
     while (1) {
-      switch (_context88.prev = _context88.next) {
+      switch (_context90.prev = _context90.next) {
         case 0:
-          _context88.next = 2;
+          _context90.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
         case 2:
-          conn = _context88.sent;
-          _context88.next = 5;
+          conn = _context90.sent;
+          _context90.next = 5;
           return regeneratorRuntime.awrap(conn.query("SELECT * FROM tarifas;"));
 
         case 5:
-          result = _context88.sent;
+          result = _context90.sent;
           console.log(result);
-          return _context88.abrupt("return", result);
+          return _context90.abrupt("return", result);
 
         case 8:
         case "end":
-          return _context88.stop();
+          return _context90.stop();
       }
     }
   });
 }); // ----------------------------------------------------------------
 // Funcion que carga las cuotas de acuerdo al id de la planilla
 
-ipcMain.handle("getCuotasByPlanillaId", function _callee86(event, planillaId) {
-  var conn, result;
-  return regeneratorRuntime.async(function _callee86$(_context89) {
-    while (1) {
-      switch (_context89.prev = _context89.next) {
-        case 0:
-          _context89.next = 2;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 2:
-          conn = _context89.sent;
-          _context89.next = 5;
-          return regeneratorRuntime.awrap(conn.query("select planillas.codigo,servicios.id," + "servicios.servicio,servicios.descripcion,servicios.fecha,servicios.valor,servicios.estado " + "from servicios join extrasplanilla on servicios.id=extrasplanilla.serviciosId " + "join planillas on planillas.id=extrasplanilla.planillasId " + "where servicios.tipo='cuota' and planillas.id=?;", planillaId));
-
-        case 5:
-          result = _context89.sent;
-          console.log(result);
-          return _context89.abrupt("return", result);
-
-        case 8:
-        case "end":
-          return _context89.stop();
-      }
-    }
-  });
-}); // ----------------------------------------------------------------
-
-ipcMain.handle("createCuota", function _callee87(event, cuota, planillaId) {
-  var conn, _result17, idNuevoServicio, newExtrasPlanilla, result1;
-
-  return regeneratorRuntime.async(function _callee87$(_context90) {
-    while (1) {
-      switch (_context90.prev = _context90.next) {
-        case 0:
-          _context90.prev = 0;
-          _context90.next = 3;
-          return regeneratorRuntime.awrap(getConnection());
-
-        case 3:
-          conn = _context90.sent;
-          console.log("Cuota recibida: ", cuota);
-          _context90.next = 7;
-          return regeneratorRuntime.awrap(conn.query("Insert into servicios set ?", cuota));
-
-        case 7:
-          _result17 = _context90.sent;
-          idNuevoServicio = _result17.insertId;
-          console.log(_result17.insertId);
-          newExtrasPlanilla = {
-            serviciosId: idNuevoServicio,
-            planillasId: planillaId,
-            descuentosId: 3
-          };
-          _context90.next = 13;
-          return regeneratorRuntime.awrap(conn.query("Insert into extrasplanilla set ?", newExtrasPlanilla));
-
-        case 13:
-          result1 = _context90.sent;
-          console.log(result1);
-          new Notification({
-            title: "Electrom Mysql",
-            body: "New servicio saved succesfully"
-          }).show();
-          servicio.id = _result17.insertId;
-          return _context90.abrupt("return", servicio);
-
-        case 20:
-          _context90.prev = 20;
-          _context90.t0 = _context90["catch"](0);
-          console.log(_context90.t0);
-
-        case 23:
-        case "end":
-          return _context90.stop();
-      }
-    }
-  }, null, null, [[0, 20]]);
-}); // Funcion que carga multas y descuentos de acuerdo al id de la planilla
-
-ipcMain.handle("getMultasDescByPlanillaId", function _callee88(event, planillaId) {
+ipcMain.handle("getCuotasByPlanillaId", function _callee88(event, planillaId) {
   var conn, result;
   return regeneratorRuntime.async(function _callee88$(_context91) {
     while (1) {
@@ -4111,7 +4313,7 @@ ipcMain.handle("getMultasDescByPlanillaId", function _callee88(event, planillaId
         case 2:
           conn = _context91.sent;
           _context91.next = 5;
-          return regeneratorRuntime.awrap(conn.query("select planillas.codigo,multasdescuentos.id,multasdescuentos.tipo," + "multasdescuentos.motivo,multasdescuentos.fecha,multasdescuentos.valor from " + "multasdescuentos join planillas on planillas.id=multasdescuentos.planillaId " + "where planillas.id=?;", planillaId));
+          return regeneratorRuntime.awrap(conn.query("select planillas.codigo,servicios.id," + "servicios.servicio,servicios.descripcion,servicios.fecha,servicios.valor,servicios.estado " + "from servicios join extrasplanilla on servicios.id=extrasplanilla.serviciosId " + "join planillas on planillas.id=extrasplanilla.planillasId " + "where servicios.tipo='cuota' and planillas.id=?;", planillaId));
 
         case 5:
           result = _context91.sent;
@@ -4124,127 +4326,210 @@ ipcMain.handle("getMultasDescByPlanillaId", function _callee88(event, planillaId
       }
     }
   });
-}); // Funcion que edita los valores permitidos de la planilla
+}); // ----------------------------------------------------------------
 
-ipcMain.handle("updatePlanilla", function _callee89(event, id, planilla) {
-  var conn, result;
+ipcMain.handle("createCuota", function _callee89(event, cuota, planillaId) {
+  var conn, _result17, idNuevoServicio, newExtrasPlanilla, result1;
+
   return regeneratorRuntime.async(function _callee89$(_context92) {
     while (1) {
       switch (_context92.prev = _context92.next) {
         case 0:
-          _context92.next = 2;
+          _context92.prev = 0;
+          _context92.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 2:
+        case 3:
           conn = _context92.sent;
-          console.log("Actualizando planilla: " + planilla);
-          _context92.next = 6;
-          return regeneratorRuntime.awrap(conn.query("UPDATE planillas set ? where id = ?", [planilla, id]));
+          console.log("Cuota recibida: ", cuota);
+          _context92.next = 7;
+          return regeneratorRuntime.awrap(conn.query("Insert into servicios set ?", cuota));
 
-        case 6:
-          result = _context92.sent;
-          console.log(result);
-          return _context92.abrupt("return", result);
+        case 7:
+          _result17 = _context92.sent;
+          idNuevoServicio = _result17.insertId;
+          console.log(_result17.insertId);
+          newExtrasPlanilla = {
+            serviciosId: idNuevoServicio,
+            planillasId: planillaId,
+            descuentosId: 3
+          };
+          _context92.next = 13;
+          return regeneratorRuntime.awrap(conn.query("Insert into extrasplanilla set ?", newExtrasPlanilla));
 
-        case 9:
+        case 13:
+          result1 = _context92.sent;
+          console.log(result1);
+          new Notification({
+            title: "Electrom Mysql",
+            body: "New servicio saved succesfully"
+          }).show();
+          servicio.id = _result17.insertId;
+          return _context92.abrupt("return", servicio);
+
+        case 20:
+          _context92.prev = 20;
+          _context92.t0 = _context92["catch"](0);
+          console.log(_context92.t0);
+
+        case 23:
         case "end":
           return _context92.stop();
       }
     }
-  });
-}); // ----------------------------------------------------------------
-// Funciones de los parametros
+  }, null, null, [[0, 20]]);
+}); // Funcion que carga multas y descuentos de acuerdo al id de la planilla
 
-ipcMain.handle("createParametro", function _callee90(event, parametro) {
-  var conn, _result18;
-
+ipcMain.handle("getMultasDescByPlanillaId", function _callee90(event, planillaId) {
+  var conn, result;
   return regeneratorRuntime.async(function _callee90$(_context93) {
     while (1) {
       switch (_context93.prev = _context93.next) {
         case 0:
-          _context93.prev = 0;
-          _context93.next = 3;
+          _context93.next = 2;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 3:
+        case 2:
           conn = _context93.sent;
-          console.log("Recibido: ", parametro);
-          parametro.valor = parseFloat(parametro.valor);
-          _context93.next = 8;
-          return regeneratorRuntime.awrap(conn.query("Insert into parametros set ?", parametro));
+          _context93.next = 5;
+          return regeneratorRuntime.awrap(conn.query("select planillas.codigo,multasdescuentos.id,multasdescuentos.tipo," + "multasdescuentos.motivo,multasdescuentos.fecha,multasdescuentos.valor from " + "multasdescuentos join planillas on planillas.id=multasdescuentos.planillaId " + "where planillas.id=?;", planillaId));
+
+        case 5:
+          result = _context93.sent;
+          console.log(result);
+          return _context93.abrupt("return", result);
 
         case 8:
-          _result18 = _context93.sent;
-          console.log(_result18);
-          new Notification({
-            title: "Electrom Mysql",
-            body: "New parametro saved succesfully"
-          }).show();
-          parametro.id = _result18.insertId;
-          return _context93.abrupt("return", parametro);
-
-        case 15:
-          _context93.prev = 15;
-          _context93.t0 = _context93["catch"](0);
-          console.log(_context93.t0);
-
-        case 18:
         case "end":
           return _context93.stop();
       }
     }
-  }, null, null, [[0, 15]]);
-});
-ipcMain.handle("getParametros", function _callee91() {
-  var conn, results;
+  });
+}); // Funcion que edita los valores permitidos de la planilla
+
+ipcMain.handle("updatePlanilla", function _callee91(event, id, planilla) {
+  var conn, planillaCancelada, _result18;
+
   return regeneratorRuntime.async(function _callee91$(_context94) {
     while (1) {
       switch (_context94.prev = _context94.next) {
         case 0:
-          _context94.next = 2;
+          _context94.prev = 0;
+          _context94.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 2:
+        case 3:
           conn = _context94.sent;
-          results = conn.query("Select * from parametros order by id desc;");
-          console.log(results);
-          return _context94.abrupt("return", results);
+          console.log("Actualizando planilla: " + planilla);
+          _context94.next = 7;
+          return regeneratorRuntime.awrap(conn.query("SELECT planillas.estado FROM planillas WHERE planillas.id= " + id + " ;"));
 
-        case 6:
+        case 7:
+          planillaCancelada = _context94.sent;
+
+          if (!(planillaCancelada[0] !== undefined)) {
+            _context94.next = 21;
+            break;
+          }
+
+          if (!(planillaCancelada[0].estado == "Cancelado")) {
+            _context94.next = 13;
+            break;
+          }
+
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "Esta planilla ya ha sido cancelada, no puedes editar sus valores."
+          });
+          _context94.next = 19;
+          break;
+
+        case 13:
+          _context94.next = 15;
+          return regeneratorRuntime.awrap(conn.query("UPDATE planillas set ? where id = ?", [planilla, id]));
+
+        case 15:
+          _result18 = _context94.sent;
+          console.log(_result18);
+          event.sender.send("Notificar", {
+            success: true,
+            title: "Actualizado!",
+            message: "Se ha hactualizado la planilla."
+          });
+          return _context94.abrupt("return", _result18);
+
+        case 19:
+          _context94.next = 22;
+          break;
+
+        case 21:
+          event.sender.send("Notificar", {
+            success: false,
+            title: "Error!",
+            message: "No existe una planilla, actualiza la lista de planillas e intentalo de nuevo."
+          });
+
+        case 22:
+          _context94.next = 27;
+          break;
+
+        case 24:
+          _context94.prev = 24;
+          _context94.t0 = _context94["catch"](0);
+          console.log("Error al actualizar planilla:", _context94.t0);
+
+        case 27:
         case "end":
           return _context94.stop();
       }
     }
-  });
-});
-ipcMain.handle("getParametroById", function _callee92(event, id) {
-  var conn, result;
+  }, null, null, [[0, 24]]);
+}); // ----------------------------------------------------------------
+// Funciones de los parametros
+
+ipcMain.handle("createParametro", function _callee92(event, parametro) {
+  var conn, _result19;
+
   return regeneratorRuntime.async(function _callee92$(_context95) {
     while (1) {
       switch (_context95.prev = _context95.next) {
         case 0:
-          _context95.next = 2;
+          _context95.prev = 0;
+          _context95.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
-        case 2:
+        case 3:
           conn = _context95.sent;
-          _context95.next = 5;
-          return regeneratorRuntime.awrap(conn.query("Select * from parametros where id = ?", id));
-
-        case 5:
-          result = _context95.sent;
-          console.log(result[0]);
-          return _context95.abrupt("return", result[0]);
+          console.log("Recibido: ", parametro);
+          parametro.valor = parseFloat(parametro.valor);
+          _context95.next = 8;
+          return regeneratorRuntime.awrap(conn.query("Insert into parametros set ?", parametro));
 
         case 8:
+          _result19 = _context95.sent;
+          console.log(_result19);
+          new Notification({
+            title: "Electrom Mysql",
+            body: "New parametro saved succesfully"
+          }).show();
+          parametro.id = _result19.insertId;
+          return _context95.abrupt("return", parametro);
+
+        case 15:
+          _context95.prev = 15;
+          _context95.t0 = _context95["catch"](0);
+          console.log(_context95.t0);
+
+        case 18:
         case "end":
           return _context95.stop();
       }
     }
-  });
+  }, null, null, [[0, 15]]);
 });
-ipcMain.handle("updateParametro", function _callee93(event, id, parametro) {
-  var conn, result;
+ipcMain.handle("getParametros", function _callee93() {
+  var conn, results;
   return regeneratorRuntime.async(function _callee93$(_context96) {
     while (1) {
       switch (_context96.prev = _context96.next) {
@@ -4254,44 +4539,92 @@ ipcMain.handle("updateParametro", function _callee93(event, id, parametro) {
 
         case 2:
           conn = _context96.sent;
-          _context96.next = 5;
-          return regeneratorRuntime.awrap(conn.query("UPDATE parametros set ? where id = ?", [parametro, id]));
+          results = conn.query("Select * from parametros order by id desc;");
+          console.log(results);
+          return _context96.abrupt("return", results);
 
-        case 5:
-          result = _context96.sent;
-          console.log(result);
-          return _context96.abrupt("return", result);
-
-        case 8:
+        case 6:
         case "end":
           return _context96.stop();
       }
     }
   });
 });
-ipcMain.handle("deleteParametro", function _callee94(event, id) {
+ipcMain.handle("getParametroById", function _callee94(event, id) {
   var conn, result;
   return regeneratorRuntime.async(function _callee94$(_context97) {
     while (1) {
       switch (_context97.prev = _context97.next) {
         case 0:
+          _context97.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context97.sent;
+          _context97.next = 5;
+          return regeneratorRuntime.awrap(conn.query("Select * from parametros where id = ?", id));
+
+        case 5:
+          result = _context97.sent;
+          console.log(result[0]);
+          return _context97.abrupt("return", result[0]);
+
+        case 8:
+        case "end":
+          return _context97.stop();
+      }
+    }
+  });
+});
+ipcMain.handle("updateParametro", function _callee95(event, id, parametro) {
+  var conn, result;
+  return regeneratorRuntime.async(function _callee95$(_context98) {
+    while (1) {
+      switch (_context98.prev = _context98.next) {
+        case 0:
+          _context98.next = 2;
+          return regeneratorRuntime.awrap(getConnection());
+
+        case 2:
+          conn = _context98.sent;
+          _context98.next = 5;
+          return regeneratorRuntime.awrap(conn.query("UPDATE parametros set ? where id = ?", [parametro, id]));
+
+        case 5:
+          result = _context98.sent;
+          console.log(result);
+          return _context98.abrupt("return", result);
+
+        case 8:
+        case "end":
+          return _context98.stop();
+      }
+    }
+  });
+});
+ipcMain.handle("deleteParametro", function _callee96(event, id) {
+  var conn, result;
+  return regeneratorRuntime.async(function _callee96$(_context99) {
+    while (1) {
+      switch (_context99.prev = _context99.next) {
+        case 0:
           console.log("id from main.js: ", id);
-          _context97.next = 3;
+          _context99.next = 3;
           return regeneratorRuntime.awrap(getConnection());
 
         case 3:
-          conn = _context97.sent;
-          _context97.next = 6;
+          conn = _context99.sent;
+          _context99.next = 6;
           return regeneratorRuntime.awrap(conn.query("Delete from parametros where id = ?", id));
 
         case 6:
-          result = _context97.sent;
+          result = _context99.sent;
           console.log(result);
-          return _context97.abrupt("return", result);
+          return _context99.abrupt("return", result);
 
         case 9:
         case "end":
-          return _context97.stop();
+          return _context99.stop();
       }
     }
   });
