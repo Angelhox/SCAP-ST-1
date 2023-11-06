@@ -29,6 +29,8 @@ var servicioTit = document.getElementById("servicio-tit");
 var servicioDesc = document.getElementById("servicio-desc");
 var servicioDet = document.getElementById("servicio-det");
 var servicioVal = document.getElementById("servicio-val");
+var servicioCreaciondet = document.getElementById("fechaCreacion-det");
+var individualSn = document.getElementById("individualSn");
 var btnVolver = document.getElementById("btn-volver"); // ----------------------------------------------------------------
 // Variables para mostrar el estado de recaudacion.
 // ----------------------------------------------------------------
@@ -44,6 +46,8 @@ var mesRecaudacion = document.getElementById("mesRecaudacion");
 var anioLimite = document.getElementById("anioLimite");
 var mesLimite = document.getElementById("mesLimite");
 var btnReporte = document.getElementById("btnReporte");
+var mesBusqueda = document.getElementById("mesBusqueda");
+var anioBusqueda = document.getElementById("anioBusqueda");
 var recaudaciones = [];
 var servicios = [];
 var usuarios = [];
@@ -51,40 +55,41 @@ var contratados = [];
 var editingStatus = false;
 var editServicioId = "";
 servicioForm.addEventListener("submit", function _callee2(e) {
-  var newServicio, result;
+  var individualSnDf, newServicio, result;
   return regeneratorRuntime.async(function _callee2$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
+          individualSnDf = "Si";
           e.preventDefault(); // var estadoParametro = "Innactivo";
           // if (parametroEstado.checked) {
           //   estadoParametro = "Activo";
           // }
 
           if (!validator.isEmpty(servicioCreacion.value)) {
-            _context2.next = 6;
+            _context2.next = 7;
             break;
           }
 
           mensajeError.textContent = "Ingresa una fecha de creación válida.";
           servicioCreacion.focus();
-          _context2.next = 30;
+          _context2.next = 32;
           break;
 
-        case 6:
+        case 7:
           if (!validator.isEmpty(servicioNombre.value)) {
-            _context2.next = 11;
+            _context2.next = 12;
             break;
           }
 
           mensajeError.textContent = "El nombre del servicio es obligatorio.";
           servicioNombre.focus();
-          _context2.next = 30;
+          _context2.next = 32;
           break;
 
-        case 11:
+        case 12:
           if (!validator.isEmpty(servicioDescripcion.value)) {
-            _context2.next = 16;
+            _context2.next = 17;
             break;
           }
 
@@ -94,21 +99,25 @@ servicioForm.addEventListener("submit", function _callee2(e) {
           //   servicioTipo.focus();
           // }
 
-          _context2.next = 30;
+          _context2.next = 32;
           break;
 
-        case 16:
+        case 17:
           if (!validator.isEmpty(servicioValor.value)) {
-            _context2.next = 21;
+            _context2.next = 22;
             break;
           }
 
           mensajeError.textContent = "El valor el servicio es obligatorio.";
           servicioValor.focus();
-          _context2.next = 30;
+          _context2.next = 32;
           break;
 
-        case 21:
+        case 22:
+          if (individualSn.value !== null) {
+            individualSnDf = individualSn.value;
+          }
+
           newServicio = {
             fechaCreacion: servicioCreacion.value,
             nombre: servicioNombre.value,
@@ -118,25 +127,25 @@ servicioForm.addEventListener("submit", function _callee2(e) {
             aplazableSn: "No",
             numeroPagos: 1,
             valorPagos: servicioValor.value,
-            individualSn: "Si",
+            individualSn: individualSnDf,
             valoresDistintosSn: "No"
           };
 
           if (editingStatus) {
-            _context2.next = 29;
+            _context2.next = 31;
             break;
           }
 
-          _context2.next = 25;
+          _context2.next = 27;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("createServiciosFijos", newServicio));
 
-        case 25:
+        case 27:
           result = _context2.sent;
           console.log(result);
-          _context2.next = 30;
+          _context2.next = 32;
           break;
 
-        case 29:
+        case 31:
           Swal.fire({
             title: "¿Quieres guardar los cambios?",
             text: "No podrás deshacer esta acción.",
@@ -173,7 +182,7 @@ servicioForm.addEventListener("submit", function _callee2(e) {
             });
           });
 
-        case 30:
+        case 32:
         case "end":
           return _context2.stop();
       }
@@ -346,19 +355,25 @@ function renderUsuarios(usuarios, servicioId) {
 
           usuariosList.innerHTML = "";
           usuarios.forEach(function _callee3(usuario) {
-            var divCol4, divRowG0, divCol2, img, divCol8, divCardBody, containerTitle, h6Contrato, pContrato, pContratoValue, containerSocios, h6Socio, pSocio, pSocioValue, divCol2Estado, divEstado, pEstado, divCustomCheckbox, inputCheckbox, labelCheckbox, iCheckbox;
+            var divContainer, divCol4, divRowG0, divCol2, img, divCol8, divCardBody, containerTitle, h6Contrato, pContrato, pContratoValue, containerSocios, h6Socio, pSocio, pSocioValue, divCol2Estado, divEstado, pEstado, divCustomCheckbox, inputCheckbox, labelCheckbox, iCheckbox;
             return regeneratorRuntime.async(function _callee3$(_context3) {
               while (1) {
                 switch (_context3.prev = _context3.next) {
                   case 0:
+                    divContainer = document.createElement("div");
+                    divContainer.className = "col-xl-6 col-lg-6 col-md-12 col-sm-12";
                     divCol4 = document.createElement("div");
-                    divCol4.className = "col-4 card mx-2 my-2";
-                    divCol4.style.maxWidth = "30%";
-                    divCol4.style.width = "30%";
+                    divCol4.className = "clase col-12 card my-1";
+                    divCol4.style.padding = "0.3em";
+                    divCol4.style.backgroundColor = "#d6eaf8";
+                    divCol4.style.maxWidth = "100%";
+                    divCol4.style.width = "100%";
+                    divCol4.style.minWidth = "100%";
                     divCol4.style.height = "fit-content";
                     divCol4.style.maxHeight = "fit-content";
                     divRowG0 = document.createElement("div");
                     divRowG0.className = "row g-0";
+                    divRowG0.style.backgroundColor = "white";
                     divCol2 = document.createElement("div");
                     divCol2.className = "col-2 d-flex justify-content-center align-items-center";
                     img = document.createElement("img");
@@ -367,18 +382,19 @@ function renderUsuarios(usuarios, servicioId) {
                     img.alt = "not found";
                     divCol2.appendChild(img);
                     divCol8 = document.createElement("div");
-                    divCol8.className = "col-8 d-flex justify-content-center align-items-center text-center";
+                    divCol8.className = "col-7 d-flex justify-content-center align-items-center text-center";
                     divCardBody = document.createElement("div");
                     divCardBody.className = "card-body text-center";
                     containerTitle = document.createElement("div");
-                    containerTitle.className = "d-flex align-items-baseline container-title";
+                    containerTitle.className = "d-flex align-items-baseline container-title mp-0";
                     h6Contrato = document.createElement("h6");
-                    h6Contrato.className = "card-title";
+                    h6Contrato.className = "card-title mp-0";
                     h6Contrato.textContent = "Contrato:";
                     pContrato = document.createElement("p");
                     pContrato.className = "text-white";
                     pContrato.textContent = "-";
                     pContratoValue = document.createElement("p");
+                    pContratoValue.className = "mp-0";
                     pContratoValue.textContent = usuario.codigo;
                     containerTitle.appendChild(h6Contrato);
                     containerTitle.appendChild(pContrato);
@@ -388,7 +404,7 @@ function renderUsuarios(usuarios, servicioId) {
                     h6Socio = document.createElement("h6");
                     h6Socio.textContent = "Socio:";
                     pSocio = document.createElement("p");
-                    pSocio.className = "text-white";
+                    pSocio.className = "trans";
                     pSocio.textContent = "-";
                     pSocioValue = document.createElement("p");
                     pSocioValue.textContent = usuario.socio;
@@ -399,16 +415,15 @@ function renderUsuarios(usuarios, servicioId) {
                     divCardBody.appendChild(containerSocios);
                     divCol8.appendChild(divCardBody);
                     divCol2Estado = document.createElement("div");
-                    divCol2Estado.className = "col-2 flex-column d-flex align-items-center ";
+                    divCol2Estado.className = "col-3 flex-column d-flex align-items-center ";
                     divEstado = document.createElement("div");
                     divEstado.className = "col-12 text-center";
                     pEstado = document.createElement("p");
                     pEstado.className = "mt-3";
-                    pEstado.innerHTML = "<small>Estado</small>";
                     divCustomCheckbox = document.createElement("div");
                     divCustomCheckbox.className = "custom-checkbox d-flex justify-content-center align-items-center";
                     divCustomCheckbox.style.marginTop = "0";
-                    divCustomCheckbox.style.padding = "0 25%";
+                    divCustomCheckbox.style.padding = "0 38%";
                     divCustomCheckbox.style.width = "100%";
                     inputCheckbox = document.createElement("input");
                     inputCheckbox.type = "checkbox";
@@ -417,8 +432,10 @@ function renderUsuarios(usuarios, servicioId) {
 
                     if (ct.includes(usuario.contratosId)) {
                       inputCheckbox.checked = true;
+                      pEstado.innerHTML = "<small>Contratado</small>";
                     } else {
                       inputCheckbox.checked = false;
+                      pEstado.innerHTML = "<small>No contratado</small>";
                     }
 
                     inputCheckbox.style.width = "40%";
@@ -439,9 +456,23 @@ function renderUsuarios(usuarios, servicioId) {
                     divRowG0.appendChild(divCol8);
                     divRowG0.appendChild(divCol2Estado);
                     divCol4.appendChild(divRowG0);
-                    usuariosList.appendChild(divCol4);
+                    divContainer.appendChild(divCol4);
 
-                  case 83:
+                    divContainer.onclick = function () {
+                      // Elimina la clase "selected" de todos los elementos
+                      var elementos = document.querySelectorAll(".clase"); // Reemplaza con la clase real de tus elementos
+
+                      elementos.forEach(function (elemento) {
+                        elemento.classList.remove("bg-secondary");
+                      }); // Agrega la clase "selected" al elemento que se hizo clic
+
+                      divCol4.classList.add("bg-secondary");
+                      console.log("div: " + usuario.socio);
+                    };
+
+                    usuariosList.appendChild(divContainer);
+
+                  case 91:
                   case "end":
                     return _context3.stop();
                 }
@@ -492,19 +523,25 @@ var editServicio = function editServicio(id) {
           servicio = _context5.sent;
           servicioCreacion.value = formatearFecha(servicio.fechaCreacion);
           servicioNombre.value = servicio.nombre;
-          servicioDescripcion.value = servicio.descripcion; // if (parametro.estado == "Activo") {
+          servicioDescripcion.value = servicio.descripcion;
+          console.log('Indivisual: ', servicio.IndividualSn);
+
+          if (servicio.IndividualSn !== undefined) {
+            individualSn.value = servicio.IndividualSn;
+          } // if (parametro.estado == "Activo") {
           //   parametroEstado.checked=true;
           // } else {
           //   parametroEstado.checked = false;
           // }
           //servicioTipo.value = servicio.tipo;
 
+
           servicioValor.value = servicio.valor;
           editingStatus = true;
           editServicioId = servicio.id;
           console.log(servicio);
 
-        case 10:
+        case 12:
         case "end":
           return _context5.stop();
       }
@@ -580,6 +617,7 @@ var mostrarEstadisticas = function mostrarEstadisticas(servicioId) {
           servicio = _context8.sent;
           servicioTit.textContent = servicio.nombre;
           servicioDesc.textContent = "(" + servicio.descripcion + ")";
+          servicioCreaciondet.textContent = "Creado: " + formatearFecha(servicio.fechaCreacion);
           servicioVal.textContent = "Valor: $" + servicio.valor;
           aplazableSnText = "No aplazable";
 
@@ -593,14 +631,14 @@ var mostrarEstadisticas = function mostrarEstadisticas(servicioId) {
           console.log(servicio);
           criterioBuscar = "all";
           criterioContentBuscar = "all";
-          _context8.next = 16;
+          _context8.next = 17;
           return regeneratorRuntime.awrap(getBeneficiarios(criterioBuscar, criterioContentBuscar, servicioId));
 
-        case 16:
-          _context8.next = 18;
+        case 17:
+          _context8.next = 19;
           return regeneratorRuntime.awrap(getRecaudaciones(servicioId));
 
-        case 18:
+        case 19:
         case "end":
           return _context8.stop();
       }
@@ -612,7 +650,7 @@ var mostrarEstadisticas = function mostrarEstadisticas(servicioId) {
 
 
 var getRecaudaciones = function getRecaudaciones() {
-  var valoresRecaudados, valoresPendientes, valoresTotales, fechaDesde, fechaHasta, anioD, mesD, anioH, mesH, diaD, diaH, _diaD, _diaD2;
+  var valoresRecaudados, valoresPendientes, valoresTotales, fechaDesde, fechaHasta, anioD, mesD, anioH, mesH, diaD, _diaD;
 
   return regeneratorRuntime.async(function getRecaudaciones$(_context9) {
     while (1) {
@@ -626,20 +664,21 @@ var getRecaudaciones = function getRecaudaciones() {
           anioD = parseInt(anioRecaudacion.value);
           mesD = parseInt(mesRecaudacion.value);
           console.log("Mes a buscar: " + mesD);
-          anioH = anioRecaudacion.value;
-          mesH = mesRecaudacion.value;
+          anioH = parseInt(anioLimite.value);
+          mesH = parseInt(mesLimite.value); // if (criterioSt.value === "periodo") {
+          //   let diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
+          //   let diaH = obtenerPrimerYUltimoDiaDeMes(anioH, mesH);
+          //   // fechaDesde = "'" + anioD + "-" + mesD + "-" + diaD + "'";
+          //   // fechaHasta = "'" + anioH + "-" + mesH + "-" + diaH + "'";
+          //   fechaDesde = formatearFecha(diaD.primerDia);
+          //   fechaHasta = formatearFecha(diaH.ultimoDia);
+          //   console.log("Periodo : " + fechaDesde + " | " + fechaHasta);
+          // } else
 
-          if (criterioSt.value === "periodo") {
+          if (criterioSt.value === "mes") {
             diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
-            diaH = obtenerPrimerYUltimoDiaDeMes(anioH, mesH); // fechaDesde = "'" + anioD + "-" + mesD + "-" + diaD + "'";
-            // fechaHasta = "'" + anioH + "-" + mesH + "-" + diaH + "'";
-
             fechaDesde = formatearFecha(diaD.primerDia);
-            fechaHasta = formatearFecha(diaH.ultimoDia);
-          } else if (criterioSt.value === "mes") {
-            _diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
-            fechaDesde = formatearFecha(_diaD.primerDia);
-            fechaHasta = formatearFecha(_diaD.ultimoDia); // console.log(
+            fechaHasta = formatearFecha(diaD.ultimoDia); // console.log(
             //   "fecha error? :" + diaD.ultimoDia + " " + fechaDesde + " " + fechaHasta
             // );
           } else if (criterioSt.value === "actual") {
@@ -648,9 +687,9 @@ var getRecaudaciones = function getRecaudaciones() {
             console.log("Actual: " + anioD);
             mesD = parseInt(new Date().getMonth());
             console.log("Mes actual: " + mesD);
-            _diaD2 = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
-            fechaDesde = formatearFecha(_diaD2.primerDia);
-            fechaHasta = formatearFecha(_diaD2.ultimoDia);
+            _diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
+            fechaDesde = formatearFecha(_diaD.primerDia);
+            fechaHasta = formatearFecha(_diaD.ultimoDia);
           }
 
           _context9.next = 13;
@@ -671,10 +710,10 @@ var getRecaudaciones = function getRecaudaciones() {
               abonoRp = 0;
             }
 
-            valoresPendientes += recaudacion.saldo - abonoRp;
+            valoresPendientes += recaudacion.total - abonoRp;
             valoresRecaudados += abonoRp;
             valoresTotales += recaudacion.total;
-            recaudacionesList.innerHTML += "\n           <tr>\n           <td>".concat(recaudacion.contratosCodigo, "</td>\n           <td>").concat(recaudacion.nombres + " " + recaudacion.apellidos, "</td>\n           <td>").concat(recaudacion.detalleEstado, "</td>\n           <td>").concat(abonoRp, "</td>\n           <td>").concat(recaudacion.total, "</td>\n           <td>").concat(recaudacion.saldo - abonoRp, "</td>        \n       </tr>\n          ");
+            recaudacionesList.innerHTML += "\n           <tr>\n           <td>".concat(recaudacion.contratosCodigo, "</td>\n           <td>").concat(recaudacion.nombres + " " + recaudacion.apellidos, "</td>\n           <td>").concat(recaudacion.detalleEstado, "</td>\n           <td>").concat(abonoRp, "</td>\n           <td>").concat(recaudacion.total, "</td>\n           <td>").concat(recaudacion.total - abonoRp, "</td>        \n       </tr>\n          ");
           });
           valorPendiente.textContent = valoresPendientes.toFixed(2);
           valorRecaudado.textContent = valoresRecaudados.toFixed(2);
@@ -926,12 +965,14 @@ function init() {
           mesLimites();
           anioActual();
           anioLimites();
+          cargarMesActual();
+          cargarAnioBusquedas();
           criterioBuscar = "all";
           criterioContentBuscar = "all";
-          _context18.next = 9;
+          _context18.next = 11;
           return regeneratorRuntime.awrap(getServicios(criterioBuscar, criterioContentBuscar));
 
-        case 9:
+        case 11:
         case "end":
           return _context18.stop();
       }
@@ -1159,6 +1200,46 @@ function anioLimites() {
   }
 }
 
+function cargarMesActual() {
+  mesBusqueda.innerHTML = '<option value="all" selected>Todo mes</option>'; // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
+
+  var mesActual = new Date().getMonth(); // Array de nombres de meses
+
+  var nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]; // Llena el select con las opciones de los meses
+
+  for (var i = 0; i < nombresMeses.length; i++) {
+    var option = document.createElement("option");
+    option.value = i + 1; // El valor es el índice del mes
+
+    option.textContent = nombresMeses[i];
+
+    if (i === mesActual) {
+      console.log("seleccionando: " + mesActual); // option.selected = true;
+    }
+
+    mesBusqueda.appendChild(option);
+  } // Establece el mes actual como seleccionado
+  // mesBusqueda.value = mesActual;
+
+}
+
+function cargarAnioBusquedas() {
+  anioBusqueda.innerHTML = '<option value="all" selected>Todo año</option>'; // Obtener el año actual
+
+  var anioActual = new Date().getFullYear(); // Crear opciones de años desde el año actual hacia atrás
+
+  for (var i = anioActual; i >= 2020; i--) {
+    var option = document.createElement("option");
+    option.value = i;
+    option.text = i;
+
+    if (i === anioActual) {// option.selected = true;
+    }
+
+    anioBusqueda.appendChild(option);
+  }
+}
+
 function vistaFactura() {
   var datos, encabezado, datosTotales;
   return regeneratorRuntime.async(function vistaFactura$(_context22) {
@@ -1204,35 +1285,41 @@ function mostrarSeccion(id) {
 } // funciones del navbar
 
 
-var abrirInicio = function abrirInicio() {
-  var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context23) {
+function cerrarSesion() {
+  ipcRenderer.send("cerrarSesion");
+}
+
+ipcRenderer.on("sesionCerrada", function _callee12() {
+  var acceso, url;
+  return regeneratorRuntime.async(function _callee12$(_context23) {
     while (1) {
       switch (_context23.prev = _context23.next) {
         case 0:
-          url = "src/ui/principal.html";
-          _context23.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Login";
+          _context23.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context23.stop();
       }
     }
   });
-};
+});
 
-var abrirSocios = function abrirSocios() {
-  var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context24) {
+var abrirInicio = function abrirInicio() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirInicio$(_context24) {
     while (1) {
       switch (_context24.prev = _context24.next) {
         case 0:
-          url = "src/ui/socios.html";
-          _context24.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Inicio";
+          _context24.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context24.stop();
       }
@@ -1240,17 +1327,18 @@ var abrirSocios = function abrirSocios() {
   });
 };
 
-var abrirUsuarios = function abrirUsuarios() {
-  var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context25) {
+var abrirSocios = function abrirSocios() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirSocios$(_context25) {
     while (1) {
       switch (_context25.prev = _context25.next) {
         case 0:
-          url = "src/ui/usuarios.html";
-          _context25.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Socios";
+          _context25.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context25.stop();
       }
@@ -1258,17 +1346,18 @@ var abrirUsuarios = function abrirUsuarios() {
   });
 };
 
-var abrirPagos = function abrirPagos() {
-  var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context26) {
+var abrirUsuarios = function abrirUsuarios() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirUsuarios$(_context26) {
     while (1) {
       switch (_context26.prev = _context26.next) {
         case 0:
-          url = "src/ui/planillas.html";
-          _context26.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Usuarios";
+          _context26.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context26.stop();
       }
@@ -1276,17 +1365,18 @@ var abrirPagos = function abrirPagos() {
   });
 };
 
-var abrirPlanillas = function abrirPlanillas() {
-  var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context27) {
+var abrirPagos = function abrirPagos() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirPagos$(_context27) {
     while (1) {
       switch (_context27.prev = _context27.next) {
         case 0:
-          url = "src/ui/planillas-cuotas.html";
-          _context27.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Pagos";
+          _context27.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context27.stop();
       }
@@ -1294,17 +1384,18 @@ var abrirPlanillas = function abrirPlanillas() {
   });
 };
 
-var abrirParametros = function abrirParametros() {
-  var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context28) {
+var abrirPlanillas = function abrirPlanillas() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirPlanillas$(_context28) {
     while (1) {
       switch (_context28.prev = _context28.next) {
         case 0:
-          url = "src/ui/parametros.html";
-          _context28.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Planillas";
+          _context28.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context28.stop();
       }
@@ -1312,17 +1403,18 @@ var abrirParametros = function abrirParametros() {
   });
 };
 
-var abrirImplementos = function abrirImplementos() {
-  var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context29) {
+var abrirContratos = function abrirContratos() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirContratos$(_context29) {
     while (1) {
       switch (_context29.prev = _context29.next) {
         case 0:
-          url = "src/ui/implementos.html";
-          _context29.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Contratos";
+          _context29.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context29.stop();
       }
@@ -1330,17 +1422,18 @@ var abrirImplementos = function abrirImplementos() {
   });
 };
 
-var abrirContratos = function abrirContratos() {
-  var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context30) {
+var abrirServicios = function abrirServicios() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirServicios$(_context30) {
     while (1) {
       switch (_context30.prev = _context30.next) {
         case 0:
-          url = "src/ui/medidores.html";
-          _context30.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Servicios fijos";
+          _context30.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context30.stop();
       }
@@ -1348,17 +1441,18 @@ var abrirContratos = function abrirContratos() {
   });
 };
 
-var abrirConsolidado = function abrirConsolidado() {
-  var url;
-  return regeneratorRuntime.async(function abrirConsolidado$(_context31) {
+var abrirCuotas = function abrirCuotas() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirCuotas$(_context31) {
     while (1) {
       switch (_context31.prev = _context31.next) {
         case 0:
-          url = "src/ui/consolidado.html";
-          _context31.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Servicios ocacionales";
+          _context31.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context31.stop();
       }

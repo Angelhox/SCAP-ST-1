@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const { access } = require("original-fs");
 // const abrirInterface = async()=> {
 //    const result=  ipcRenderer.send('abrirInterface',"src/ui/index.html");
 //   }
@@ -40,13 +41,13 @@ ipcRenderer.on("loginResponse", (event, response) => {
 // Funciones de cierre de sesion
 // ----------------------------------------------------------------
 function cerrarSesion() {
-  ipcRenderer.send('cerrarSesion');
+  ipcRenderer.send("cerrarSesion");
 }
 
-ipcRenderer.on('sesionCerrada', async () => {
-  const url = "src/ui/login.html";
-  await ipcRenderer.send("abrirInterface", url);
-  
+ipcRenderer.on("sesionCerrada", async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Login";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 });
 // ----------------------------------------------------------------
 // Esta funcion abre el formulario para el inicio de sesion
@@ -61,42 +62,42 @@ function mostrarLogin() {
 //   const result = ipcRenderer.send("abrirInterface", url);
 // });
 const abrirInicio = async () => {
-  const url = "src/ui/principal.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Inicio";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirSocios = async () => {
-  const url = "src/ui/socios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Socios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirUsuarios = async () => {
-  const url = "src/ui/usuarios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Usuarios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPagos = async () => {
-  const url = "src/ui/cobros.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Pagos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPlanillas = async () => {
-  const url = "src/ui/planillas-cuotas.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-const abrirParametros = async () => {
-  const url = "src/ui/planillas.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-const abrirImplementos = async () => {
-  const url = "src/ui/implementos.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Planillas";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirContratos = async () => {
-  const url = "src/ui/contratos.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Contratos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirServicios = async () => {
-  const url = "src/ui/servicios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios fijos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirCuotas = async () => {
-  const url = "src/ui/cuotas.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios ocacionales";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };

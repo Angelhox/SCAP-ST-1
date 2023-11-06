@@ -29,6 +29,7 @@ const servicioTit = document.getElementById("servicio-tit");
 const servicioDesc = document.getElementById("servicio-desc");
 const servicioDet = document.getElementById("servicio-det");
 const servicioVal = document.getElementById("servicio-val");
+const servicioCreaciondet = document.getElementById("fechaCreacion-det");
 const btnVolver = document.getElementById("btn-volver");
 // const servicioCreacionBn = document.getElementById("fechaCreacion-bn");
 // const servicioNombreBn = document.getElementById("nombre-bn");
@@ -80,7 +81,8 @@ const contratarDg = document.getElementById("btnContratar-dg");
 const containerOpciones = document.getElementById("container-opciones");
 const sectionOpciones = document.getElementById("section-opciones");
 const cancelarForm = document.getElementById("cancelar-form");
-
+const mesBusqueda = document.getElementById("mesBusqueda");
+const anioBusqueda = document.getElementById("anioBusqueda");
 let recaudaciones = [];
 let porContratar = [];
 let servicios = [];
@@ -89,6 +91,7 @@ let valorIndividual = 0.0;
 let editingStatus = false;
 let editServicioId = "";
 let valoresDistintosDf = "No";
+let fechaCreacion = "2023-11-01 00:00:00";
 servicioForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (validator.isEmpty(servicioNombre.value)) {
@@ -323,6 +326,7 @@ async function renderUsuarios(usuarios, servicio) {
     divCol4.style.backgroundColor = "#d6eaf8";
     divCol4.style.maxWidth = "100%";
     divCol4.style.width = "100%";
+    divCol4.style.minWidth = "100%";
     divCol4.style.height = "fit-content";
     divCol4.style.maxHeight = "fit-content";
 
@@ -423,13 +427,13 @@ async function renderUsuarios(usuarios, servicio) {
     inputCheckbox.disabled = true;
     // await let contratosIds = usuario.contratosId;
     // console.log("id: " + contratosIds);
-    inputCheckbox.onchange = function () {
-      if (inputCheckbox.checked) {
-        console.log("id del contrato: " + usuario.contratosId);
-        porContratar.push(usuario.contratosId);
-        console.log("Por contratar: " + porContratar);
-      }
-    };
+    // inputCheckbox.onchange = function () {
+    //   if (inputCheckbox.checked) {
+    //     console.log("id del contrato: " + usuario.contratosId);
+    //     porContratar.push(usuario.contratosId);
+    //     console.log("Por contratar: " + porContratar);
+    //   }
+    // };
 
     const labelCheckbox = document.createElement("label");
     labelCheckbox.for = "miCheckbox";
@@ -460,12 +464,9 @@ async function renderUsuarios(usuarios, servicio) {
       elementos.forEach((elemento) => {
         elemento.classList.remove("bg-secondary");
       });
-
       // Agrega la clase "selected" al elemento que se hizo clic
       divCol4.classList.add("bg-secondary");
-
       // detallesContratos(datosContrato.contratosId);
-
       servicioOpcionesdg(usuario, servicio);
       console.log("div: " + usuario.socio);
     };
@@ -567,6 +568,7 @@ const mostrarEstadisticas = async (servicioId) => {
   console.log("Estadisticas: " + servicio);
   servicioTit.textContent = servicio.nombre;
   servicioDesc.textContent = "(" + servicio.descripcion + ")";
+  servicioCreaciondet.textContent = "Creado: "+formatearFecha(servicio.fechaCreacion)
   servicioVal.textContent = "Valor: $" + servicio.valor;
   let aplazableSnText = "No aplazable";
   if (servicio.aplazableSn !== "No") {
@@ -639,7 +641,7 @@ const getRecaudaciones = async () => {
     } else {
       abonoRp = 0;
     }
-    valoresPendientes += recaudacion.saldo - abonoRp;
+    valoresPendientes += recaudacion.total - abonoRp;
     valoresRecaudados += abonoRp;
     valoresTotales += recaudacion.total;
     recaudacionesList.innerHTML += `
@@ -649,7 +651,7 @@ const getRecaudaciones = async () => {
            <td>${recaudacion.detalleEstado}</td>
            <td>${abonoRp}</td>
            <td>${recaudacion.total}</td>
-           <td>${recaudacion.saldo - abonoRp}</td>        
+           <td>${recaudacion.total - abonoRp}</td>        
        </tr>
           `;
   });
@@ -750,6 +752,8 @@ async function init() {
   mesLimites();
   anioActual();
   anioLimites();
+  cargarMesActual();
+  cargarAnioBusquedas();
   let criterioBuscar = "all";
   let criterioContentBuscar = "all";
   await getServicios(criterioBuscar, criterioContentBuscar);
@@ -1007,8 +1011,8 @@ async function vistaFactura(tipo) {
   };
 
   const datosTotales = {
-    pendiente: valorRecaudado.textContent,
-    recaudado: valorPendiente.textContent,
+    pendiente: valorPendiente.textContent,
+    recaudado: valorRecaudado.textContent,
     totalFinal: valorTotal.textContent,
   };
 
@@ -1084,12 +1088,20 @@ const servicioOpcionesdg = async (usuario, servicio) => {
   let descuentoDf = 1;
   let editableSn = false;
   // Datos del servicio independientes
+  if (servicioDg.aplazableSn === "Si") {
+    aplazable = "Aplazable";
+  }
   servicioDg.textContent = servicio.nombre;
   descripcionDg.textContent = servicio.descripcion;
   detallesDg.textContent = servicio.tipo + " | " + aplazable;
   servicioValorDg.textContent = "Valor: $" + servicio.valor;
-  if (servicioDg.aplazableSn === "Si") {
-    aplazable = "Aplazable";
+  if (servicio.valoresDistintosSn == "Si") {
+    console.log("Valores distintos: " + servicio.valoresDistintosSn);
+    subtotalText.textContent = "Subtotal(Individual)";
+    editableSn = true;
+  } else {
+    subtotalText.textContent = "Subtotal(General)";
+    editableSn = false;
   }
   // Verifico si el servicio ha sido contratado
   console.log("Contratado?: " + servicio.id, usuario.contratosId);
@@ -1110,7 +1122,7 @@ const servicioOpcionesdg = async (usuario, servicio) => {
     }
     descuentoDg.value = descuentoDf;
     if (servicioContratado[0].valorDescuento !== null) {
-      descuento = servicioContratado[0].valorDescuento;
+      descuento = servicioContratado[0].descuentoValor;
     }
     // el valor del descuento es el que ya esta guardado.
     descuentoValDg.value = descuento;
@@ -1140,11 +1152,12 @@ const servicioOpcionesdg = async (usuario, servicio) => {
           valorCancelado += servicioDetalle.abono;
         }
         if (cancelados > 0) {
+          console.log("Cancelasdos > 0");
           editableSn = false;
-          descuentoDg.disabled = false;
+          descuentoDg.disabled = true;
         }
       });
-      //Cambiar valor or valorIndividual
+
       contratarDg.textContent = "Descontratar";
       contratarDg.onclick = async function () {
         await desContratarServicio(
@@ -1162,6 +1175,7 @@ const servicioOpcionesdg = async (usuario, servicio) => {
         servicio
       );
     };
+
     canceladosDg.textContent = cancelados;
     pendientesDg.textContent = numeroPagosDf - cancelados;
     abonadoDg.textContent = valorCancelado;
@@ -1233,7 +1247,7 @@ const servicioOpcionesdg = async (usuario, servicio) => {
       numPagosDg.options[numPagosDg.selectedIndex].value;
     console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
     valorPago = total / valorPagoSeleccionado;
-    valPagosDg.value = parseFloat(valorPago).toFixed(2);
+    valPagosDg.value = aproximarDosDecimales(valorPago);
 
     // if (servicio.valorPagos !== null) {
     //   valorPago = servicio.valorPagos;
@@ -1270,12 +1284,12 @@ const servicioOpcionesdg = async (usuario, servicio) => {
     }
   }
   // Si el servicio tiene valores distintos.
-
   if (!editableSn) {
     subtotalDg.readOnly = true;
     // descuentoDg.disabled = true;
     numPagosDg.disabled = true;
   } else {
+    console.log("Editable");
     subtotalDg.readOnly = false;
     // descuentoDg.disabled = false;
     numPagosDg.disabled = false;
@@ -1308,7 +1322,7 @@ const servicioOpcionesdg = async (usuario, servicio) => {
           console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
           valorPago = total / valorPagoSeleccionado;
         }
-        valPagosDg.value = parseFloat(valorPago).toFixed(2);
+        valPagosDg.value = aproximarDosDecimales(valorPago);
       } else {
         subtotal = servicio.valor;
         const descuentoSeleccionado =
@@ -1339,7 +1353,7 @@ const servicioOpcionesdg = async (usuario, servicio) => {
           console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
           valorPago = total / valorPagoSeleccionado;
         }
-        valPagosDg.value = parseFloat(valorPago).toFixed(2);
+        valPagosDg.value = aproximarDosDecimales(valorPago);
       }
     };
     numPagosDg.onchange = () => {
@@ -1355,7 +1369,39 @@ const servicioOpcionesdg = async (usuario, servicio) => {
         console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
         valorPago = total / valorPagoSeleccionado;
       }
-      valPagosDg.value = parseFloat(valorPago).toFixed(2);
+      valPagosDg.value = aproximarDosDecimales(valorPago);
+    };
+    //----------------------------------------------------------------
+    // funcion del select descuentos
+    descuentoDg.onchange = () => {
+      const descuentoSeleccionado =
+        descuentoDg.options[descuentoDg.selectedIndex];
+      const valorSeleccionado =
+        descuentoSeleccionado.getAttribute("value-descuento");
+      console.log("Atributo seleccionado:", valorSeleccionado);
+      porcentaje = parseInt(valorSeleccionado) / 100;
+      console.log("Porcentaje: " + subtotal, porcentaje);
+      descuento = subtotal * porcentaje;
+      descuentoValDg.value = parseFloat(descuento).toFixed(2);
+      // total = servicio.valor - descuento;
+      total = subtotal - descuento;
+      totalDg.value = parseFloat(total).toFixed(2);
+      //Incluimos la programacion del select numPagos
+      if (total !== 0) {
+        numPagosDg.disabled = false;
+        const valorPagoSeleccionado =
+          numPagosDg.options[numPagosDg.selectedIndex].value;
+        console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+        valorPago = total / valorPagoSeleccionado;
+      } else {
+        numPagosDg.value = 1;
+        numPagosDg.disabled = true;
+        const valorPagoSeleccionado =
+          numPagosDg.options[numPagosDg.selectedIndex].value;
+        console.log("Valor pagos seleccionado:", valorPagoSeleccionado);
+        valorPago = total / valorPagoSeleccionado;
+      }
+      valPagosDg.value = aproximarDosDecimales(valorPago);
     };
   }
   if (servicio.aplazableSn == "Si") {
@@ -1399,6 +1445,57 @@ const desContratarServicio = async (detalleDescontratar, usuario, servicio) => {
     }
   });
 };
+
+function cargarMesActual() {
+  mesBusqueda.innerHTML = '<option value="all" selected>Todo mes</option>';
+  // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
+  const mesActual = new Date().getMonth();
+  // Array de nombres de meses
+  const nombresMeses = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+  // Llena el select con las opciones de los meses
+  for (let i = 0; i < nombresMeses.length; i++) {
+    const option = document.createElement("option");
+    option.value = i + 1; // El valor es el índice del mes
+    option.textContent = nombresMeses[i];
+    if (i === mesActual) {
+      console.log("seleccionando: " + mesActual);
+      // option.selected = true;
+    }
+
+    mesBusqueda.appendChild(option);
+  }
+
+  // Establece el mes actual como seleccionado
+  // mesBusqueda.value = mesActual;
+}
+function cargarAnioBusquedas() {
+  anioBusqueda.innerHTML = '<option value="all" selected>Todo año</option>';
+  // Obtener el año actual
+  var anioActual = new Date().getFullYear();
+  // Crear opciones de años desde el año actual hacia atrás
+  for (var i = anioActual; i >= 2020; i--) {
+    var option = document.createElement("option");
+    option.value = i;
+    option.text = i;
+    if (i === anioActual) {
+      // option.selected = true;
+    }
+    anioBusqueda.appendChild(option);
+  }
+}
 const contratarServicio = async (servicioContratar, usuario, servicio) => {
   CerrarFormOpciones();
   Swal.fire({
@@ -1430,7 +1527,10 @@ const contratarServicio = async (servicioContratar, usuario, servicio) => {
         // correspondiente a ese mes se la cree asi como tambien nos aseguramos de que el detalle
         // no se aplique dos veces. Los detalles se aplicaran en las planillas vigentes de acuerdo
         // al mes correspondiente.
-        const result = await ipcRenderer.invoke("createPlanilla");
+        const result = await ipcRenderer.invoke(
+          "createPlanilla",
+          fechaCreacion
+        );
         // const resultComprobante = await ipcRenderer.invoke("createComprobante");
         console.log(result);
 
@@ -1456,38 +1556,59 @@ function mostrarFormOpciones() {
 function CerrarFormOpciones() {
   dialogOpciones.close();
 }
-
+function aproximarDosDecimales(numero) {
+  // Redondea el número hacia arriba
+  const numeroRedondeado = Math.ceil(numero * 100) / 100;
+  return numeroRedondeado.toFixed(2);
+}
 // funciones del navbar
+function cerrarSesion() {
+  ipcRenderer.send("cerrarSesion");
+}
+ipcRenderer.on("sesionCerrada", async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Login";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+});
 const abrirInicio = async () => {
-  const url = "src/ui/principal.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Inicio";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirSocios = async () => {
-  const url = "src/ui/socios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Socios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirUsuarios = async () => {
-  const url = "src/ui/usuarios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Usuarios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPagos = async () => {
-  const url = "src/ui/planillas.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Pagos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPlanillas = async () => {
-  const url = "src/ui/planillas-cuotas.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-const abrirParametros = async () => {
-  const url = "src/ui/parametros.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-const abrirImplementos = async () => {
-  const url = "src/ui/implementos.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Planillas";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirContratos = async () => {
-  const url = "src/ui/medidores.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Contratos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
+const abrirServicios = async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios fijos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+};
+const abrirCuotas = async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios ocacionales";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+};
+
 init();

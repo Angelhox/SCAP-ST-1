@@ -96,7 +96,6 @@ let editDetalleId = "";
 let fechaEmisionEdit = "";
 let editContratoId = "";
 
-
 let encabezadoId = "";
 planillaForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -116,7 +115,6 @@ planillaForm.addEventListener("submit", async (e) => {
   };
   if (!editingStatus) {
     console.log("Can not create planilla");
-  
   } else {
     // console.log("Editing planilla with electron");
     // const result = await ipcRenderer.invoke(
@@ -590,7 +588,8 @@ const editPlanilla = async (planillaId, contratoId, fechaEmision) => {
   serviciosFijos = await ipcRenderer.invoke(
     "getDatosServiciosByContratoId",
     contratoId,
-    formatearFecha(fechaEmision),
+    // formatearFecha(fechaEmision),
+    fechaEmision,
     "fijos"
   );
   if (serviciosFijos[0] !== undefined) {
@@ -601,7 +600,8 @@ const editPlanilla = async (planillaId, contratoId, fechaEmision) => {
   otrosServicios = await ipcRenderer.invoke(
     "getDatosServiciosByContratoId",
     contratoId,
-    formatearFecha(fechaEmision),
+    // formatearFecha(fechaEmision),
+    fechaEmision,
     "otros"
   );
   if (otrosServicios[0] !== undefined) {
@@ -1146,11 +1146,11 @@ var btnSeccion2 = document.getElementById("btnSeccion2");
 var seccion1 = document.getElementById("seccion1");
 var seccion2 = document.getElementById("seccion2");
 
-btnSeccion1.addEventListener("click", function () {
-  console.log("btn1");
-  seccion1.classList.remove("active");
-  seccion2.classList.add("active");
-});
+// btnSeccion1.addEventListener("click", function () {
+//   console.log("btn1");
+//   seccion1.classList.remove("active");
+//   seccion2.classList.add("active");
+// });
 
 btnSeccion2.addEventListener("click", function () {
   console.log("btn2");
@@ -1158,41 +1158,52 @@ btnSeccion2.addEventListener("click", function () {
   seccion1.classList.add("active");
 });
 // funciones del navbar
+function cerrarSesion() {
+  ipcRenderer.send("cerrarSesion");
+}
+ipcRenderer.on("sesionCerrada", async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Login";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+});
 const abrirInicio = async () => {
-  const url = "src/ui/principal.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Inicio";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirSocios = async () => {
-  const url = "src/ui/socios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Socios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirUsuarios = async () => {
-  const url = "src/ui/usuarios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Usuarios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPagos = async () => {
-  const url = "src/ui/planillas.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Pagos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPlanillas = async () => {
-  const url = "src/ui/planillas-cuotas.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Planillas";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
-const abrirParametros = async () => {
-  const url = "src/ui/parametros.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-const abrirImplementos = async () => {
-  const url = "src/ui/implementos.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-function mostrarLogin() {
-  const dialog = document.getElementById("loginDialog");
-  dialog.showModal();
-}
 const abrirContratos = async () => {
-  const url = "src/ui/medidores.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Contratos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
-
+const abrirServicios = async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios fijos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+};
+const abrirCuotas = async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios ocacionales";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+};
 init();

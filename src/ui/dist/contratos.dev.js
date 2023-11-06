@@ -25,7 +25,8 @@ var contratoCodigo = document.getElementById("codigocontrato");
 var contratoFecha = document.getElementById("fechaContrato");
 var contratoEstado = document.getElementById("estadoContrato");
 var labelEstadoContrato = document.getElementById("labelEstadoContrato");
-var contratoPrincipalSn = document.getElementById("principalSn"); //Indica si se ha seleccionado el servicio de agua con medidor
+var contratoPrincipalSn = document.getElementById("principalSn");
+var serviciosCompartidos = document.getElementById("serviciosCompartidos"); //Indica si se ha seleccionado el servicio de agua con medidor
 
 var contratoConMedidor = false; // Tabla de contratos con medidor
 
@@ -76,7 +77,8 @@ var conMedidor = document.getElementById("conMedidor");
 var sinMedidor = document.getElementById("sinMedidor");
 var titleContratos = document.getElementById("title-contratos"); //Variable que indica el medidor a editar Borrar
 
-var editContratoId = ""; // ----------------------------------------------------------------
+var editContratoId = "";
+var editSocioId = ""; // ----------------------------------------------------------------
 // Variables componentes del formulario.
 // ----------------------------------------------------------------
 
@@ -94,6 +96,7 @@ function eventoServiciosId(serviciosFijos) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
+          console.log('Servicios here: ' + serviciosFijos);
           serviciosFijos.forEach(function (servicioFijo) {
             document.getElementById(servicioFijo.id).addEventListener("change", function (event) {
               if (servicioFijo.nombre == "Agua Potable") {
@@ -154,7 +157,7 @@ function eventoServiciosId(serviciosFijos) {
             });
           });
 
-        case 1:
+        case 2:
         case "end":
           return _context.stop();
       }
@@ -167,7 +170,7 @@ function eventoServiciosId(serviciosFijos) {
 
 
 contratoForm.addEventListener("submit", function _callee(e) {
-  var newMedidor, contratoEstadoDf, medidorDf, callePrincipalDf, calleSecundariaDf, numeroCasaDf, observacionDf, principalDf, _newContrato, fakeMedidor, resultContrato, result, _resultContrato, resultMedidor;
+  var newMedidor, contratoEstadoDf, medidorDf, callePrincipalDf, calleSecundariaDf, numeroCasaDf, observacionDf, principalDf, serviciosCompartidosDf, _newContrato, fakeMedidor, resultContrato, result, _resultContrato, resultMedidor;
 
   return regeneratorRuntime.async(function _callee$(_context2) {
     while (1) {
@@ -184,7 +187,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa un número de cédula correspondiente a un socio registrado.";
           socioContratanteCedula.focus();
-          _context2.next = 103;
+          _context2.next = 105;
           break;
 
         case 8:
@@ -196,7 +199,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una fecha de contrato válida.";
           contratoFecha.focus();
-          _context2.next = 103;
+          _context2.next = 105;
           break;
 
         case 14:
@@ -211,7 +214,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   mensajeError.textContent = "Ingresa un numero de casa válido.";
           //   medidorNumeroCasa.focus();
 
-          _context2.next = 103;
+          _context2.next = 105;
           break;
 
         case 20:
@@ -229,7 +232,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   mensajeError.textContent = "Ingresa una calle secundaria válida.";
           //   medidorSecundaria.focus();
 
-          _context2.next = 103;
+          _context2.next = 105;
           break;
 
         case 26:
@@ -241,7 +244,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una referencia válida.";
           medidorReferencia.focus();
-          _context2.next = 103;
+          _context2.next = 105;
           break;
 
         case 32:
@@ -253,7 +256,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           errorContainer.style.color = "red";
           mensajeError.textContent = "Ingresa una fecha de instalación válida.";
           medidorInstalacion.focus();
-          _context2.next = 103;
+          _context2.next = 105;
           break;
 
         case 38:
@@ -277,14 +280,14 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   errorContainer.style.color = "red";
           //   mensajeError.textContent = "Selecciona al menos un servicio a contratar.";
 
-          _context2.next = 103;
+          _context2.next = 105;
           break;
 
         case 44:
           console.log("Servicios a contratar: " + serviciosDisponiblesAContratar);
 
           if (!(!socioContratanteId == "")) {
-            _context2.next = 102;
+            _context2.next = 104;
             break;
           }
 
@@ -295,6 +298,7 @@ contratoForm.addEventListener("submit", function _callee(e) {
           numeroCasaDf = "SN";
           observacionDf = "NA";
           principalDf = "Si";
+          serviciosCompartidosDf = 0;
 
           if (contratoConMedidor) {
             medidorDf = "Si";
@@ -324,6 +328,10 @@ contratoForm.addEventListener("submit", function _callee(e) {
             principalDf = contratoPrincipalSn.value;
           }
 
+          if (serviciosCompartidos.value !== "0") {
+            serviciosCompartidosDf = parseInt(serviciosCompartidos.value);
+          }
+
           newMedidor = {
             codigo: contratoCodigo.value,
             fechaInstalacion: medidorInstalacion.value,
@@ -347,7 +355,8 @@ contratoForm.addEventListener("submit", function _callee(e) {
             calleSecundaria: calleSecundariaDf,
             numeroCasa: numeroCasaDf,
             referencia: medidorReferencia.value,
-            principalSn: principalDf // contratosId: contratoId,
+            principalSn: principalDf,
+            serviciosCompartidos: serviciosCompartidosDf // contratosId: contratoId,
 
           };
           fakeMedidor = {
@@ -358,24 +367,24 @@ contratoForm.addEventListener("submit", function _callee(e) {
           };
 
           if (editingStatus) {
-            _context2.next = 84;
+            _context2.next = 86;
             break;
           }
 
-          _context2.prev = 64;
-          _context2.next = 67;
+          _context2.prev = 66;
+          _context2.next = 69;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("createContrato", _newContrato, numero, sectorId));
 
-        case 67:
+        case 69:
           resultContrato = _context2.sent;
           console.log("Muestro resultado de insertar contrato: ", resultContrato);
           contratoId = resultContrato.id;
           console.log("Muestro id resultado de insertar contrato: ", contratoId);
           fakeMedidor.contratosId = contratoId;
-          _context2.next = 74;
+          _context2.next = 76;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", contratoId, fakeMedidor));
 
-        case 74:
+        case 76:
           result = _context2.sent;
           console.log("resultado de crearMedidor: ", result);
           editContrato(contratoId); // if (!contratoId == "" || !contratoId == undefined) {
@@ -394,63 +403,63 @@ contratoForm.addEventListener("submit", function _callee(e) {
           //   // }
           // }
 
-          _context2.next = 82;
+          _context2.next = 84;
           break;
 
-        case 79:
-          _context2.prev = 79;
-          _context2.t0 = _context2["catch"](64);
+        case 81:
+          _context2.prev = 81;
+          _context2.t0 = _context2["catch"](66);
           console.log("Error al registrar el contrato: ", _context2.t0);
 
-        case 82:
-          _context2.next = 100;
+        case 84:
+          _context2.next = 102;
           break;
 
-        case 84:
+        case 86:
           console.log("Editing contrato with electron");
           newMedidor.contratosId = editContratoId;
-          _context2.prev = 86;
-          _context2.next = 89;
+          _context2.prev = 88;
+          _context2.next = 91;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, _newContrato));
 
-        case 89:
+        case 91:
           _resultContrato = _context2.sent;
 
           if (!contratoConMedidor) {
-            _context2.next = 94;
+            _context2.next = 96;
             break;
           }
 
-          _context2.next = 93;
+          _context2.next = 95;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", editContratoId, newMedidor));
 
-        case 93:
+        case 95:
           resultMedidor = _context2.sent;
 
-        case 94:
+        case 96:
           // contratarServicios(serviciosDisponiblesAContratar, editContratoId);
           console.log(_resultContrato);
-          _context2.next = 100;
+          _context2.next = 102;
           break;
 
-        case 97:
-          _context2.prev = 97;
-          _context2.t1 = _context2["catch"](86);
+        case 99:
+          _context2.prev = 99;
+          _context2.t1 = _context2["catch"](88);
           console.log("Error al editar el contrato: ", _context2.t1);
 
-        case 100:
-          _context2.next = 103;
+        case 102:
+          _context2.next = 105;
           break;
 
-        case 102:
+        case 104:
           console.log("Socio not found");
 
-        case 103:
+        case 105:
         case "end":
           return _context2.stop();
       }
     }
-  }, null, null, [[64, 79], [86, 97]]);
+  }, null, null, [[66, 81], [88, 99]]);
 }); // ----------------------------------------------------------------
 // Funcion que recibe el id del servicio a contratar y los relaciona con el id del contrato
 // Registra un servicio contratado a la vez.
@@ -933,93 +942,7 @@ function renderContratosSinMedidor(datosContratosSinMedidor) {
 
     contratosSinMedidorList.appendChild(divCol);
   });
-} // function renderContratosSinMedidor(datosContratosSinMedidor) {
-//   contratosSinMedidorList.innerHTML = "";
-//   const cardContainer = document.createElement("div");
-//   cardContainer.classList.add("card-container-horizontal");
-//   datosContratosSinMedidor.forEach((contratosinmedidor) => {
-//     const card = document.createElement("div");
-//     card.classList.add("card");
-//     card.innerHTML = `
-//       <div class="card-content">
-//         <div class="card-header">${contratosinmedidor.codigo}</div>
-//         <div class="card-body">
-//           <p>${formatearFecha(contratosinmedidor.fecha)}</p>
-//           <p>${
-//             contratosinmedidor.primerNombre +
-//             " " +
-//             contratosinmedidor.segundoNombre +
-//             " " +
-//             contratosinmedidor.primerApellido +
-//             " " +
-//             contratosinmedidor.segundoApellido
-//           }</p>
-//           <p>${contratosinmedidor.cedulaPasaporte}</p>
-//           <p>${contratosinmedidor.estado}</p>
-//         </div>
-//         <div class="card-footer">
-//           <button onclick="detallesContratos('${
-//             contratosinmedidor.id
-//           }')" class="btn ">
-//             <i class="fa-solid fa-circle-info" style="color: #511f1f;"></i>
-//           </button>
-//           <button onclick="editMedidor('${
-//             contratosinmedidor.id
-//           }')" class="btn ">
-//             <i class="fa-solid fa-user-pen"></i>
-//           </button>
-//         </div>
-//       </div>
-//     `;
-//     cardContainer.appendChild(card);
-//   });
-//   contratosSinMedidorList.appendChild(cardContainer);
-// }
-// function renderServiciosContratos(serviciosContratados) {
-//   servicosContratadosList.innerHTML = "";
-//   serviciosContratados.forEach((servicioContratado) => {
-//     serviciosCheck[servicioContratado.id] = servicioContratado.id;
-//     serviciosFijosList.push(servicioContratado.id);
-//     servicosContratadosList.innerHTML += `
-//     <div class="col-6 text-center">
-//     <div class="card card-fondo my-2" style="height: 18rem;">
-//       <div class="card-zona-img"></div>
-//       <div class="card-body col-12 card-contenido">
-//         <div class="col-12">
-//           <h5 class="card-title">${servicioContratado.nombre}</h5>
-//         </div>
-//         <div class="col-12 card-zona-desc" >
-//           <p class="card-text">
-//             ${servicioContratado.descripcion}
-//           </p>
-//         </div>
-//         <div
-//           class="col-12 d-flex justify-content-center align-items-center"
-//         >
-//           <input
-//             type="checkbox"
-//             class="btn-check"
-//             name="options-outlined"
-//             id="${servicioContratado.id}"
-//             autocomplete="off"
-//           />
-//           <label
-//             style="width: 40%"
-//             class="btn btn-outline-success"
-//             for="${servicioContratado.id}"
-//             >Adquirido</label
-//           >
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-//       `;
-//     //const servicio = ;
-//   });
-//   console.log(serviciosCheck);
-//   console.log(serviciosFijosList[0]);
-// }
-// ----------------------------------------------------------------
+} // ----------------------------------------------------------------
 // Funcion que crea las cards de los servicios registrados segun el id
 // del contrato seleccionado
 // ----------------------------------------------------------------
@@ -1037,295 +960,507 @@ function renderServiciosContratados(serviciosContratados) {
 
 
 function renderServiciosDisponibles(serviciosDisponibles) {
-  serviciosDisponiblesAContratar = [];
-  servicosDisponiblesList.innerHTML = "";
+  var _loop, i;
 
-  var _loop = function _loop(i) {
-    console.log("Servicios: ", serviciosDisponibles[i]); //serviciosContratados.forEach((servicioContratado) => {
+  return regeneratorRuntime.async(function renderServiciosDisponibles$(_context9) {
+    while (1) {
+      switch (_context9.prev = _context9.next) {
+        case 0:
+          serviciosDisponiblesAContratar = [];
+          servicosDisponiblesList.innerHTML = "";
 
-    serviciosDisponiblesAContratar.push(serviciosDisponibles[i].id);
-    var cardContainer = document.createElement("div");
-    cardContainer.classList.add("col-6", "text-center");
-    var card = document.createElement("div");
-    card.classList.add("card", "card-fondo", "my-2");
-    card.style.height = "18rem";
-    var cardImage = document.createElement("div");
-    cardImage.classList.add("card-zona-img");
-    var cardBody = document.createElement("div");
-    cardBody.classList.add("card-body", "col-12", "card-contenido");
-    var title = document.createElement("h5");
-    title.classList.add("card-title");
-    title.textContent = serviciosDisponibles[i].nombre;
-    var description = document.createElement("p");
-    description.classList.add("card-text");
-    description.textContent = serviciosDisponibles[i].descripcion;
-    var divValue = document.createElement("div");
-    var divRowBtn = document.createElement("div");
-    divRowBtn.className = "row";
-    divValue.className = "col-4 mp-0 text-center";
-    var pValue = document.createElement("p");
-    pValue.className = "mp-0 value-disponibles";
-    pValue.textContent = "$" + parseFloat(serviciosDisponibles[i].valor).toFixed(2);
-    divValue.appendChild(pValue);
-    var checkboxDiv = document.createElement("div");
-    checkboxDiv.classList.add("col-8", "d-flex", "justify-content-center", "align-items-center");
-    var checkbox = document.createElement("input"); //checkbox.checked = "false";
-
-    checkbox.type = "checkbox";
-    checkbox.classList.add("btn-check"); //checkbox.name = "options-outlined";
-
-    checkbox.id = serviciosDisponibles[i].id;
-    checkbox.autocomplete = "off";
-    checkbox.checked = false;
-
-    checkbox.onclick = function () {
-      if (serviciosDisponibles[i].nombre === "Agua Potable") {
-        habilitarFormMedidor();
-
-        if (validator.isEmpty(medidorInstalacion.value)) {
-          errorContainer.style.color = "red";
-          mensajeError.textContent = "Debes ingresar una fecha de instalacion válida.";
-          medidorInstalacion.focus();
-          checkbox.checked = false;
-        } else if (validator.isEmpty(medidorMarca.value)) {
-          errorContainer.style.color = "red";
-          mensajeError.textContent = "Debes ingresar una marca valida para el medidor.";
-          medidorMarca.focus();
-          checkbox.checked = false;
-        } else {
-          Swal.fire({
-            title: "¿Quieres contratar este servicio para este contrato?",
-            text: "El valor se cargara en la planilla a partir del mes próximo.",
-            icon: "question",
-            iconColor: "#f8c471",
-            showCancelButton: true,
-            confirmButtonColor: "#2874A6",
-            cancelButtonColor: "#EC7063 ",
-            confirmButtonText: "Sí, continuar",
-            cancelButtonText: "Cancelar"
-          }).then(function _callee3(result) {
-            var observacionDf, resultContrato, _result;
-
-            return regeneratorRuntime.async(function _callee3$(_context5) {
+          _loop = function _loop(i) {
+            var cardContainer, card, cardImage, cardBody, title, description, divValue, divRowBtn, pValue, checkboxDiv, checkbox, label, compartidoSn, compartidoAnteriorSn, compartidoContratado;
+            return regeneratorRuntime.async(function _loop$(_context8) {
               while (1) {
-                switch (_context5.prev = _context5.next) {
+                switch (_context8.prev = _context8.next) {
                   case 0:
-                    if (!result.isConfirmed) {
-                      _context5.next = 20;
+                    console.log("Servicios: ", serviciosDisponibles[i]); //serviciosContratados.forEach((servicioContratado) => {
+
+                    serviciosDisponiblesAContratar.push(serviciosDisponibles[i].id);
+                    cardContainer = document.createElement("div");
+                    cardContainer.classList.add("col-6", "text-center");
+                    card = document.createElement("div");
+                    card.classList.add("card", "card-fondo", "my-2");
+                    card.style.height = "18rem";
+                    cardImage = document.createElement("div");
+                    cardImage.classList.add("card-zona-img");
+                    cardBody = document.createElement("div");
+                    cardBody.classList.add("card-body", "col-12", "card-contenido");
+                    title = document.createElement("h5");
+                    title.classList.add("card-title");
+                    title.textContent = serviciosDisponibles[i].nombre;
+                    description = document.createElement("p");
+                    description.classList.add("card-text");
+                    description.textContent = serviciosDisponibles[i].descripcion;
+                    divValue = document.createElement("div");
+                    divRowBtn = document.createElement("div");
+                    divRowBtn.className = "row";
+                    divValue.className = "col-2 mp-0 text-center";
+                    pValue = document.createElement("p");
+                    pValue.className = "mp-0 value-disponibles";
+                    pValue.textContent = "$" + parseFloat(serviciosDisponibles[i].valor).toFixed(2);
+                    divValue.appendChild(pValue);
+                    checkboxDiv = document.createElement("div");
+                    checkboxDiv.classList.add("col-8", "d-flex", "justify-content-center", "align-items-center");
+                    checkbox = document.createElement("input"); //checkbox.checked = "false";
+
+                    checkbox.type = "checkbox";
+                    checkbox.classList.add("btn-check"); //checkbox.name = "options-outlined";
+
+                    checkbox.id = serviciosDisponibles[i].id;
+                    checkbox.autocomplete = "off";
+                    checkbox.checked = false;
+                    label = document.createElement("label");
+                    label.style.width = "100%";
+                    label.classList.add("btn", "btn-outline-warning");
+                    label.setAttribute("for", serviciosDisponibles[i].id);
+                    label.textContent = "Contratar";
+                    compartidoSn = false;
+                    compartidoAnteriorSn = false;
+
+                    if (!(serviciosDisponibles[i].IndividualSn == "Compartido")) {
+                      _context8.next = 48;
                       break;
                     }
 
-                    // Aquí puedes realizar la acción que desees cuando el usuario confirme.
-                    // checkbox.checked = true;
-                    observacionDf = "SN";
+                    compartidoSn = true;
+                    label.innerHTML = 'Contratar<i class="mx-2 fa-solid fa-share-nodes"></i>';
+                    _context8.next = 45;
+                    return regeneratorRuntime.awrap(ipcRenderer.invoke("getCompartidosContratados", serviciosDisponibles[i].id, editSocioId));
 
-                    if (!validator.isEmpty(medidorObservacion.value)) {
-                      observacionDf = medidorObservacion.value;
+                  case 45:
+                    compartidoContratado = _context8.sent;
+                    console.log('CompartidoSn: ' + compartidoContratado.length);
+
+                    if (compartidoContratado.length > 0) {
+                      compartidoAnteriorSn = true;
                     }
 
-                    newContrato = {
-                      medidorSn: "Si"
+                  case 48:
+                    checkbox.onclick = function () {
+                      if (serviciosDisponibles[i].nombre === "Agua Potable") {
+                        habilitarFormMedidor();
+
+                        if (validator.isEmpty(medidorInstalacion.value)) {
+                          errorContainer.style.color = "red";
+                          mensajeError.textContent = "Debes ingresar una fecha de instalacion válida.";
+                          medidorInstalacion.focus();
+                          checkbox.checked = false;
+                        } else if (validator.isEmpty(medidorMarca.value)) {
+                          errorContainer.style.color = "red";
+                          mensajeError.textContent = "Debes ingresar una marca valida para el medidor.";
+                          medidorMarca.focus();
+                          checkbox.checked = false;
+                        } else {
+                          Swal.fire({
+                            title: "¿Quieres contratar este servicio para este contrato?",
+                            text: "El valor se cargara en la planilla a partir del mes próximo.",
+                            icon: "question",
+                            iconColor: "#f8c471",
+                            showCancelButton: true,
+                            confirmButtonColor: "#2874A6",
+                            cancelButtonColor: "#EC7063 ",
+                            confirmButtonText: "Sí, continuar",
+                            cancelButtonText: "Cancelar"
+                          }).then(function _callee3(result) {
+                            var observacionDf, resultContrato, _result;
+
+                            return regeneratorRuntime.async(function _callee3$(_context5) {
+                              while (1) {
+                                switch (_context5.prev = _context5.next) {
+                                  case 0:
+                                    if (!result.isConfirmed) {
+                                      _context5.next = 20;
+                                      break;
+                                    }
+
+                                    // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                                    // checkbox.checked = true;
+                                    observacionDf = "SN";
+
+                                    if (!validator.isEmpty(medidorObservacion.value)) {
+                                      observacionDf = medidorObservacion.value;
+                                    }
+
+                                    newContrato = {
+                                      medidorSn: "Si"
+                                    };
+                                    newMedidor = {
+                                      codigo: contratoCodigo.value,
+                                      fechaInstalacion: medidorInstalacion.value,
+                                      marca: medidorMarca.value,
+                                      observacion: observacionDf,
+                                      // barrio: medidorBarrio.value,
+                                      // callePrincipal: medidorPrincipal.value,
+                                      // calleSecundaria: medidorSecundaria.value,
+                                      // numeroCasa: medidorNumeroCasa.value,
+                                      // referencia: medidorReferencia.value,
+                                      contratosId: editContratoId
+                                    };
+                                    _context5.next = 7;
+                                    return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, newContrato));
+
+                                  case 7:
+                                    resultContrato = _context5.sent;
+                                    console.log("vamos a crear un medidor");
+                                    _context5.next = 11;
+                                    return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", editContratoId, newMedidor));
+
+                                  case 11:
+                                    _result = _context5.sent;
+                                    console.log("Resultado del medidor: " + _result);
+
+                                    if (_result.id !== undefined) {
+                                      console.log("Muestro result del medior: " + _result.id);
+                                      contratarServicio(serviciosDisponibles[i].id, editContratoId);
+                                    }
+
+                                    _context5.next = 16;
+                                    return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                                  case 16:
+                                    _context5.next = 18;
+                                    return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                                  case 18:
+                                    _context5.next = 22;
+                                    break;
+
+                                  case 20:
+                                    checkbox.checked = false;
+                                    inHabilitarFormMedidor();
+
+                                  case 22:
+                                  case "end":
+                                    return _context5.stop();
+                                }
+                              }
+                            });
+                          });
+                        }
+                      } else {
+                        if (compartidoAnteriorSn && compartidoSn) {
+                          Swal.fire({
+                            title: "¿Quieres contratar este servicio para este contrato?",
+                            text: "Este servicio es compartido y ha sido adquirido en un contrato anterior \n" + "¿Deseas contratarlo de  todas formas? \n El valor se cargará en la planilla a partir del mes próximo.",
+                            icon: "question",
+                            iconColor: "#f8c471",
+                            showCancelButton: true,
+                            confirmButtonColor: "#2874A6",
+                            cancelButtonColor: "#EC7063 ",
+                            confirmButtonText: "Sí, continuar",
+                            cancelButtonText: "Cancelar"
+                          }).then(function _callee4(result) {
+                            return regeneratorRuntime.async(function _callee4$(_context6) {
+                              while (1) {
+                                switch (_context6.prev = _context6.next) {
+                                  case 0:
+                                    if (!result.isConfirmed) {
+                                      _context6.next = 8;
+                                      break;
+                                    }
+
+                                    // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                                    // checkbox.checked = true;
+                                    contratarServicio(serviciosDisponibles[i].id, editContratoId);
+                                    _context6.next = 4;
+                                    return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                                  case 4:
+                                    _context6.next = 6;
+                                    return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                                  case 6:
+                                    _context6.next = 9;
+                                    break;
+
+                                  case 8:
+                                    checkbox.checked = false;
+
+                                  case 9:
+                                  case "end":
+                                    return _context6.stop();
+                                }
+                              }
+                            });
+                          });
+                        } else {
+                          Swal.fire({
+                            title: "¿Quieres contratar este servicio para este contrato?",
+                            text: "El valor se cargara en la planilla a partir del mes próximo.",
+                            icon: "question",
+                            iconColor: "#f8c471",
+                            showCancelButton: true,
+                            confirmButtonColor: "#2874A6",
+                            cancelButtonColor: "#EC7063 ",
+                            confirmButtonText: "Sí, continuar",
+                            cancelButtonText: "Cancelar"
+                          }).then(function _callee5(result) {
+                            return regeneratorRuntime.async(function _callee5$(_context7) {
+                              while (1) {
+                                switch (_context7.prev = _context7.next) {
+                                  case 0:
+                                    if (!result.isConfirmed) {
+                                      _context7.next = 8;
+                                      break;
+                                    }
+
+                                    // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                                    // checkbox.checked = true;
+                                    contratarServicio(serviciosDisponibles[i].id, editContratoId);
+                                    _context7.next = 4;
+                                    return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                                  case 4:
+                                    _context7.next = 6;
+                                    return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                                  case 6:
+                                    _context7.next = 9;
+                                    break;
+
+                                  case 8:
+                                    checkbox.checked = false;
+
+                                  case 9:
+                                  case "end":
+                                    return _context7.stop();
+                                }
+                              }
+                            });
+                          });
+                        }
+                      }
                     };
-                    newMedidor = {
-                      codigo: contratoCodigo.value,
-                      fechaInstalacion: medidorInstalacion.value,
-                      marca: medidorMarca.value,
-                      observacion: observacionDf,
-                      // barrio: medidorBarrio.value,
-                      // callePrincipal: medidorPrincipal.value,
-                      // calleSecundaria: medidorSecundaria.value,
-                      // numeroCasa: medidorNumeroCasa.value,
-                      // referencia: medidorReferencia.value,
-                      contratosId: editContratoId
-                    };
-                    _context5.next = 7;
-                    return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, newContrato));
 
-                  case 7:
-                    resultContrato = _context5.sent;
-                    console.log("vamos a crear un medidor");
-                    _context5.next = 11;
-                    return regeneratorRuntime.awrap(ipcRenderer.invoke("updateMedidor", editContratoId, newMedidor));
+                    checkboxDiv.appendChild(checkbox);
+                    checkboxDiv.appendChild(label);
+                    divRowBtn.appendChild(divValue);
+                    divRowBtn.appendChild(checkboxDiv);
+                    cardBody.appendChild(title);
+                    cardBody.appendChild(description);
+                    cardBody.appendChild(divRowBtn); // cardBody.appendChild(divValue);
+                    // cardBody.appendChild(checkboxDiv);
 
-                  case 11:
-                    _result = _context5.sent;
-                    console.log("Resultado del medidor: " + _result);
+                    card.appendChild(cardImage);
+                    card.appendChild(cardBody);
+                    cardContainer.appendChild(card);
+                    servicosDisponiblesList.appendChild(cardContainer);
 
-                    if (_result.id !== undefined) {
-                      console.log("Muestro result del medior: " + _result.id);
-                      contratarServicio(serviciosDisponibles[i].id, editContratoId);
-                    }
-
-                    _context5.next = 16;
-                    return regeneratorRuntime.awrap(editContrato(editContratoId));
-
-                  case 16:
-                    _context5.next = 18;
-                    return regeneratorRuntime.awrap(editContrato(editContratoId));
-
-                  case 18:
-                    _context5.next = 22;
-                    break;
-
-                  case 20:
-                    checkbox.checked = false;
-                    inHabilitarFormMedidor();
-
-                  case 22:
+                  case 60:
                   case "end":
-                    return _context5.stop();
+                    return _context8.stop();
                 }
               }
             });
-          });
-        }
-      } else {
-        Swal.fire({
-          title: "¿Quieres contratar este servicio para este contrato?",
-          text: "El valor se cargara en la planilla a partir del mes próximo.",
-          icon: "question",
-          iconColor: "#f8c471",
-          showCancelButton: true,
-          confirmButtonColor: "#2874A6",
-          cancelButtonColor: "#EC7063 ",
-          confirmButtonText: "Sí, continuar",
-          cancelButtonText: "Cancelar"
-        }).then(function _callee4(result) {
-          return regeneratorRuntime.async(function _callee4$(_context6) {
-            while (1) {
-              switch (_context6.prev = _context6.next) {
-                case 0:
-                  if (result.isConfirmed) {
-                    // Aquí puedes realizar la acción que desees cuando el usuario confirme.
-                    // checkbox.checked = true;
-                    contratarServicio(serviciosDisponibles[i].id, editContratoId); // await editContrato(editContratoId);
-                    // await editContrato(editContratoId);
-                  } else {
-                    checkbox.checked = false;
-                  }
+          };
 
-                case 1:
-                case "end":
-                  return _context6.stop();
-              }
-            }
-          });
-        });
+          i = 0;
+
+        case 4:
+          if (!(i < serviciosDisponibles.length)) {
+            _context9.next = 10;
+            break;
+          }
+
+          _context9.next = 7;
+          return regeneratorRuntime.awrap(_loop(i));
+
+        case 7:
+          i++;
+          _context9.next = 4;
+          break;
+
+        case 10:
+          marcarServiciosContratados();
+          console.log(serviciosDisponiblesAContratar[0]);
+
+        case 12:
+        case "end":
+          return _context9.stop();
       }
-    };
-
-    var label = document.createElement("label");
-    label.style.width = "100%";
-    label.classList.add("btn", "btn-outline-warning");
-    label.setAttribute("for", serviciosDisponibles[i].id);
-    label.textContent = "Contratar";
-    checkboxDiv.appendChild(checkbox);
-    checkboxDiv.appendChild(label);
-    divRowBtn.appendChild(divValue);
-    divRowBtn.appendChild(checkboxDiv);
-    cardBody.appendChild(title);
-    cardBody.appendChild(description);
-    cardBody.appendChild(divRowBtn); // cardBody.appendChild(divValue);
-    // cardBody.appendChild(checkboxDiv);
-
-    card.appendChild(cardImage);
-    card.appendChild(cardBody);
-    cardContainer.appendChild(card);
-    servicosDisponiblesList.appendChild(cardContainer);
-  };
-
-  for (var i = 0; i < serviciosDisponibles.length; i++) {
-    _loop(i);
-  }
-
-  marcarServiciosContratados();
-  console.log(serviciosDisponiblesAContratar[0]);
+    }
+  });
 }
 
 function marcarServiciosContratados() {
-  if (serviciosEditar !== null) {
-    console.log("Marcando servicios: " + serviciosEditar);
+  var _loop2, i;
 
-    var _loop2 = function _loop2(i) {
-      var checkContratados = document.getElementById(serviciosEditar[i].serviciosId);
-      checkContratados.checked = true;
+  return regeneratorRuntime.async(function marcarServiciosContratados$(_context12) {
+    while (1) {
+      switch (_context12.prev = _context12.next) {
+        case 0:
+          if (serviciosEditar !== null) {
+            console.log("Marcando servicios: " + serviciosEditar);
 
-      checkContratados.onclick = function () {
-        // checkContratados.checked = false;
-        Swal.fire({
-          title: "¿Quieres quitar este servicio de este contrato?",
-          text: "El valor no se cargara en la planilla a partir del mes próximo.",
-          icon: "question",
-          iconColor: "#f8c471",
-          showCancelButton: true,
-          confirmButtonColor: "#2874A6",
-          cancelButtonColor: "#EC7063 ",
-          confirmButtonText: "Sí, continuar",
-          cancelButtonText: "Cancelar"
-        }).then(function _callee5(result) {
-          var _newContrato2, resultContrato;
+            _loop2 = function _loop2(i) {
+              var checkContratados = document.getElementById(serviciosEditar[i].serviciosId);
+              checkContratados.checked = true;
+              var labelElement = document.querySelector('label[for="' + serviciosEditar[i].serviciosId + '"]');
+              labelElement.textContent = "Contratado";
+              console.log('Compartido: ', serviciosEditar[i]);
+              var compartidoSn = false;
 
-          return regeneratorRuntime.async(function _callee5$(_context7) {
-            while (1) {
-              switch (_context7.prev = _context7.next) {
-                case 0:
-                  if (!result.isConfirmed) {
-                    _context7.next = 16;
-                    break;
-                  }
-
-                  if (!(serviciosEditar[i].nombre === "Agua Potable")) {
-                    _context7.next = 9;
-                    break;
-                  }
-
-                  _newContrato2 = {
-                    medidorSn: "No"
-                  };
-                  _context7.next = 5;
-                  return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, _newContrato2));
-
-                case 5:
-                  resultContrato = _context7.sent;
-                  contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
-                  _context7.next = 10;
-                  break;
-
-                case 9:
-                  contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
-
-                case 10:
-                  _context7.next = 12;
-                  return regeneratorRuntime.awrap(editContrato(editContratoId));
-
-                case 12:
-                  _context7.next = 14;
-                  return regeneratorRuntime.awrap(editContrato(editContratoId));
-
-                case 14:
-                  _context7.next = 17;
-                  break;
-
-                case 16:
-                  checkContratados.checked = true;
-
-                case 17:
-                case "end":
-                  return _context7.stop();
+              if (serviciosEditar[i].IndividualSn == "Compartido") {
+                compartidoSn = true;
+                labelElement.innerHTML = 'Contratado<i class="mx-2 fa-solid fa-share-nodes"></i>'; // const compartidoContratado = await ipcRenderer.invoke(
+                //   "getCompartidosContratados",
+                //   serviciosEditar[i].id,
+                //   editSocioId
+                // );
+                // if (compartidoContratado.length > 0) {
+                //   compartidoAnteriorSn = true;
+                // }
               }
+
+              checkContratados.onclick = function () {
+                // checkContratados.checked = false;
+                if (compartidoSn) {
+                  Swal.fire({
+                    title: "¿Quieres quitar este servicio de este contrato?",
+                    text: "Este servicio es compartido al descontratarlo el resto de contratos \n" + "relacionados con el socio no se beneficiaran de el.\n" + "El valor no se cargara en la planilla a partir del mes próximo.",
+                    icon: "question",
+                    iconColor: "#f8c471",
+                    showCancelButton: true,
+                    confirmButtonColor: "#2874A6",
+                    cancelButtonColor: "#EC7063 ",
+                    confirmButtonText: "Sí, continuar",
+                    cancelButtonText: "Cancelar"
+                  }).then(function _callee6(result) {
+                    var _newContrato2, resultContrato;
+
+                    return regeneratorRuntime.async(function _callee6$(_context10) {
+                      while (1) {
+                        switch (_context10.prev = _context10.next) {
+                          case 0:
+                            if (!result.isConfirmed) {
+                              _context10.next = 16;
+                              break;
+                            }
+
+                            if (!(serviciosEditar[i].nombre === "Agua Potable")) {
+                              _context10.next = 9;
+                              break;
+                            }
+
+                            _newContrato2 = {
+                              medidorSn: "No"
+                            };
+                            _context10.next = 5;
+                            return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, _newContrato2));
+
+                          case 5:
+                            resultContrato = _context10.sent;
+                            contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
+                            _context10.next = 10;
+                            break;
+
+                          case 9:
+                            contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
+
+                          case 10:
+                            _context10.next = 12;
+                            return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                          case 12:
+                            _context10.next = 14;
+                            return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                          case 14:
+                            _context10.next = 17;
+                            break;
+
+                          case 16:
+                            checkContratados.checked = true;
+
+                          case 17:
+                          case "end":
+                            return _context10.stop();
+                        }
+                      }
+                    });
+                  });
+                } else {
+                  Swal.fire({
+                    title: "¿Quieres quitar este servicio de este contrato?",
+                    text: "El valor no se cargara en la planilla a partir del mes próximo.",
+                    icon: "question",
+                    iconColor: "#f8c471",
+                    showCancelButton: true,
+                    confirmButtonColor: "#2874A6",
+                    cancelButtonColor: "#EC7063 ",
+                    confirmButtonText: "Sí, continuar",
+                    cancelButtonText: "Cancelar"
+                  }).then(function _callee7(result) {
+                    var _newContrato3, resultContrato;
+
+                    return regeneratorRuntime.async(function _callee7$(_context11) {
+                      while (1) {
+                        switch (_context11.prev = _context11.next) {
+                          case 0:
+                            if (!result.isConfirmed) {
+                              _context11.next = 16;
+                              break;
+                            }
+
+                            if (!(serviciosEditar[i].nombre === "Agua Potable")) {
+                              _context11.next = 9;
+                              break;
+                            }
+
+                            _newContrato3 = {
+                              medidorSn: "No"
+                            };
+                            _context11.next = 5;
+                            return regeneratorRuntime.awrap(ipcRenderer.invoke("updateContrato", editContratoId, _newContrato3));
+
+                          case 5:
+                            resultContrato = _context11.sent;
+                            contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
+                            _context11.next = 10;
+                            break;
+
+                          case 9:
+                            contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
+
+                          case 10:
+                            _context11.next = 12;
+                            return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                          case 12:
+                            _context11.next = 14;
+                            return regeneratorRuntime.awrap(editContrato(editContratoId));
+
+                          case 14:
+                            _context11.next = 17;
+                            break;
+
+                          case 16:
+                            checkContratados.checked = true;
+
+                          case 17:
+                          case "end":
+                            return _context11.stop();
+                        }
+                      }
+                    });
+                  });
+                }
+              };
+            };
+
+            for (i = 0; i < serviciosEditar.length; i++) {
+              _loop2(i);
             }
-          });
-        });
-      };
+          }
 
-      var labelElement = document.querySelector('label[for="' + serviciosEditar[i].serviciosId + '"]');
-      labelElement.textContent = "Contratado";
-    };
-
-    for (var i = 0; i < serviciosEditar.length; i++) {
-      _loop2(i);
+        case 1:
+        case "end":
+          return _context12.stop();
+      }
     }
-  }
+  });
 } // ----------------------------------------------------------------
 // Funcion que muestra los detalles de los contratos registrados
 // segun se los seleccione
@@ -1334,24 +1469,25 @@ function marcarServiciosContratados() {
 
 var detallesContratos = function detallesContratos(id) {
   var serviciosContratos;
-  return regeneratorRuntime.async(function detallesContratos$(_context8) {
+  return regeneratorRuntime.async(function detallesContratos$(_context13) {
     while (1) {
-      switch (_context8.prev = _context8.next) {
+      switch (_context13.prev = _context13.next) {
         case 0:
           console.log("Detallles de : " + id);
-          contratoForm.reset();
-          _context8.next = 4;
+          contratoForm.reset(); // resetForm();
+
+          _context13.next = 4;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getServiciosContratadosById", id));
 
         case 4:
-          serviciosContratos = _context8.sent;
+          serviciosContratos = _context13.sent;
           renderServiciosContratados(serviciosContratos);
           console.log(serviciosContratos);
-          return _context8.abrupt("return", serviciosContratos);
+          return _context13.abrupt("return", serviciosContratos);
 
         case 8:
         case "end":
-          return _context8.stop();
+          return _context13.stop();
       }
     }
   });
@@ -1363,227 +1499,237 @@ var detallesContratos = function detallesContratos(id) {
 
 var editContrato = function editContrato(id) {
   var principalSn, contrato, conMedidor;
-  return regeneratorRuntime.async(function editContrato$(_context11) {
+  return regeneratorRuntime.async(function editContrato$(_context16) {
     while (1) {
-      switch (_context11.prev = _context11.next) {
+      switch (_context16.prev = _context16.next) {
         case 0:
           principalSn = "undefined";
           contratoForm.reset();
-          getServiciosDisponibles();
-          _context11.next = 5;
+          _context16.next = 4;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getDatosContratosById", id));
 
-        case 5:
-          contrato = _context11.sent;
-          console.log("Recibido: " + contrato);
+        case 4:
+          contrato = _context16.sent;
+          console.log("Recibido: " + contrato.sociosId);
+          editSocioId = contrato.sociosId;
+          console.log('Editosocio' + editSocioId);
+          getServiciosDisponibles();
+          _context16.next = 11;
+          return regeneratorRuntime.awrap(getContratosSimilares(editSocioId, contrato.id));
+
+        case 11:
+          if (contrato.serviciosCompartidos !== 0) {
+            serviciosCompartidos.value = contrato.serviciosCompartidos;
+          } else {
+            serviciosCompartidos.value = "0";
+          }
+
           conMedidor = contrato.medidorSn;
 
-          if (!(conMedidor == "Si")) {
-            _context11.next = 40;
-            break;
-          }
+          if (conMedidor == "Si") {
+            contratoConMedidor = true;
+            console.log("conMedidor");
+            habilitarFormMedidor();
+            contratoFecha.value = formatearFecha(contrato.fecha);
+            socioContratanteCedula.value = contrato.cedulaPasaporte;
+            socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
+            socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre;
+            contratoCodigo.value = contrato.codigo;
 
-          contratoConMedidor = true;
-          console.log("conMedidor");
-          _context11.next = 13;
-          return regeneratorRuntime.awrap(habilitarFormMedidor());
+            if (contrato.principalSn == "No") {
+              principalSn = "Secundario";
+              contratoPrincipalSn.value = principalSn;
 
-        case 13:
-          contratoFecha.value = formatearFecha(contrato.fecha);
-          socioContratanteCedula.value = contrato.cedulaPasaporte;
-          socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
-          socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre;
-          contratoCodigo.value = contrato.codigo;
+              contratoPrincipalSn.onclick = function () {
+                Swal.fire({
+                  title: "¿Quieres realizar cambios?",
+                  text: "Este contrato es " + principalSn + " por lo que no presentara valores por socio " + "puedes hacer de este un contrato principal actualizando el resto de contratos " + "de este socio a secundarios.",
+                  icon: "question",
+                  iconColor: "#f8c471",
+                  showCancelButton: true,
+                  confirmButtonColor: "#2874A6",
+                  cancelButtonColor: "#EC7063 ",
+                  confirmButtonText: "Cambiar a principal",
+                  cancelButtonText: "Cancelar"
+                }).then(function _callee8(result) {
+                  return regeneratorRuntime.async(function _callee8$(_context14) {
+                    while (1) {
+                      switch (_context14.prev = _context14.next) {
+                        case 0:
+                          if (result.isConfirmed) {
+                            Swal.fire({
+                              title: "Quieres confirmar esta accion?",
+                              text: "Actualizaremos este contrato como principal.",
+                              showCancelButton: true,
+                              confirmButtonText: "Aceptar",
+                              cancelButtonText: "Cancelar"
+                            }).then(function (result) {
+                              if (result.isConfirmed) {
+                                // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                                cambiarContratoPrincipal(contrato.id, contrato.sociosId);
+                              }
+                            });
+                          }
 
-          if (contrato.principalSn == "No") {
-            principalSn = "Secundario";
-            contratoPrincipalSn.value = principalSn;
-
-            contratoPrincipalSn.onclick = function () {
-              Swal.fire({
-                title: "¿Quieres realizar cambios?",
-                text: "Este contrato es " + principalSn + " por lo que no presentara valores por socio " + "puedes hacer de este un contrato principal actualizando el resto de contratos " + "de este socio a secundarios.",
-                icon: "question",
-                iconColor: "#f8c471",
-                showCancelButton: true,
-                confirmButtonColor: "#2874A6",
-                cancelButtonColor: "#EC7063 ",
-                confirmButtonText: "Cambiar a principal",
-                cancelButtonText: "Cancelar"
-              }).then(function _callee6(result) {
-                return regeneratorRuntime.async(function _callee6$(_context9) {
-                  while (1) {
-                    switch (_context9.prev = _context9.next) {
-                      case 0:
-                        if (result.isConfirmed) {
-                          Swal.fire({
-                            title: "Quieres confirmar esta accion?",
-                            text: "Actualizaremos este contrato como principal.",
-                            showCancelButton: true,
-                            confirmButtonText: "Aceptar",
-                            cancelButtonText: "Cancelar"
-                          }).then(function (result) {
-                            if (result.isConfirmed) {
-                              // Aquí puedes realizar la acción que desees cuando el usuario confirme.
-                              cambiarContratoPrincipal(contrato.id, contrato.sociosId);
-                            }
-                          });
-                        }
-
-                      case 1:
-                      case "end":
-                        return _context9.stop();
+                        case 1:
+                        case "end":
+                          return _context14.stop();
+                      }
                     }
-                  }
+                  });
                 });
-              });
-            };
-          } else {
-            principalSn = "Principal";
-            contratoPrincipalSn.value = principalSn; // ----------------------------------------------------------------
-            // Cambiar el contrato principal.
-            // ----------------------------------------------------------------
+              };
+            } else {
+              principalSn = "Principal";
+              contratoPrincipalSn.value = principalSn; // ----------------------------------------------------------------
+              // Cambiar el contrato principal.
+              // ----------------------------------------------------------------
 
-            contratoPrincipalSn.onclick = function () {
-              Swal.fire({
-                title: "Contrato principal",
-                text: "Los valores por socio se" + "cargaran en las planillas de este contrato.",
-                icon: "info",
-                iconColor: "green",
-                showConfirmButton: true,
-                confirmButtonText: "Sandy",
-                confirmButtonColor: "green"
-              });
-            };
-          }
-
-          contratoConMedidor = true; //medidorCodigo.value = contrato.codigoMedidor;
-
-          medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
-          medidorMarca.value = contrato.marca;
-          medidorObservacion.value = contrato.observacion;
-          medidorBarrio.value = contrato.barrio;
-          medidorPrincipal.value = contrato.callePrincipal;
-          medidorSecundaria.value = contrato.calleSecundaria;
-          medidorNumeroCasa.value = contrato.numeroCasa;
-          medidorReferencia.value = contrato.referencia; // Permitimos editar los datos del medidor
-          // medidorCodigo.disabled = false;
-
-          medidorInstalacion.readOnly = true;
-          medidorInstalacion.disabled = false;
-          medidorMarca.disabled = false;
-          medidorObservacion.disabled = false; // Inhabilitamos los campos que no se deben editar
-
-          contratoFecha.readOnly = true;
-          socioContratanteCedula.readOnly = true;
-          socioContratanteApellido.readOnly = true;
-          socioContratanteNombre.readOnly = true;
-          generarCodigoBt.disabled = true; // ~~~~~~~~~~~~~~~~
-
-          editContratoId = contrato.id;
-          _context11.next = 61;
-          break;
-
-        case 40:
-          console.log("sinMedidor");
-          contratoConMedidor = false;
-          inHabilitarFormMedidor();
-          contratoCodigo.value = contrato.codigo;
-          contratoFecha.value = formatearFecha(contrato.fecha);
-
-          if (contrato.principalSn == "No") {
-            principalSn = "Secundario";
-            contratoPrincipalSn.value = principalSn;
-
-            contratoPrincipalSn.onclick = function () {
-              Swal.fire({
-                title: "¿Quieres realizar cambios?",
-                text: "Este contrato es " + principalSn + " por lo que no presentara valores por socio " + "puedes hacer de este un contrato principal actualizando el resto de contratos " + "de este socio a secundarios.",
-                icon: "question",
-                iconColor: "#f8c471",
-                showCancelButton: true,
-                confirmButtonColor: "#2874A6",
-                cancelButtonColor: "#EC7063 ",
-                confirmButtonText: "Cambiar a principal",
-                cancelButtonText: "Cancelar"
-              }).then(function _callee7(result) {
-                return regeneratorRuntime.async(function _callee7$(_context10) {
-                  while (1) {
-                    switch (_context10.prev = _context10.next) {
-                      case 0:
-                        if (result.isConfirmed) {
-                          Swal.fire({
-                            title: "Quieres confirmar esta accion?",
-                            text: "Actualizaremos este contrato como principal.",
-                            showCancelButton: true,
-                            confirmButtonText: "Aceptar",
-                            cancelButtonText: "Cancelar"
-                          }).then(function (result) {
-                            if (result.isConfirmed) {
-                              cambiarContratoPrincipal(contrato.id, contrato.sociosId); // Aquí puedes realizar la acción que desees cuando el usuario confirme.
-                            }
-                          });
-                        }
-
-                      case 1:
-                      case "end":
-                        return _context10.stop();
-                    }
-                  }
+              contratoPrincipalSn.onclick = function () {
+                Swal.fire({
+                  title: "Contrato principal",
+                  text: "Los valores por socio se" + "cargaran en las planillas de este contrato.",
+                  icon: "info",
+                  iconColor: "green",
+                  showConfirmButton: true,
+                  confirmButtonText: "Sandy",
+                  confirmButtonColor: "green"
                 });
-              });
-            };
-          } else {
-            principalSn = "Principal";
-            contratoPrincipalSn.value = principalSn; // ----------------------------------------------------------------
-            // Cambiar el contrato principal.
-            // ----------------------------------------------------------------
+              };
+            }
 
-            contratoPrincipalSn.onclick = function () {
-              Swal.fire({
-                title: "Contrato principal",
-                text: "Los valores por socio se" + "cargaran en las planillas de este contrato.",
-                icon: "info",
-                iconColor: "green",
-                showConfirmButton: true,
-                confirmButtonText: "Aceptar",
-                confirmButtonColor: "green"
-              });
-            };
-          }
+            contratoConMedidor = true; //medidorCodigo.value = contrato.codigoMedidor;
 
-          socioContratanteCedula.value = contrato.cedulaPasaporte;
-          socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
-          socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre; // medidorCodigo.value = medidor.codigo;
-          // medidorInstalacion.value = formatearFecha(medidor.fechaInstalacion);
-          // medidoresDisponibles.selectedIndex = 0;
-          // medidorMarca.value = medidor.marca;
-          // medidorBarrio.value = medidor.barrio;
-          // medidorObservacion.value = medidor.observacion;
-
-          medidorBarrio.value = contrato.barrio;
-          medidorPrincipal.value = contrato.callePrincipal;
-          medidorSecundaria.value = contrato.calleSecundaria;
-          medidorNumeroCasa.value = contrato.numeroCasa;
-          medidorReferencia.value = contrato.referencia; // Permitimos editar los datos del medidor
-          // medidorCodigo.disabled = false;
-          // Inhabilitamos los campos que no se deben editar
-
-          if (contrato.codigoMedidor != undefined) {
             medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
             medidorMarca.value = contrato.marca;
             medidorObservacion.value = contrato.observacion;
+            medidorBarrio.value = contrato.barrio;
+            medidorPrincipal.value = contrato.callePrincipal;
+            medidorSecundaria.value = contrato.calleSecundaria;
+            medidorNumeroCasa.value = contrato.numeroCasa;
+            medidorReferencia.value = contrato.referencia; // Permitimos editar los datos del medidor
+            // medidorCodigo.disabled = false;
+
+            medidorInstalacion.readOnly = true;
+            medidorInstalacion.disabled = false;
+            medidorMarca.disabled = false;
+            medidorObservacion.disabled = false;
+            serviciosCompartidos.disabled = false; // Inhabilitamos los campos que no se deben editar
+
+            contratoFecha.readOnly = true;
+            socioContratanteCedula.readOnly = true;
+            socioContratanteApellido.readOnly = true;
+            socioContratanteNombre.readOnly = true;
+            generarCodigoBt.disabled = true; // ~~~~~~~~~~~~~~~~
+
+            editContratoId = contrato.id;
+          } else {
+            console.log("sinMedidor");
+            contratoConMedidor = false;
+            inHabilitarFormMedidor();
+            contratoCodigo.value = contrato.codigo;
+
+            if (contrato.fecha !== null) {
+              contratoFecha.value = formatearFecha(contrato.fecha);
+            }
+
+            if (contrato.principalSn == "No") {
+              principalSn = "Secundario";
+              contratoPrincipalSn.value = principalSn;
+
+              contratoPrincipalSn.onclick = function () {
+                Swal.fire({
+                  title: "¿Quieres realizar cambios?",
+                  text: "Este contrato es " + principalSn + " por lo que no presentara valores por socio " + "puedes hacer de este un contrato principal actualizando el resto de contratos " + "de este socio a secundarios.",
+                  icon: "question",
+                  iconColor: "#f8c471",
+                  showCancelButton: true,
+                  confirmButtonColor: "#2874A6",
+                  cancelButtonColor: "#EC7063 ",
+                  confirmButtonText: "Cambiar a principal",
+                  cancelButtonText: "Cancelar"
+                }).then(function _callee9(result) {
+                  return regeneratorRuntime.async(function _callee9$(_context15) {
+                    while (1) {
+                      switch (_context15.prev = _context15.next) {
+                        case 0:
+                          if (result.isConfirmed) {
+                            Swal.fire({
+                              title: "Quieres confirmar esta accion?",
+                              text: "Actualizaremos este contrato como principal.",
+                              showCancelButton: true,
+                              confirmButtonText: "Aceptar",
+                              cancelButtonText: "Cancelar"
+                            }).then(function (result) {
+                              if (result.isConfirmed) {
+                                cambiarContratoPrincipal(contrato.id, contrato.sociosId); // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+                              }
+                            });
+                          }
+
+                        case 1:
+                        case "end":
+                          return _context15.stop();
+                      }
+                    }
+                  });
+                });
+              };
+            } else {
+              principalSn = "Principal";
+              contratoPrincipalSn.value = principalSn; // ----------------------------------------------------------------
+              // Cambiar el contrato principal.
+              // ----------------------------------------------------------------
+
+              contratoPrincipalSn.onclick = function () {
+                Swal.fire({
+                  title: "Contrato principal",
+                  text: "Los valores por socio se" + "cargaran en las planillas de este contrato.",
+                  icon: "info",
+                  iconColor: "green",
+                  showConfirmButton: true,
+                  confirmButtonText: "Aceptar",
+                  confirmButtonColor: "green"
+                });
+              };
+            }
+
+            socioContratanteCedula.value = contrato.cedulaPasaporte;
+            socioContratanteApellido.value = contrato.primerApellido + " " + contrato.segundoApellido;
+            socioContratanteNombre.value = contrato.primerNombre + " " + contrato.segundoNombre; // medidorCodigo.value = medidor.codigo;
+            // medidorInstalacion.value = formatearFecha(medidor.fechaInstalacion);
+            // medidoresDisponibles.selectedIndex = 0;
+            // medidorMarca.value = medidor.marca;
+            // medidorBarrio.value = medidor.barrio;
+            // medidorObservacion.value = medidor.observacion;
+
+            medidorBarrio.value = contrato.barrio;
+            medidorPrincipal.value = contrato.callePrincipal;
+            medidorSecundaria.value = contrato.calleSecundaria;
+            medidorNumeroCasa.value = contrato.numeroCasa;
+            medidorReferencia.value = contrato.referencia; // Permitimos editar los datos del medidor
+            // medidorCodigo.disabled = false;
+            // Inhabilitamos los campos que no se deben editar
+
+            if (contrato.codigoMedidor != undefined) {
+              if (contrato.fechaInstalacion != undefined) {
+                medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
+              }
+
+              medidorMarca.value = contrato.marca;
+              medidorObservacion.value = contrato.observacion;
+            }
+
+            serviciosCompartidos.disabled = false;
+            contratoFecha.readOnly = true;
+            socioContratanteCedula.readOnly = true;
+            socioContratanteApellido.readOnly = true;
+            socioContratanteNombre.readOnly = true;
+            generarCodigoBt.disabled = true; // ~~~~~~~~~~~~~~~~
+
+            editContratoId = contrato.id;
           }
 
-          contratoFecha.readOnly = true;
-          socioContratanteCedula.readOnly = true;
-          socioContratanteApellido.readOnly = true;
-          socioContratanteNombre.readOnly = true;
-          generarCodigoBt.disabled = true; // ~~~~~~~~~~~~~~~~
-
-          editContratoId = contrato.id;
-
-        case 61:
           socioContratanteId = contrato.sociosId;
           editingStatus = true;
           console.log(contrato);
@@ -1593,9 +1739,9 @@ var editContrato = function editContrato(id) {
           seccion2.classList.remove("active");
           seccion1.classList.add("active");
 
-        case 69:
+        case 22:
         case "end":
-          return _context11.stop();
+          return _context16.stop();
       }
     }
   });
@@ -1603,28 +1749,28 @@ var editContrato = function editContrato(id) {
 
 function cambiarContratoPrincipal(contratoId, socioId) {
   var cambioPrincipal;
-  return regeneratorRuntime.async(function cambiarContratoPrincipal$(_context12) {
+  return regeneratorRuntime.async(function cambiarContratoPrincipal$(_context17) {
     while (1) {
-      switch (_context12.prev = _context12.next) {
+      switch (_context17.prev = _context17.next) {
         case 0:
-          _context12.prev = 0;
-          _context12.next = 3;
+          _context17.prev = 0;
+          _context17.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("updatePrincipal", contratoId, socioId));
 
         case 3:
-          cambioPrincipal = _context12.sent;
+          cambioPrincipal = _context17.sent;
           editContrato(contratoId);
-          _context12.next = 10;
+          _context17.next = 10;
           break;
 
         case 7:
-          _context12.prev = 7;
-          _context12.t0 = _context12["catch"](0);
-          console.log(_context12.t0);
+          _context17.prev = 7;
+          _context17.t0 = _context17["catch"](0);
+          console.log(_context17.t0);
 
         case 10:
         case "end":
-          return _context12.stop();
+          return _context17.stop();
       }
     }
   }, null, null, [[0, 7]]);
@@ -1635,29 +1781,29 @@ function cambiarContratoPrincipal(contratoId, socioId) {
 
 
 function editarServiciosContratados(id) {
-  return regeneratorRuntime.async(function editarServiciosContratados$(_context13) {
+  return regeneratorRuntime.async(function editarServiciosContratados$(_context18) {
     while (1) {
-      switch (_context13.prev = _context13.next) {
+      switch (_context18.prev = _context18.next) {
         case 0:
-          _context13.prev = 0;
-          _context13.next = 3;
+          _context18.prev = 0;
+          _context18.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getServiciosContratadosById", id));
 
         case 3:
-          serviciosEditar = _context13.sent;
+          serviciosEditar = _context18.sent;
           //serviciosContratadosList.push(serviciosContratados.serviciosFijosId);
           console.log("Servicios a editar: ", serviciosEditar);
-          _context13.next = 10;
+          _context18.next = 10;
           break;
 
         case 7:
-          _context13.prev = 7;
-          _context13.t0 = _context13["catch"](0);
-          console.log("Error al cargar los servicios contratados para " + id + " : " + _context13.t0);
+          _context18.prev = 7;
+          _context18.t0 = _context18["catch"](0);
+          console.log("Error al cargar los servicios contratados para " + id + " : " + _context18.t0);
 
         case 10:
         case "end":
-          return _context13.stop();
+          return _context18.stop();
       }
     }
   }, null, null, [[0, 7]]);
@@ -1668,53 +1814,109 @@ function editarServiciosContratados(id) {
 
 var deleteMedidor = function deleteMedidor(id) {
   var response, result;
-  return regeneratorRuntime.async(function deleteMedidor$(_context14) {
+  return regeneratorRuntime.async(function deleteMedidor$(_context19) {
     while (1) {
-      switch (_context14.prev = _context14.next) {
+      switch (_context19.prev = _context19.next) {
         case 0:
           response = confirm("Estas seguro de eliminar este medidor?");
 
           if (!response) {
-            _context14.next = 8;
+            _context19.next = 8;
             break;
           }
 
           console.log("id from medidores.js");
-          _context14.next = 5;
+          _context19.next = 5;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("deleteMedidor", id));
 
         case 5:
-          result = _context14.sent;
+          result = _context19.sent;
           console.log("Resultado medidores.js", result);
           getContratos();
 
         case 8:
         case "end":
-          return _context14.stop();
+          return _context19.stop();
       }
     }
   });
 }; // ----------------------------------------------------------------
+// Funcion que carga los contratos relacionados con el socio.
+// ----------------------------------------------------------------
+
+
+var getContratosSimilares = function getContratosSimilares(socioId, contratoId) {
+  var contratosSimilares;
+  return regeneratorRuntime.async(function getContratosSimilares$(_context20) {
+    while (1) {
+      switch (_context20.prev = _context20.next) {
+        case 0:
+          _context20.next = 2;
+          return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosSimilares", socioId));
+
+        case 2:
+          contratosSimilares = _context20.sent;
+          console.log(contratosSimilares);
+          renderContratosSimilares(contratosSimilares, contratoId);
+
+        case 5:
+        case "end":
+          return _context20.stop();
+      }
+    }
+  });
+};
+
+function renderContratosSimilares(contratosSimilares, contratoId) {
+  return regeneratorRuntime.async(function renderContratosSimilares$(_context21) {
+    while (1) {
+      switch (_context21.prev = _context21.next) {
+        case 0:
+          // serviciosCompartidos.innerHTML = "";
+          serviciosCompartidos.innerHTML = '<option value="0" selected>Sin servicios compartidos</option>';
+          contratosSimilares.forEach(function (contratosSimilar) {
+            var option = document.createElement("option");
+            option.value = contratosSimilar.id;
+            option.text = contratosSimilar.codigo + " ( " + contratosSimilar.barrio + ", " + contratosSimilar.callePrincipal + ", " + contratosSimilar.calleSecundaria + ", " + contratosSimilar.numeroCasa + " ).";
+
+            if (contratoId !== undefined) {
+              console.log("Comparar: " + contratoId, " | ", contratosSimilar.id);
+
+              if (contratoId !== contratosSimilar.id) {
+                serviciosCompartidos.appendChild(option);
+              }
+            } else {
+              serviciosCompartidos.appendChild(option);
+            }
+          });
+
+        case 2:
+        case "end":
+          return _context21.stop();
+      }
+    }
+  });
+} // ----------------------------------------------------------------
 // Funcion que consulta los contratos con medidor
 // ----------------------------------------------------------------
 
 
 var getContratos = function getContratos() {
-  return regeneratorRuntime.async(function getContratos$(_context15) {
+  return regeneratorRuntime.async(function getContratos$(_context22) {
     while (1) {
-      switch (_context15.prev = _context15.next) {
+      switch (_context22.prev = _context22.next) {
         case 0:
-          _context15.next = 2;
+          _context22.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosConMedidor"));
 
         case 2:
-          datosContratos = _context15.sent;
+          datosContratos = _context22.sent;
           console.log(datosContratos);
           renderContratosConMedidor(datosContratos);
 
         case 5:
         case "end":
-          return _context15.stop();
+          return _context22.stop();
       }
     }
   });
@@ -1724,21 +1926,21 @@ var getContratos = function getContratos() {
 
 
 var getContratosSinMedidor = function getContratosSinMedidor() {
-  return regeneratorRuntime.async(function getContratosSinMedidor$(_context16) {
+  return regeneratorRuntime.async(function getContratosSinMedidor$(_context23) {
     while (1) {
-      switch (_context16.prev = _context16.next) {
+      switch (_context23.prev = _context23.next) {
         case 0:
-          _context16.next = 2;
+          _context23.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosSinMedidor"));
 
         case 2:
-          datosContratosSinMedidor = _context16.sent;
+          datosContratosSinMedidor = _context23.sent;
           console.log("Here: ", datosContratosSinMedidor);
           renderContratosSinMedidor(datosContratosSinMedidor);
 
         case 5:
         case "end":
-          return _context16.stop();
+          return _context23.stop();
       }
     }
   });
@@ -1748,22 +1950,26 @@ var getContratosSinMedidor = function getContratosSinMedidor() {
 
 
 var getServiciosDisponibles = function getServiciosDisponibles() {
-  return regeneratorRuntime.async(function getServiciosDisponibles$(_context17) {
+  return regeneratorRuntime.async(function getServiciosDisponibles$(_context24) {
     while (1) {
-      switch (_context17.prev = _context17.next) {
+      switch (_context24.prev = _context24.next) {
         case 0:
-          _context17.next = 2;
+          _context24.next = 2;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getServiciosDisponibles"));
 
         case 2:
-          serviciosDisponibles = _context17.sent;
-          console.log(serviciosDisponibles);
-          renderServiciosDisponibles(serviciosDisponibles);
-          eventoServiciosId(serviciosDisponibles);
+          serviciosDisponibles = _context24.sent;
+          console.log('srv dsp', serviciosDisponibles);
+          _context24.next = 6;
+          return regeneratorRuntime.awrap(renderServiciosDisponibles(serviciosDisponibles));
 
         case 6:
+          _context24.next = 8;
+          return regeneratorRuntime.awrap(eventoServiciosId(serviciosDisponibles));
+
+        case 8:
         case "end":
-          return _context17.stop();
+          return _context24.stop();
       }
     }
   });
@@ -1773,20 +1979,20 @@ var getServiciosDisponibles = function getServiciosDisponibles() {
 
 
 function init() {
-  return regeneratorRuntime.async(function init$(_context18) {
+  return regeneratorRuntime.async(function init$(_context25) {
     while (1) {
-      switch (_context18.prev = _context18.next) {
+      switch (_context25.prev = _context25.next) {
         case 0:
-          _context18.next = 2;
+          _context25.next = 2;
           return regeneratorRuntime.awrap(getContratos());
 
         case 2:
-          _context18.next = 4;
+          _context25.next = 4;
           return regeneratorRuntime.awrap(getContratosSinMedidor());
 
         case 4:
         case "end":
-          return _context18.stop();
+          return _context25.stop();
       }
     }
   });
@@ -1812,16 +2018,16 @@ function formatearFecha(fecha) {
 
 function obtenerSugerencias() {
   var cedulasSugerencias;
-  return regeneratorRuntime.async(function obtenerSugerencias$(_context19) {
+  return regeneratorRuntime.async(function obtenerSugerencias$(_context26) {
     while (1) {
-      switch (_context19.prev = _context19.next) {
+      switch (_context26.prev = _context26.next) {
         case 0:
-          _context19.prev = 0;
-          _context19.next = 3;
+          _context26.prev = 0;
+          _context26.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getSocios"));
 
         case 3:
-          cedulasSugerencias = _context19.sent;
+          cedulasSugerencias = _context26.sent;
           sugerencias = cedulasSugerencias.map(function (objeto) {
             return objeto; // objeto.cedulaPasaporte +
             // " " +
@@ -1833,17 +2039,17 @@ function obtenerSugerencias() {
             // " " +
             // objeto.segundoApellido
           });
-          _context19.next = 10;
+          _context26.next = 10;
           break;
 
         case 7:
-          _context19.prev = 7;
-          _context19.t0 = _context19["catch"](0);
-          console.error("Error al obtener las sugerencias:", _context19.t0);
+          _context26.prev = 7;
+          _context26.t0 = _context26["catch"](0);
+          console.error("Error al obtener las sugerencias:", _context26.t0);
 
         case 10:
         case "end":
-          return _context19.stop();
+          return _context26.stop();
       }
     }
   }, null, null, [[0, 7]]);
@@ -1923,25 +2129,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var obtenerDatosSocioContratante = function obtenerDatosSocioContratante(cedula) {
   var socioContratante;
-  return regeneratorRuntime.async(function obtenerDatosSocioContratante$(_context20) {
+  return regeneratorRuntime.async(function obtenerDatosSocioContratante$(_context27) {
     while (1) {
-      switch (_context20.prev = _context20.next) {
+      switch (_context27.prev = _context27.next) {
         case 0:
           console.log("Se llamo a la carga de datos del contratante", cedula);
-          _context20.next = 3;
+          _context27.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratanteByCedula", cedula));
 
         case 3:
-          socioContratante = _context20.sent;
+          socioContratante = _context27.sent;
+          socioContratanteCedula.value = cedula;
           socioContratanteNombre.value = socioContratante.primerNombre + " " + socioContratante.segundoNombre;
           socioContratanteApellido.value = socioContratante.primerApellido + " " + socioContratante.segundoApellido;
           socioContratanteId = socioContratante.id;
           console.log(socioContratante);
           verificarContratosAnteriores(cedula);
 
-        case 9:
+        case 10:
         case "end":
-          return _context20.stop();
+          return _context27.stop();
       }
     }
   });
@@ -1952,21 +2159,22 @@ var obtenerDatosSocioContratante = function obtenerDatosSocioContratante(cedula)
 
 var verificarContratosAnteriores = function verificarContratosAnteriores(cedula) {
   var contratos;
-  return regeneratorRuntime.async(function verificarContratosAnteriores$(_context21) {
+  return regeneratorRuntime.async(function verificarContratosAnteriores$(_context28) {
     while (1) {
-      switch (_context21.prev = _context21.next) {
+      switch (_context28.prev = _context28.next) {
         case 0:
           console.log("Se llamo a la verificacion de contratos", cedula);
-          _context21.next = 3;
+          _context28.next = 3;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getContratosAnterioresByCedula", cedula));
 
         case 3:
-          contratos = _context21.sent;
+          contratos = _context28.sent;
           console.log(contratos);
+          renderContratosSimilares(contratos);
 
-        case 5:
+        case 6:
         case "end":
-          return _context21.stop();
+          return _context28.stop();
       }
     }
   });
@@ -2042,17 +2250,17 @@ function inHabilitarFormMedidor() {
 
 function generarCodigo() {
   var codigoGenerado, barrio, sectores, selectElement, numeroContrato, select, codigoInput;
-  return regeneratorRuntime.async(function generarCodigo$(_context22) {
+  return regeneratorRuntime.async(function generarCodigo$(_context29) {
     while (1) {
-      switch (_context22.prev = _context22.next) {
+      switch (_context29.prev = _context29.next) {
         case 0:
           codigoGenerado = "error";
           barrio = "No seleccionado";
-          _context22.next = 4;
+          _context29.next = 4;
           return regeneratorRuntime.awrap(ipcRenderer.invoke("getSectores"));
 
         case 4:
-          sectores = _context22.sent;
+          sectores = _context29.sent;
           selectElement = document.createElement("select");
           selectElement.id = "sectorNombre";
           selectElement.classList.add("form-select"); // Itera sobre la lista de sectores y agrega opciones al select
@@ -2120,7 +2328,7 @@ function generarCodigo() {
 
         case 18:
         case "end":
-          return _context22.stop();
+          return _context29.stop();
       }
     }
   });
@@ -2157,17 +2365,17 @@ medidorSinMedidor.onchange = function () {
   }
 };
 
-ipcRenderer.on("contrato-desde-socios", function _callee8(event, socioId, socioCedula) {
-  return regeneratorRuntime.async(function _callee8$(_context23) {
+ipcRenderer.on("contrato-desde-socios", function _callee10(event, socioId, socioCedula) {
+  return regeneratorRuntime.async(function _callee10$(_context30) {
     while (1) {
-      switch (_context23.prev = _context23.next) {
+      switch (_context30.prev = _context30.next) {
         case 0:
           console.log("Socio id recibido: " + socioId, socioCedula);
           obtenerDatosSocioContratante(socioCedula);
 
         case 2:
         case "end":
-          return _context23.stop();
+          return _context30.stop();
       }
     }
   });
@@ -2201,15 +2409,15 @@ ipcRenderer.on("Notificar", function (event, response) {
 });
 
 function resetFormAfterUpdate() {
-  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context24) {
+  return regeneratorRuntime.async(function resetFormAfterUpdate$(_context31) {
     while (1) {
-      switch (_context24.prev = _context24.next) {
+      switch (_context31.prev = _context31.next) {
         case 0:
-          _context24.next = 2;
+          _context31.next = 2;
           return regeneratorRuntime.awrap(getContratos());
 
         case 2:
-          _context24.next = 4;
+          _context31.next = 4;
           return regeneratorRuntime.awrap(getContratosSinMedidor());
 
         case 4:
@@ -2218,22 +2426,22 @@ function resetFormAfterUpdate() {
 
         case 6:
         case "end":
-          return _context24.stop();
+          return _context31.stop();
       }
     }
   });
 }
 
 function resetFormAfterSave() {
-  return regeneratorRuntime.async(function resetFormAfterSave$(_context25) {
+  return regeneratorRuntime.async(function resetFormAfterSave$(_context32) {
     while (1) {
-      switch (_context25.prev = _context25.next) {
+      switch (_context32.prev = _context32.next) {
         case 0:
-          _context25.next = 2;
+          _context32.next = 2;
           return regeneratorRuntime.awrap(getContratos());
 
         case 2:
-          _context25.next = 4;
+          _context32.next = 4;
           return regeneratorRuntime.awrap(getContratosSinMedidor());
 
         case 4:
@@ -2245,15 +2453,17 @@ function resetFormAfterSave() {
 
         case 6:
         case "end":
-          return _context25.stop();
+          return _context32.stop();
       }
     }
   });
 }
 
 function resetForm() {
+  serviciosCompartidos.disabled = true;
   editingStatus = false;
   editContratoId = "";
+  editSocioId = "";
   contratoForm.reset();
   mensajeError.textContent = "";
   inHabilitarFormMedidor();
@@ -2264,6 +2474,7 @@ function resetForm() {
 }
 
 function habilitarNuevoContrato() {
+  serviciosCompartidos.disabled = true;
   socioContratanteCedula.readOnly = false;
   socioContratanteApellido.readOnly = false;
   socioContratanteNombre.readOnly = false;
@@ -2317,153 +2528,179 @@ btnSeccion2.addEventListener("click", function () {
 // funciones de trancision entre interfaces
 // ----------------------------------------------------------------
 
-var abrirInicio = function abrirInicio() {
-  var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context26) {
-    while (1) {
-      switch (_context26.prev = _context26.next) {
-        case 0:
-          url = "src/ui/principal.html";
-          _context26.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+function cerrarSesion() {
+  ipcRenderer.send("cerrarSesion");
+}
 
-        case 3:
+ipcRenderer.on("sesionCerrada", function _callee11() {
+  var acceso, url;
+  return regeneratorRuntime.async(function _callee11$(_context33) {
+    while (1) {
+      switch (_context33.prev = _context33.next) {
+        case 0:
+          acceso = sessionStorage.getItem("acceso");
+          url = "Login";
+          _context33.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
+
+        case 4:
         case "end":
-          return _context26.stop();
+          return _context33.stop();
+      }
+    }
+  });
+});
+
+var abrirInicio = function abrirInicio() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirInicio$(_context34) {
+    while (1) {
+      switch (_context34.prev = _context34.next) {
+        case 0:
+          acceso = sessionStorage.getItem("acceso");
+          url = "Inicio";
+          _context34.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
+
+        case 4:
+        case "end":
+          return _context34.stop();
       }
     }
   });
 };
 
 var abrirSocios = function abrirSocios() {
-  var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context27) {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirSocios$(_context35) {
     while (1) {
-      switch (_context27.prev = _context27.next) {
+      switch (_context35.prev = _context35.next) {
         case 0:
-          url = "src/ui/socios.html";
-          _context27.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Socios";
+          _context35.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
-          return _context27.stop();
+          return _context35.stop();
       }
     }
   });
 };
 
 var abrirUsuarios = function abrirUsuarios() {
-  var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context28) {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirUsuarios$(_context36) {
     while (1) {
-      switch (_context28.prev = _context28.next) {
+      switch (_context36.prev = _context36.next) {
         case 0:
-          url = "src/ui/usuarios.html";
-          _context28.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Usuarios";
+          _context36.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
-          return _context28.stop();
+          return _context36.stop();
       }
     }
   });
 };
 
 var abrirPagos = function abrirPagos() {
-  var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context29) {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirPagos$(_context37) {
     while (1) {
-      switch (_context29.prev = _context29.next) {
+      switch (_context37.prev = _context37.next) {
         case 0:
-          url = "src/ui/planillas.html";
-          _context29.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Pagos";
+          _context37.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
-          return _context29.stop();
+          return _context37.stop();
       }
     }
   });
 };
 
 var abrirPlanillas = function abrirPlanillas() {
-  var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context30) {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirPlanillas$(_context38) {
     while (1) {
-      switch (_context30.prev = _context30.next) {
+      switch (_context38.prev = _context38.next) {
         case 0:
-          url = "src/ui/planillas.html";
-          _context30.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Planillas";
+          _context38.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
-          return _context30.stop();
-      }
-    }
-  });
-};
-
-var abrirParametros = function abrirParametros() {
-  var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context31) {
-    while (1) {
-      switch (_context31.prev = _context31.next) {
-        case 0:
-          url = "src/ui/parametros.html";
-          _context31.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context31.stop();
-      }
-    }
-  });
-};
-
-var abrirImplementos = function abrirImplementos() {
-  var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context32) {
-    while (1) {
-      switch (_context32.prev = _context32.next) {
-        case 0:
-          url = "src/ui/implementos.html";
-          _context32.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
-
-        case 3:
-        case "end":
-          return _context32.stop();
+          return _context38.stop();
       }
     }
   });
 };
 
 var abrirContratos = function abrirContratos() {
-  var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context33) {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirContratos$(_context39) {
     while (1) {
-      switch (_context33.prev = _context33.next) {
+      switch (_context39.prev = _context39.next) {
         case 0:
-          url = "src/ui/medidores.html";
-          _context33.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Contratos";
+          _context39.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
-          return _context33.stop();
+          return _context39.stop();
       }
     }
   });
 };
 
-function mostrarLogin() {
-  var dialog = document.getElementById("loginDialog");
-  dialog.showModal();
-}
+var abrirServicios = function abrirServicios() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirServicios$(_context40) {
+    while (1) {
+      switch (_context40.prev = _context40.next) {
+        case 0:
+          acceso = sessionStorage.getItem("acceso");
+          url = "Servicios fijos";
+          _context40.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
+
+        case 4:
+        case "end":
+          return _context40.stop();
+      }
+    }
+  });
+};
+
+var abrirCuotas = function abrirCuotas() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirCuotas$(_context41) {
+    while (1) {
+      switch (_context41.prev = _context41.next) {
+        case 0:
+          acceso = sessionStorage.getItem("acceso");
+          url = "Servicios ocacionales";
+          _context41.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
+
+        case 4:
+        case "end":
+          return _context41.stop();
+      }
+    }
+  });
+};
 
 init();

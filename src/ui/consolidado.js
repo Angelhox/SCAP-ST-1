@@ -220,7 +220,7 @@ ipcRenderer.on(
       padding: 5px;
       
       font-size: 15px;
-    ">${parseFloat(recaudacion.saldo - abonoRp).toFixed(2)}</td>        
+    ">${parseFloat(recaudacion.total - abonoRp).toFixed(2)}</td>        
   </tr>
       `;
     });
@@ -435,6 +435,7 @@ function formatearFecha(fecha) {
   return fechaFormateada;
 }
 const abrirPagos = async () => {
-  const url = "src/ui/servicios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios ocacionales";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };

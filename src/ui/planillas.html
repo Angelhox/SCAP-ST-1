@@ -35,6 +35,7 @@
   </head>
   <body class="vh-100 overflow-hidden body">
     <!-- Navbar -->
+ 
     <header class="header">
       <nav class="navbar navbar-expand-lg navbar-dark fixed-top header">
         <div class="container-fluid">
@@ -86,6 +87,7 @@
                 </li>
 
                 <li class="nav-item mx-2">
+                  <!--Registros Dropdown-->
                   <div class="dropdown">
                     <button
                       class="nav-link btn btn-outline dropdown-toggle"
@@ -107,68 +109,70 @@
                           >Usuarios</a
                         >
                       </li>
-                      <li><hr class="dropdown-divider" /></li>
-                      <li class="nav-item mx-2">
-                        <a class="dropdown-item" onclick="abrirImplementos()"
-                          >Inventario</a
-                        >
-                      </li>
-                      <li><hr class="dropdown-divider" /></li>
-                      <li class="nav-item mx-2">
-                        <a class="dropdown-item" onclick="abrirParametros()"
-                          >Configuraciones</a
-                        >
-                      </li>
-                      <!-- <li>
-                        <a class="dropdown-item" href="#"
-                          >Something else here</a
-                        >
-                      </li> -->
                     </ul>
                   </div>
                 </li>
-
                 <li class="nav-item mx-2">
-                  <a class="nav-link" onclick="abrirPagos()">Pagos</a>
-                </li>
+                  <!-- Servicios Dropdown -->
+                  <div class="dropdown">
+                    <button
+                      class="nav-link btn btn-outline dropdown-toggle"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      Servicios
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li class="nav-item mx-2">
+                        <a class="dropdown-item" onclick="abrirServicios()"
+                          >Servicios Fijos</a
+                        >
+                      </li>
 
+                      <li><hr class="dropdown-divider" /></li>
+                      <li class="nav-item mx-2">
+                        <a class="dropdown-item" onclick="abrirCuotas()"
+                          >Servicios Ocacionales</a
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="nav-item mx-2">
+                  <a class="nav-link" onclick="abrirContratos()">Contratos</a>
+                </li>
                 <li class="nav-item mx-2">
                   <a class="nav-link" onclick="abrirPlanillas()">Planillas</a>
                 </li>
                 <li class="nav-item mx-2">
-                  <a class="nav-link" onclick="abrirContratos()">Contratos</a>
+                  <a class="nav-link" onclick="abrirPagos()">Pagos</a>
                 </li>
               </ul>
               <!-- Login/Sign up -->
               <div
                 class="d-flex justify-content-center align-items-center gap-3 flex-column flex-lg-row"
               >
-                <!-- <button
+                <button
+                  hidden
                   onclick="mostrarLogin()"
                   class="text-white px-3 py-1 rounded-1 btn bg-primary"
                 >
                   Iniciar sesion
-                </button> -->
-                <button class="text-black px-3 py-1 rounded-1 btn bg-white">
+                </button>
+                <button
+                  type="button"
+                  class="text-black px-3 py-1 rounded-1 btn bg-white"
+                  onclick="cerrarSesion()"
+                >
                   Salir
                 </button>
-                <div class="col-12 d-flex justify-content-end">
-                  <button
-                    style="display: none"
-                    class="btn btn-success mx-2"
-                    id="btnSeccion1"
-                  >
-                    Administrar Planillas
-                  </button>
-                  <!-- <button class="btn btn-success " onclick="generarPlanillas()" id="btnGenerarPlanillas"> -->
-                </div>
               </div>
             </div>
           </div>
         </div>
       </nav>
     </header>
-
     <section class="active" id="seccion1">
       <div class="row container-fluid" style="padding-top: 7em">
         <div
@@ -256,6 +260,8 @@
                   >
                     <option value="Por cobrar" selected>Sin cancelar</option>
                     <option value="Cancelado">Cancelado</option>
+                    <option value="all">Todos</option>
+                  
                   </select>
                 </div>
                 <div class="col-3">

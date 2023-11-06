@@ -207,7 +207,10 @@ ipcRenderer.on(
         if (servicioEditado) {
           console.log(`Se encontró un objeto con el ID ${otroServicio.id}`);
           console.log("Nuevo abono: " + servicioEditado.valor);
+          console.log("Total: " + otroServicio.total);
+          console.log("Saldo: " + otroServicio.saldo);
           otroServicio.abono = servicioEditado.valor;
+          otroServicio.saldo=otroServicio.total-servicioEditado.valor;
         } else {
           console.log(`No se encontró un objeto con el ID ${otroServicio.id}`);
         }
@@ -355,6 +358,7 @@ async function imprimirYGuardarPDFfinal() {
     });
 }
 const abrirPagos = async () => {
-  const url = "src/ui/cobros.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso=sessionStorage.getItem("acceso");
+  const url = "Pagos";
+  await ipcRenderer.send("abrirInterface", url,acceso);
 };

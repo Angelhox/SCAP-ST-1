@@ -23,6 +23,8 @@ const servicioTit = document.getElementById("servicio-tit");
 const servicioDesc = document.getElementById("servicio-desc");
 const servicioDet = document.getElementById("servicio-det");
 const servicioVal = document.getElementById("servicio-val");
+const servicioCreaciondet = document.getElementById("fechaCreacion-det");
+const individualSn = document.getElementById("individualSn");
 const btnVolver = document.getElementById("btn-volver");
 // ----------------------------------------------------------------
 // Variables para mostrar el estado de recaudacion.
@@ -39,6 +41,10 @@ const mesRecaudacion = document.getElementById("mesRecaudacion");
 const anioLimite = document.getElementById("anioLimite");
 const mesLimite = document.getElementById("mesLimite");
 const btnReporte = document.getElementById("btnReporte");
+
+const mesBusqueda = document.getElementById("mesBusqueda");
+const anioBusqueda = document.getElementById("anioBusqueda");
+
 let recaudaciones = [];
 let servicios = [];
 let usuarios = [];
@@ -46,6 +52,7 @@ let contratados = [];
 let editingStatus = false;
 let editServicioId = "";
 servicioForm.addEventListener("submit", async (e) => {
+  let individualSnDf = "Si";
   e.preventDefault();
   // var estadoParametro = "Innactivo";
   // if (parametroEstado.checked) {
@@ -68,6 +75,9 @@ servicioForm.addEventListener("submit", async (e) => {
     mensajeError.textContent = "El valor el servicio es obligatorio.";
     servicioValor.focus();
   } else {
+    if(individualSn.value!==null){
+individualSnDf=individualSn.value;
+    }
     const newServicio = {
       fechaCreacion: servicioCreacion.value,
       nombre: servicioNombre.value,
@@ -77,7 +87,7 @@ servicioForm.addEventListener("submit", async (e) => {
       aplazableSn: "No",
       numeroPagos: 1,
       valorPagos: servicioValor.value,
-      individualSn: "Si",
+      individualSn: individualSnDf,
       valoresDistintosSn: "No",
     };
     if (!editingStatus) {
@@ -286,16 +296,21 @@ async function renderUsuarios(usuarios, servicioId) {
   // await getContratados(servicioId);
   usuariosList.innerHTML = "";
   usuarios.forEach(async (usuario) => {
+    const divContainer = document.createElement("div");
+    divContainer.className = "col-xl-6 col-lg-6 col-md-12 col-sm-12";
     const divCol4 = document.createElement("div");
-    divCol4.className = "col-4 card mx-2 my-2";
-    divCol4.style.maxWidth = "30%";
-    divCol4.style.width = "30%";
+    divCol4.className = "clase col-12 card my-1";
+    divCol4.style.padding = "0.3em";
+    divCol4.style.backgroundColor = "#d6eaf8";
+    divCol4.style.maxWidth = "100%";
+    divCol4.style.width = "100%";
+    divCol4.style.minWidth = "100%";
     divCol4.style.height = "fit-content";
     divCol4.style.maxHeight = "fit-content";
 
     const divRowG0 = document.createElement("div");
     divRowG0.className = "row g-0";
-
+    divRowG0.style.backgroundColor = "white";
     const divCol2 = document.createElement("div");
     divCol2.className =
       "col-2 d-flex justify-content-center align-items-center";
@@ -309,16 +324,17 @@ async function renderUsuarios(usuarios, servicioId) {
 
     const divCol8 = document.createElement("div");
     divCol8.className =
-      "col-8 d-flex justify-content-center align-items-center text-center";
+      "col-7 d-flex justify-content-center align-items-center text-center";
 
     const divCardBody = document.createElement("div");
     divCardBody.className = "card-body text-center";
 
     const containerTitle = document.createElement("div");
-    containerTitle.className = "d-flex align-items-baseline container-title";
+    containerTitle.className =
+      "d-flex align-items-baseline container-title mp-0";
 
     const h6Contrato = document.createElement("h6");
-    h6Contrato.className = "card-title";
+    h6Contrato.className = "card-title mp-0";
     h6Contrato.textContent = "Contrato:";
 
     const pContrato = document.createElement("p");
@@ -326,6 +342,7 @@ async function renderUsuarios(usuarios, servicioId) {
     pContrato.textContent = "-";
 
     const pContratoValue = document.createElement("p");
+    pContratoValue.className = "mp-0";
     pContratoValue.textContent = usuario.codigo;
 
     containerTitle.appendChild(h6Contrato);
@@ -339,7 +356,7 @@ async function renderUsuarios(usuarios, servicioId) {
     h6Socio.textContent = "Socio:";
 
     const pSocio = document.createElement("p");
-    pSocio.className = "text-white";
+    pSocio.className = "trans";
     pSocio.textContent = "-";
 
     const pSocioValue = document.createElement("p");
@@ -355,20 +372,19 @@ async function renderUsuarios(usuarios, servicioId) {
     divCol8.appendChild(divCardBody);
 
     const divCol2Estado = document.createElement("div");
-    divCol2Estado.className = "col-2 flex-column d-flex align-items-center ";
+    divCol2Estado.className = "col-3 flex-column d-flex align-items-center ";
 
     const divEstado = document.createElement("div");
     divEstado.className = "col-12 text-center";
 
     const pEstado = document.createElement("p");
     pEstado.className = "mt-3";
-    pEstado.innerHTML = "<small>Estado</small>";
 
     const divCustomCheckbox = document.createElement("div");
     divCustomCheckbox.className =
       "custom-checkbox d-flex justify-content-center align-items-center";
     divCustomCheckbox.style.marginTop = "0";
-    divCustomCheckbox.style.padding = "0 25%";
+    divCustomCheckbox.style.padding = "0 38%";
     divCustomCheckbox.style.width = "100%";
 
     const inputCheckbox = document.createElement("input");
@@ -377,8 +393,10 @@ async function renderUsuarios(usuarios, servicioId) {
     console.log("Cotratados comparar: " + ct);
     if (ct.includes(usuario.contratosId)) {
       inputCheckbox.checked = true;
+      pEstado.innerHTML = "<small>Contratado</small>";
     } else {
       inputCheckbox.checked = false;
+      pEstado.innerHTML = "<small>No contratado</small>";
     }
 
     inputCheckbox.style.width = "40%";
@@ -407,7 +425,19 @@ async function renderUsuarios(usuarios, servicioId) {
     divRowG0.appendChild(divCol2Estado);
 
     divCol4.appendChild(divRowG0);
-    usuariosList.appendChild(divCol4);
+    divContainer.appendChild(divCol4);
+    divContainer.onclick = () => {
+      // Elimina la clase "selected" de todos los elementos
+      const elementos = document.querySelectorAll(".clase"); // Reemplaza con la clase real de tus elementos
+      elementos.forEach((elemento) => {
+        elemento.classList.remove("bg-secondary");
+      });
+
+      // Agrega la clase "selected" al elemento que se hizo clic
+      divCol4.classList.add("bg-secondary");
+      console.log("div: " + usuario.socio);
+    };
+    usuariosList.appendChild(divContainer);
   });
 }
 
@@ -439,6 +469,10 @@ const editServicio = async (id) => {
   servicioCreacion.value = formatearFecha(servicio.fechaCreacion);
   servicioNombre.value = servicio.nombre;
   servicioDescripcion.value = servicio.descripcion;
+  console.log('Indivisual: ',servicio.IndividualSn)
+  if(servicio.IndividualSn!==undefined){
+    individualSn.value = servicio.IndividualSn;
+  }
   // if (parametro.estado == "Activo") {
   //   parametroEstado.checked=true;
   // } else {
@@ -481,6 +515,8 @@ const mostrarEstadisticas = async (servicioId) => {
   );
   servicioTit.textContent = servicio.nombre;
   servicioDesc.textContent = "(" + servicio.descripcion + ")";
+  servicioCreaciondet.textContent = "Creado: "+formatearFecha(servicio.fechaCreacion)
+
   servicioVal.textContent = "Valor: $" + servicio.valor;
   let aplazableSnText = "No aplazable";
   if (servicio.aplazableSn !== "No") {
@@ -507,16 +543,18 @@ const getRecaudaciones = async () => {
   let anioD = parseInt(anioRecaudacion.value);
   let mesD = parseInt(mesRecaudacion.value);
   console.log("Mes a buscar: " + mesD);
-  let anioH = anioRecaudacion.value;
-  let mesH = mesRecaudacion.value;
-  if (criterioSt.value === "periodo") {
-    let diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
-    let diaH = obtenerPrimerYUltimoDiaDeMes(anioH, mesH);
-    // fechaDesde = "'" + anioD + "-" + mesD + "-" + diaD + "'";
-    // fechaHasta = "'" + anioH + "-" + mesH + "-" + diaH + "'";
-    fechaDesde = formatearFecha(diaD.primerDia);
-    fechaHasta = formatearFecha(diaH.ultimoDia);
-  } else if (criterioSt.value === "mes") {
+  let anioH = parseInt(anioLimite.value);
+  let mesH = parseInt(mesLimite.value);
+  // if (criterioSt.value === "periodo") {
+  //   let diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
+  //   let diaH = obtenerPrimerYUltimoDiaDeMes(anioH, mesH);
+  //   // fechaDesde = "'" + anioD + "-" + mesD + "-" + diaD + "'";
+  //   // fechaHasta = "'" + anioH + "-" + mesH + "-" + diaH + "'";
+  //   fechaDesde = formatearFecha(diaD.primerDia);
+  //   fechaHasta = formatearFecha(diaH.ultimoDia);
+  //   console.log("Periodo : " + fechaDesde + " | " + fechaHasta);
+  // } else
+  if (criterioSt.value === "mes") {
     let diaD = obtenerPrimerYUltimoDiaDeMes(anioD, mesD);
     fechaDesde = formatearFecha(diaD.primerDia);
     fechaHasta = formatearFecha(diaD.ultimoDia);
@@ -555,7 +593,7 @@ const getRecaudaciones = async () => {
     } else {
       abonoRp = 0;
     }
-    valoresPendientes += recaudacion.saldo - abonoRp;
+    valoresPendientes += recaudacion.total - abonoRp;
     valoresRecaudados += abonoRp;
     valoresTotales += recaudacion.total;
     recaudacionesList.innerHTML += `
@@ -565,7 +603,7 @@ const getRecaudaciones = async () => {
            <td>${recaudacion.detalleEstado}</td>
            <td>${abonoRp}</td>
            <td>${recaudacion.total}</td>
-           <td>${recaudacion.saldo - abonoRp}</td>        
+           <td>${recaudacion.total - abonoRp}</td>        
        </tr>
           `;
   });
@@ -674,6 +712,8 @@ async function init() {
   mesLimites();
   anioActual();
   anioLimites();
+  cargarMesActual();
+  cargarAnioBusquedas();
   let criterioBuscar = "all";
   let criterioContentBuscar = "all";
   await getServicios(criterioBuscar, criterioContentBuscar);
@@ -859,6 +899,56 @@ function anioLimites() {
     anioLimite.appendChild(option);
   }
 }
+function cargarMesActual() {
+  mesBusqueda.innerHTML = '<option value="all" selected>Todo mes</option>';
+  // Obtén el mes actual (0-indexed, enero es 0, diciembre es 11)
+  const mesActual = new Date().getMonth();
+  // Array de nombres de meses
+  const nombresMeses = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+  // Llena el select con las opciones de los meses
+  for (let i = 0; i < nombresMeses.length; i++) {
+    const option = document.createElement("option");
+    option.value = i + 1; // El valor es el índice del mes
+    option.textContent = nombresMeses[i];
+    if (i === mesActual) {
+      console.log("seleccionando: " + mesActual);
+      // option.selected = true;
+    }
+
+    mesBusqueda.appendChild(option);
+  }
+
+  // Establece el mes actual como seleccionado
+  // mesBusqueda.value = mesActual;
+}
+function cargarAnioBusquedas() {
+  anioBusqueda.innerHTML = '<option value="all" selected>Todo año</option>';
+  // Obtener el año actual
+  var anioActual = new Date().getFullYear();
+  // Crear opciones de años desde el año actual hacia atrás
+  for (var i = anioActual; i >= 2020; i--) {
+    var option = document.createElement("option");
+    option.value = i;
+    option.text = i;
+    if (i === anioActual) {
+      // option.selected = true;
+    }
+    anioBusqueda.appendChild(option);
+  }
+}
 async function vistaFactura() {
   const datos = {
     mensaje: "Hola desde pagina1",
@@ -897,40 +987,52 @@ function mostrarSeccion(id) {
 }
 
 // funciones del navbar
+function cerrarSesion() {
+  ipcRenderer.send("cerrarSesion");
+}
+ipcRenderer.on("sesionCerrada", async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Login";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+});
 const abrirInicio = async () => {
-  const url = "src/ui/principal.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Inicio";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirSocios = async () => {
-  const url = "src/ui/socios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Socios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirUsuarios = async () => {
-  const url = "src/ui/usuarios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Usuarios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPagos = async () => {
-  const url = "src/ui/planillas.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Pagos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPlanillas = async () => {
-  const url = "src/ui/planillas-cuotas.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-const abrirParametros = async () => {
-  const url = "src/ui/parametros.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-const abrirImplementos = async () => {
-  const url = "src/ui/implementos.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Planillas";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirContratos = async () => {
-  const url = "src/ui/medidores.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Contratos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
-const abrirConsolidado = async () => {
-  const url = "src/ui/consolidado.html";
-  await ipcRenderer.send("abrirInterface", url);
+const abrirServicios = async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios fijos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+};
+const abrirCuotas = async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios ocacionales";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 init();

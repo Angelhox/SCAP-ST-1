@@ -199,7 +199,10 @@ ipcRenderer.on("datos-a-pagina2", function (event, datos, encabezado, serviciosF
               if (servicioEditado) {
                 console.log("Se encontr\xF3 un objeto con el ID ".concat(otroServicio.id));
                 console.log("Nuevo abono: " + servicioEditado.valor);
+                console.log("Total: " + otroServicio.total);
+                console.log("Saldo: " + otroServicio.saldo);
                 otroServicio.abono = servicioEditado.valor;
+                otroServicio.saldo = otroServicio.total - servicioEditado.valor;
               } else {
                 console.log("No se encontr\xF3 un objeto con el ID ".concat(otroServicio.id));
               } // if (otroServicio.nombre === "Agua Potable") {
@@ -334,16 +337,17 @@ function imprimirYGuardarPDFfinal() {
 }
 
 var abrirPagos = function abrirPagos() {
-  var url;
+  var acceso, url;
   return regeneratorRuntime.async(function abrirPagos$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
         case 0:
-          url = "src/ui/cobros.html";
-          _context5.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Pagos";
+          _context5.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context5.stop();
       }

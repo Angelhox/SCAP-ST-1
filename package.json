@@ -38,6 +38,7 @@
     "promise-mysql": "^5.2.0",
     "puppeteer": "^21.3.6",
     "reload": "^3.2.1",
+    "secure-electron-store": "^4.0.2",
     "select2": "^4.1.0-rc.0",
     "sweetalert2": "^11.6.13",
     "validator": "^13.9.0"

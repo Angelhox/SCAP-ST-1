@@ -19,6 +19,7 @@ const contratoFecha = document.getElementById("fechaContrato");
 const contratoEstado = document.getElementById("estadoContrato");
 const labelEstadoContrato = document.getElementById("labelEstadoContrato");
 const contratoPrincipalSn = document.getElementById("principalSn");
+const serviciosCompartidos = document.getElementById("serviciosCompartidos");
 //Indica si se ha seleccionado el servicio de agua con medidor
 var contratoConMedidor = false;
 // Tabla de contratos con medidor
@@ -80,6 +81,7 @@ const sinMedidor = document.getElementById("sinMedidor");
 const titleContratos = document.getElementById("title-contratos");
 //Variable que indica el medidor a editar Borrar
 let editContratoId = "";
+let editSocioId = "";
 // ----------------------------------------------------------------
 // Variables componentes del formulario.
 // ----------------------------------------------------------------
@@ -94,6 +96,7 @@ var sugerencias = [];
 // para validar si se ha seleccionado al menos un servicio a contratar.
 // ----------------------------------------------------------------
 async function eventoServiciosId(serviciosFijos) {
+console.log('Servicios here: ' + serviciosFijos)
   serviciosFijos.forEach((servicioFijo) => {
     document
       .getElementById(servicioFijo.id)
@@ -233,6 +236,7 @@ contratoForm.addEventListener("submit", async (e) => {
       var numeroCasaDf = "SN";
       var observacionDf = "NA";
       var principalDf = "Si";
+      let serviciosCompartidosDf = 0;
       if (contratoConMedidor) {
         medidorDf = "Si";
       }
@@ -253,6 +257,9 @@ contratoForm.addEventListener("submit", async (e) => {
       }
       if (!validator.isEmpty(contratoPrincipalSn.value)) {
         principalDf = contratoPrincipalSn.value;
+      }
+      if (serviciosCompartidos.value !== "0") {
+        serviciosCompartidosDf = parseInt(serviciosCompartidos.value);
       }
 
       newMedidor = {
@@ -279,6 +286,7 @@ contratoForm.addEventListener("submit", async (e) => {
         numeroCasa: numeroCasaDf,
         referencia: medidorReferencia.value,
         principalSn: principalDf,
+        serviciosCompartidos: serviciosCompartidosDf,
         // contratosId: contratoId,
       };
       const fakeMedidor = {
@@ -874,100 +882,7 @@ function renderContratosSinMedidor(datosContratosSinMedidor) {
     contratosSinMedidorList.appendChild(divCol);
   });
 }
-// function renderContratosSinMedidor(datosContratosSinMedidor) {
-//   contratosSinMedidorList.innerHTML = "";
 
-//   const cardContainer = document.createElement("div");
-//   cardContainer.classList.add("card-container-horizontal");
-
-//   datosContratosSinMedidor.forEach((contratosinmedidor) => {
-//     const card = document.createElement("div");
-//     card.classList.add("card");
-
-//     card.innerHTML = `
-//       <div class="card-content">
-//         <div class="card-header">${contratosinmedidor.codigo}</div>
-//         <div class="card-body">
-//           <p>${formatearFecha(contratosinmedidor.fecha)}</p>
-//           <p>${
-//             contratosinmedidor.primerNombre +
-//             " " +
-//             contratosinmedidor.segundoNombre +
-//             " " +
-//             contratosinmedidor.primerApellido +
-//             " " +
-//             contratosinmedidor.segundoApellido
-//           }</p>
-//           <p>${contratosinmedidor.cedulaPasaporte}</p>
-//           <p>${contratosinmedidor.estado}</p>
-//         </div>
-//         <div class="card-footer">
-//           <button onclick="detallesContratos('${
-//             contratosinmedidor.id
-//           }')" class="btn ">
-//             <i class="fa-solid fa-circle-info" style="color: #511f1f;"></i>
-//           </button>
-//           <button onclick="editMedidor('${
-//             contratosinmedidor.id
-//           }')" class="btn ">
-//             <i class="fa-solid fa-user-pen"></i>
-//           </button>
-//         </div>
-//       </div>
-//     `;
-
-//     cardContainer.appendChild(card);
-//   });
-
-//   contratosSinMedidorList.appendChild(cardContainer);
-// }
-// function renderServiciosContratos(serviciosContratados) {
-//   servicosContratadosList.innerHTML = "";
-//   serviciosContratados.forEach((servicioContratado) => {
-//     serviciosCheck[servicioContratado.id] = servicioContratado.id;
-//     serviciosFijosList.push(servicioContratado.id);
-//     servicosContratadosList.innerHTML += `
-
-//     <div class="col-6 text-center">
-//     <div class="card card-fondo my-2" style="height: 18rem;">
-//       <div class="card-zona-img"></div>
-//       <div class="card-body col-12 card-contenido">
-//         <div class="col-12">
-//           <h5 class="card-title">${servicioContratado.nombre}</h5>
-//         </div>
-//         <div class="col-12 card-zona-desc" >
-//           <p class="card-text">
-//             ${servicioContratado.descripcion}
-//           </p>
-//         </div>
-//         <div
-//           class="col-12 d-flex justify-content-center align-items-center"
-//         >
-//           <input
-//             type="checkbox"
-//             class="btn-check"
-//             name="options-outlined"
-//             id="${servicioContratado.id}"
-//             autocomplete="off"
-
-//           />
-//           <label
-//             style="width: 40%"
-//             class="btn btn-outline-success"
-//             for="${servicioContratado.id}"
-//             >Adquirido</label
-//           >
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-//       `;
-//     //const servicio = ;
-//   });
-
-//   console.log(serviciosCheck);
-//   console.log(serviciosFijosList[0]);
-// }
 // ----------------------------------------------------------------
 // Funcion que crea las cards de los servicios registrados segun el id
 // del contrato seleccionado
@@ -1002,7 +917,8 @@ function renderServiciosContratados(serviciosContratados) {
 // ----------------------------------------------------------------
 // Funcion que crea las cards de los servicios disponibles para los nuevos contratos
 // ----------------------------------------------------------------
-function renderServiciosDisponibles(serviciosDisponibles) {
+async function renderServiciosDisponibles(serviciosDisponibles) {
+ 
   serviciosDisponiblesAContratar = [];
   servicosDisponiblesList.innerHTML = "";
   for (let i = 0; i < serviciosDisponibles.length; i++) {
@@ -1020,7 +936,6 @@ function renderServiciosDisponibles(serviciosDisponibles) {
 
     const cardImage = document.createElement("div");
     cardImage.classList.add("card-zona-img");
-
     const cardBody = document.createElement("div");
     cardBody.classList.add("card-body", "col-12", "card-contenido");
 
@@ -1034,11 +949,13 @@ function renderServiciosDisponibles(serviciosDisponibles) {
     const divValue = document.createElement("div");
     const divRowBtn = document.createElement("div");
     divRowBtn.className = "row";
-    divValue.className = "col-4 mp-0 text-center";
+
+    divValue.className = "col-2 mp-0 text-center";
     const pValue = document.createElement("p");
     pValue.className = "mp-0 value-disponibles";
     pValue.textContent =
       "$" + parseFloat(serviciosDisponibles[i].valor).toFixed(2);
+
     divValue.appendChild(pValue);
     const checkboxDiv = document.createElement("div");
     checkboxDiv.classList.add(
@@ -1056,6 +973,28 @@ function renderServiciosDisponibles(serviciosDisponibles) {
     checkbox.id = serviciosDisponibles[i].id;
     checkbox.autocomplete = "off";
     checkbox.checked = false;
+    const label = document.createElement("label");
+    label.style.width = "100%";
+    label.classList.add("btn", "btn-outline-warning");
+    label.setAttribute("for", serviciosDisponibles[i].id);
+    label.textContent = "Contratar";
+    let compartidoSn = false;
+    let compartidoAnteriorSn = false;
+    if (serviciosDisponibles[i].IndividualSn == "Compartido") {
+      compartidoSn = true;
+
+      label.innerHTML = 'Contratar<i class="mx-2 fa-solid fa-share-nodes"></i>';
+      const compartidoContratado = await ipcRenderer.invoke(
+        "getCompartidosContratados",
+        serviciosDisponibles[i].id,
+        editSocioId
+      );
+
+      console.log('CompartidoSn: '+compartidoContratado.length);
+      if (compartidoContratado.length>0) {
+        compartidoAnteriorSn = true;
+      }
+    }
     checkbox.onclick = () => {
       if (serviciosDisponibles[i].nombre === "Agua Potable") {
         habilitarFormMedidor();
@@ -1131,39 +1070,60 @@ function renderServiciosDisponibles(serviciosDisponibles) {
           });
         }
       } else {
-        Swal.fire({
-          title: "¿Quieres contratar este servicio para este contrato?",
-          text: "El valor se cargara en la planilla a partir del mes próximo.",
-          icon: "question",
-          iconColor: "#f8c471",
-          showCancelButton: true,
-          confirmButtonColor: "#2874A6",
-          cancelButtonColor: "#EC7063 ",
-          confirmButtonText: "Sí, continuar",
-          cancelButtonText: "Cancelar",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            // Aquí puedes realizar la acción que desees cuando el usuario confirme.
-            // checkbox.checked = true;
-            contratarServicio(serviciosDisponibles[i].id, editContratoId);
-            // await editContrato(editContratoId);
-            // await editContrato(editContratoId);
-          } else {
-            checkbox.checked = false;
-          }
-        });
+        if (compartidoAnteriorSn && compartidoSn) {
+          Swal.fire({
+            title: "¿Quieres contratar este servicio para este contrato?",
+            text:
+              "Este servicio es compartido y ha sido adquirido en un contrato anterior \n" +
+              "¿Deseas contratarlo de  todas formas? \n El valor se cargará en la planilla a partir del mes próximo.",
+            icon: "question",
+            iconColor: "#f8c471",
+            showCancelButton: true,
+            confirmButtonColor: "#2874A6",
+            cancelButtonColor: "#EC7063 ",
+            confirmButtonText: "Sí, continuar",
+            cancelButtonText: "Cancelar",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+              // checkbox.checked = true;
+              contratarServicio(serviciosDisponibles[i].id, editContratoId);
+              await editContrato(editContratoId);
+              await editContrato(editContratoId);
+            } else {
+              checkbox.checked = false;
+            }
+          });
+        } else {
+          Swal.fire({
+            title: "¿Quieres contratar este servicio para este contrato?",
+            text: "El valor se cargara en la planilla a partir del mes próximo.",
+            icon: "question",
+            iconColor: "#f8c471",
+            showCancelButton: true,
+            confirmButtonColor: "#2874A6",
+            cancelButtonColor: "#EC7063 ",
+            confirmButtonText: "Sí, continuar",
+            cancelButtonText: "Cancelar",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+              // checkbox.checked = true;
+              contratarServicio(serviciosDisponibles[i].id, editContratoId);
+              await editContrato(editContratoId);
+              await editContrato(editContratoId);
+            } else {
+              checkbox.checked = false;
+            }
+          });
+        }
       }
     };
-
-    const label = document.createElement("label");
-    label.style.width = "100%";
-    label.classList.add("btn", "btn-outline-warning");
-    label.setAttribute("for", serviciosDisponibles[i].id);
-    label.textContent = "Contratar";
 
     checkboxDiv.appendChild(checkbox);
     checkboxDiv.appendChild(label);
     divRowBtn.appendChild(divValue);
+
     divRowBtn.appendChild(checkboxDiv);
     cardBody.appendChild(title);
     cardBody.appendChild(description);
@@ -1180,7 +1140,8 @@ function renderServiciosDisponibles(serviciosDisponibles) {
 
   console.log(serviciosDisponiblesAContratar[0]);
 }
-function marcarServiciosContratados() {
+async function marcarServiciosContratados() {
+
   if (serviciosEditar !== null) {
     console.log("Marcando servicios: " + serviciosEditar);
     for (let i = 0; i < serviciosEditar.length; i++) {
@@ -1188,45 +1149,112 @@ function marcarServiciosContratados() {
         serviciosEditar[i].serviciosId
       );
       checkContratados.checked = true;
-      checkContratados.onclick = () => {
-        // checkContratados.checked = false;
-        Swal.fire({
-          title: "¿Quieres quitar este servicio de este contrato?",
-          text: "El valor no se cargara en la planilla a partir del mes próximo.",
-          icon: "question",
-          iconColor: "#f8c471",
-          showCancelButton: true,
-          confirmButtonColor: "#2874A6",
-          cancelButtonColor: "#EC7063 ",
-          confirmButtonText: "Sí, continuar",
-          cancelButtonText: "Cancelar",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            // Aquí puedes realizar la acción que desees cuando el usuario confirme.
-            if (serviciosEditar[i].nombre === "Agua Potable") {
-              const newContrato = {
-                medidorSn: "No",
-              };
-              const resultContrato = await ipcRenderer.invoke(
-                "updateContrato",
-                editContratoId,
-                newContrato
-              );
-              contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
-            } else {
-              contratarServicio(serviciosEditar[i].serviciosId, editContratoId);
-            }
-            await editContrato(editContratoId);
-            await editContrato(editContratoId);
-          } else {
-            checkContratados.checked = true;
-          }
-        });
-      };
+
       const labelElement = document.querySelector(
         'label[for="' + serviciosEditar[i].serviciosId + '"]'
       );
       labelElement.textContent = "Contratado";
+      console.log('Compartido: ',serviciosEditar[i])
+      let compartidoSn = false;
+      if (serviciosEditar[i].IndividualSn == "Compartido") {
+        compartidoSn = true;
+        labelElement.innerHTML =
+          'Contratado<i class="mx-2 fa-solid fa-share-nodes"></i>';
+        // const compartidoContratado = await ipcRenderer.invoke(
+        //   "getCompartidosContratados",
+        //   serviciosEditar[i].id,
+        //   editSocioId
+        // );
+        // if (compartidoContratado.length > 0) {
+        //   compartidoAnteriorSn = true;
+        // }
+      }
+      checkContratados.onclick = () => {
+        // checkContratados.checked = false;
+
+        if (compartidoSn) {
+          Swal.fire({
+            title: "¿Quieres quitar este servicio de este contrato?",
+            text:
+              "Este servicio es compartido al descontratarlo el resto de contratos \n" +
+              "relacionados con el socio no se beneficiaran de el.\n" +
+              "El valor no se cargara en la planilla a partir del mes próximo.",
+            icon: "question",
+            iconColor: "#f8c471",
+            showCancelButton: true,
+            confirmButtonColor: "#2874A6",
+            cancelButtonColor: "#EC7063 ",
+            confirmButtonText: "Sí, continuar",
+            cancelButtonText: "Cancelar",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+              if (serviciosEditar[i].nombre === "Agua Potable") {
+                const newContrato = {
+                  medidorSn: "No",
+                };
+                const resultContrato = await ipcRenderer.invoke(
+                  "updateContrato",
+                  editContratoId,
+                  newContrato
+                );
+                contratarServicio(
+                  serviciosEditar[i].serviciosId,
+                  editContratoId
+                );
+              } else {
+                contratarServicio(
+                  serviciosEditar[i].serviciosId,
+                  editContratoId
+                );
+              }
+              await editContrato(editContratoId);
+              await editContrato(editContratoId);
+            } else {
+              checkContratados.checked = true;
+            }
+          });
+        } else {
+          Swal.fire({
+            title: "¿Quieres quitar este servicio de este contrato?",
+            text: "El valor no se cargara en la planilla a partir del mes próximo.",
+            icon: "question",
+            iconColor: "#f8c471",
+            showCancelButton: true,
+            confirmButtonColor: "#2874A6",
+            cancelButtonColor: "#EC7063 ",
+            confirmButtonText: "Sí, continuar",
+            cancelButtonText: "Cancelar",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              // Aquí puedes realizar la acción que desees cuando el usuario confirme.
+              if (serviciosEditar[i].nombre === "Agua Potable") {
+                const newContrato = {
+                  medidorSn: "No",
+                };
+                const resultContrato = await ipcRenderer.invoke(
+                  "updateContrato",
+                  editContratoId,
+                  newContrato
+                );
+                contratarServicio(
+                  serviciosEditar[i].serviciosId,
+                  editContratoId
+                );
+              } else {
+                contratarServicio(
+                  serviciosEditar[i].serviciosId,
+                  editContratoId
+                );
+              }
+              await editContrato(editContratoId);
+              await editContrato(editContratoId);
+            } else {
+              checkContratados.checked = true;
+            }
+          });
+        }
+      };
     }
   }
 }
@@ -1237,6 +1265,7 @@ function marcarServiciosContratados() {
 const detallesContratos = async (id) => {
   console.log("Detallles de : " + id);
   contratoForm.reset();
+  // resetForm();
   const serviciosContratos = await ipcRenderer.invoke(
     "getServiciosContratadosById",
     id
@@ -1252,15 +1281,22 @@ const detallesContratos = async (id) => {
 const editContrato = async (id) => {
   let principalSn = "undefined";
   contratoForm.reset();
-  getServiciosDisponibles();
   const contrato = await ipcRenderer.invoke("getDatosContratosById", id);
-  console.log("Recibido: " + contrato);
-
+  console.log("Recibido: " + contrato.sociosId);
+  editSocioId = contrato.sociosId;
+  console.log('Editosocio'+editSocioId)
+  getServiciosDisponibles();
+  await getContratosSimilares(editSocioId, contrato.id);
+  if (contrato.serviciosCompartidos !== 0) {
+    serviciosCompartidos.value = contrato.serviciosCompartidos;
+  } else {
+    serviciosCompartidos.value = "0";
+  }
   var conMedidor = contrato.medidorSn;
   if (conMedidor == "Si") {
     contratoConMedidor = true;
     console.log("conMedidor");
-    await habilitarFormMedidor();
+    habilitarFormMedidor();
     contratoFecha.value = formatearFecha(contrato.fecha);
     socioContratanteCedula.value = contrato.cedulaPasaporte;
     socioContratanteApellido.value =
@@ -1268,9 +1304,11 @@ const editContrato = async (id) => {
     socioContratanteNombre.value =
       contrato.primerNombre + " " + contrato.segundoNombre;
     contratoCodigo.value = contrato.codigo;
+
     if (contrato.principalSn == "No") {
       principalSn = "Secundario";
       contratoPrincipalSn.value = principalSn;
+
       contratoPrincipalSn.onclick = () => {
         Swal.fire({
           title: "¿Quieres realizar cambios?",
@@ -1341,6 +1379,7 @@ const editContrato = async (id) => {
     medidorInstalacion.disabled = false;
     medidorMarca.disabled = false;
     medidorObservacion.disabled = false;
+    serviciosCompartidos.disabled = false;
     // Inhabilitamos los campos que no se deben editar
     contratoFecha.readOnly = true;
     socioContratanteCedula.readOnly = true;
@@ -1355,7 +1394,10 @@ const editContrato = async (id) => {
     contratoConMedidor = false;
     inHabilitarFormMedidor();
     contratoCodigo.value = contrato.codigo;
-    contratoFecha.value = formatearFecha(contrato.fecha);
+    if (contrato.fecha !== null) {
+      contratoFecha.value = formatearFecha(contrato.fecha);
+    }
+
     if (contrato.principalSn == "No") {
       principalSn = "Secundario";
       contratoPrincipalSn.value = principalSn;
@@ -1433,11 +1475,13 @@ const editContrato = async (id) => {
     // medidorCodigo.disabled = false;
     // Inhabilitamos los campos que no se deben editar
     if (contrato.codigoMedidor != undefined) {
-      medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
+      if (contrato.fechaInstalacion != undefined) {
+        medidorInstalacion.value = formatearFecha(contrato.fechaInstalacion);
+      }
       medidorMarca.value = contrato.marca;
       medidorObservacion.value = contrato.observacion;
     }
-
+    serviciosCompartidos.disabled = false;
     contratoFecha.readOnly = true;
     socioContratanteCedula.readOnly = true;
     socioContratanteApellido.readOnly = true;
@@ -1499,6 +1543,45 @@ const deleteMedidor = async (id) => {
   }
 };
 // ----------------------------------------------------------------
+// Funcion que carga los contratos relacionados con el socio.
+// ----------------------------------------------------------------
+const getContratosSimilares = async (socioId, contratoId) => {
+  const contratosSimilares = await ipcRenderer.invoke(
+    "getContratosSimilares",
+    socioId
+  );
+  console.log(contratosSimilares);
+  renderContratosSimilares(contratosSimilares, contratoId);
+};
+async function renderContratosSimilares(contratosSimilares, contratoId) {
+  // serviciosCompartidos.innerHTML = "";
+  serviciosCompartidos.innerHTML =
+    '<option value="0" selected>Sin servicios compartidos</option>';
+  contratosSimilares.forEach((contratosSimilar) => {
+    const option = document.createElement("option");
+    option.value = contratosSimilar.id;
+    option.text =
+      contratosSimilar.codigo +
+      " ( " +
+      contratosSimilar.barrio +
+      ", " +
+      contratosSimilar.callePrincipal +
+      ", " +
+      contratosSimilar.calleSecundaria +
+      ", " +
+      contratosSimilar.numeroCasa +
+      " ).";
+    if (contratoId !== undefined) {
+      console.log("Comparar: " + contratoId, " | ", contratosSimilar.id);
+      if (contratoId !== contratosSimilar.id) {
+        serviciosCompartidos.appendChild(option);
+      }
+    } else {
+      serviciosCompartidos.appendChild(option);
+    }
+  });
+}
+// ----------------------------------------------------------------
 // Funcion que consulta los contratos con medidor
 // ----------------------------------------------------------------
 const getContratos = async () => {
@@ -1519,9 +1602,9 @@ const getContratosSinMedidor = async () => {
 // ----------------------------------------------------------------
 const getServiciosDisponibles = async () => {
   serviciosDisponibles = await ipcRenderer.invoke("getServiciosDisponibles");
-  console.log(serviciosDisponibles);
-  renderServiciosDisponibles(serviciosDisponibles);
-  eventoServiciosId(serviciosDisponibles);
+  console.log('srv dsp',serviciosDisponibles);
+  await renderServiciosDisponibles(serviciosDisponibles);
+  await eventoServiciosId(serviciosDisponibles);
 };
 // ----------------------------------------------------------------
 // Funcion que carga los eventos iniciales de la interfaz
@@ -1662,6 +1745,7 @@ const obtenerDatosSocioContratante = async (cedula) => {
     "getContratanteByCedula",
     cedula
   );
+  socioContratanteCedula.value = cedula;
   socioContratanteNombre.value =
     socioContratante.primerNombre + " " + socioContratante.segundoNombre;
   socioContratanteApellido.value =
@@ -1680,6 +1764,7 @@ const verificarContratosAnteriores = async (cedula) => {
     cedula
   );
   console.log(contratos);
+  renderContratosSimilares(contratos);
 };
 ipcRenderer.on("showAlertMedidoresExistentes", (event, message) => {
   Swal.fire({
@@ -1933,8 +2018,10 @@ async function resetFormAfterSave() {
   // fechaCreacion.value = formatearFecha(new Date());
 }
 function resetForm() {
+  serviciosCompartidos.disabled = true;
   editingStatus = false;
   editContratoId = "";
+  editSocioId = "";
   contratoForm.reset();
   mensajeError.textContent = "";
   inHabilitarFormMedidor();
@@ -1944,6 +2031,7 @@ function resetForm() {
   contratoFecha.value = formatearFecha(new Date());
 }
 function habilitarNuevoContrato() {
+  serviciosCompartidos.disabled = true;
   socioContratanteCedula.readOnly = false;
   socioContratanteApellido.readOnly = false;
   socioContratanteNombre.readOnly = false;
@@ -1998,42 +2086,52 @@ btnSeccion2.addEventListener("click", function () {
 // ----------------------------------------------------------------
 // funciones de trancision entre interfaces
 // ----------------------------------------------------------------
+function cerrarSesion() {
+  ipcRenderer.send("cerrarSesion");
+}
+ipcRenderer.on("sesionCerrada", async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Login";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+});
 const abrirInicio = async () => {
-  const url = "src/ui/principal.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Inicio";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirSocios = async () => {
-  const url = "src/ui/socios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Socios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirUsuarios = async () => {
-  const url = "src/ui/usuarios.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Usuarios";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPagos = async () => {
-  const url = "src/ui/planillas.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Pagos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirPlanillas = async () => {
-  const url = "src/ui/planillas.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-const abrirParametros = async () => {
-  const url = "src/ui/parametros.html";
-  await ipcRenderer.send("abrirInterface", url);
-};
-const abrirImplementos = async () => {
-  const url = "src/ui/implementos.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Planillas";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
 const abrirContratos = async () => {
-  const url = "src/ui/medidores.html";
-  await ipcRenderer.send("abrirInterface", url);
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Contratos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
 };
-
-function mostrarLogin() {
-  const dialog = document.getElementById("loginDialog");
-  dialog.showModal();
-}
-
+const abrirServicios = async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios fijos";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+};
+const abrirCuotas = async () => {
+  const acceso = sessionStorage.getItem("acceso");
+  const url = "Servicios ocacionales";
+  await ipcRenderer.send("abrirInterface", url, acceso);
+};
 init();

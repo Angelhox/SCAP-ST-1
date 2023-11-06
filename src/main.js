@@ -1,10 +1,12 @@
-const { BrowserWindow, Notification, dialog } = require("electron");
-const Notifications = require("electron-notification-shim");
+const { BrowserWindow, Notification, dialog, session } = require("electron");
 const { app, ipcMain } = require("electron");
 const { getConnection, cerrarConnection } = require("./database");
+const SecureElectronStore = require("secure-electron-store").default;
+// const Store = require("electron-store");
 const path = require("path");
 const url = require("url");
 const { error } = require("console");
+let window;
 let servicioEnviar = [];
 
 ipcMain.on("hello", () => {
@@ -33,88 +35,7 @@ ipcMain.on("printPDF", (event, filePath) => {
     );
   });
 });
-//Funciones de inicio de sesion
-ipcMain.on("validarUsuarios", async (event, { usuario, clave }) => {
-  try {
-    const conn = await getConnection();
-    const usuarioPeticion = await conn.query(
-      "SELECT usuario FROM usuarios WHERE usuario = ?",
-      usuario,
-      (error, results) => {
-        if (error) {
-          event.reply("loginResponse", {
-            success: false,
-            message: "Error en la consulta a la base de datos",
-          });
-        } else if (results.length > 0) {
-          console.log("usuario en peticion ");
-          conn.query(
-            "SELECT * from usuarios where usuario=? and clave=?",
-            [usuario, clave],
-            (error, results) => {
-              if (error) {
-                event.sender.send("loginResponse", {
-                  success: false,
-                  message: "Error en la consulta a la base de datos",
-                });
-                const notification = new Notification({
-                  title: "No se ha podido iniciar session!",
-                  body: "Ocurrio un error al consultar en la base de datos, si el problema persiste solicite soporte tecnico",
-                  icon: "/path/to/icon.png",
-                });
 
-                notification.show();
-              } else if (results.length > 0) {
-                event.sender.send("loginResponse", {
-                  success: true,
-                  message: "Credenciales correctas",
-                });
-                const notification = new Notification({
-                  title: "Credenciales correctas!",
-                  body: "Bienvenido usuario: " + usuario,
-                  icon: "/path/to/icon.png",
-                });
-
-                notification.show();
-              } else {
-                event.sender.send("loginResponse", {
-                  success: false,
-                  message: "Credenciales incorrectas",
-                });
-                // event.sender.send(
-                //   "showAlert",
-                //   "¡Este es un mensaje de alerta!"
-                // );
-                const notification = new Notification({
-                  title: "Error de credenciales!",
-                  body: "La contraseña es incorrecta",
-                  icon: "/path/to/icon.png",
-                });
-
-                notification.show();
-              }
-            }
-          );
-        } else {
-          event.sender.send("loginResponse", {
-            success: false,
-            message: "No existe este usuario",
-          });
-          const notification = new Notification({
-            title: "Error de credenciales!",
-            body: "No hay un usuario registrado para " + usuario,
-            icon: "/path/to/icon.png",
-          });
-
-          notification.show();
-        }
-      }
-    );
-  } catch (error) {
-    console.log("Error al iniciar session: ", error);
-  }
-  return usuarioPeticion;
-});
 // ----------------------------------------------------------------
 // Funciones para el cierre de sesion
 // ----------------------------------------------------------------
@@ -129,127 +50,6 @@ ipcMain.on("salir", async (event) => {
   app.quit();
 });
 
-// ipcMain.on("loginResponse", (event, response) => {
-//   console.log("en uso login response");
-//   // Envía la respuesta de inicio de sesión al proceso de renderizado
-//   event.sender.send("loginResponse", response);
-// });
-// ----------------------------------------------------------------No funciono :(
-// ipcMain.on("printPDF", (event, filePath) => {
-//   console.log("llamando a la accion printPDF");
-//   const printWindow = new BrowserWindow({ show: false });
-//   printWindow.loadURL(`file://${filePath}`).catch(error=>console.log(error));
-//   console.log(`file://${filePath}`);
-//   try {
-//   printWindow.webContents.on("did-finish-load", () => {
-//     printWindow.webContents.print({ silent: true }, (success, errorType) => {
-//       if (success) {
-//         console.log("Success");
-//         // Enviar confirmación al proceso de renderizado
-//         event.sender.send(
-//           "printPDFComplete",
-//           "El PDF se ha enviado a la cola de impresión."
-//         );
-//       } else {
-//         // Enviar error al proceso de renderizado
-//         event.sender.send(
-//           "printPDFComplete",
-//           "Error al imprimir el PDF: " + errorType
-//           );
-//           console.log("Error: ", errorType);
-//       }
-//       console.log("Exit");
-//       printWindow.close();
-//     });
-//   });
-// } catch (error) {
-//     console.log('Error: ',error);
-// }
-// });
-// ----------------------------------------------------------------
-
-// Al utilizar ipcMain.handle
-// en lugar de ipcMain.on, estás creando una
-// función que devuelve un valor y que puede
-// ser invocada desde el proceso de representación
-// mediante ipcRenderer.invoke.
-ipcMain.handle("createProduct", async (event, product) => {
-  try {
-    const conn = await getConnection();
-    console.log("Recibido: ", product);
-    product.price = parseFloat(product.price);
-    const result = await conn.query("Insert into producto set ?", product);
-    console.log(result);
-    new Notification({
-      title: "Electrom Mysql",
-      body: "New product saved succesfully",
-    }).show();
-    product.id = result.insertId;
-    return product;
-  } catch (error) {
-    console.log(error);
-  }
-});
-ipcMain.handle("getProducts", async () => {
-  const conn = await getConnection();
-  const results = conn.query("Select * from producto order by id desc;");
-  console.log(results);
-  return results;
-});
-ipcMain.handle("getProductById", async (event, id) => {
-  const conn = await getConnection();
-  const result = await conn.query("Select * from producto where id = ?", id);
-  console.log(result[0]);
-  return result[0];
-});
-ipcMain.handle("updateProduct", async (event, id, product) => {
-  const conn = await getConnection();
-  const result = await conn.query("UPDATE producto set ? where id = ?", [
-    product,
-    id,
-  ]);
-  console.log(result);
-  return result;
-});
-ipcMain.handle("deleteProduct", async (event, id) => {
-  console.log("id from main.js: ", id);
-  const conn = await getConnection();
-  const result = await conn.query("Delete from producto where id = ?", id);
-  console.log(result);
-  return result;
-});
-
-// ----------------------------------------------------------------
-// ipcMain.handle("print", () => {
-//   console.log("Llego la orden de imprimir");
-//   // Generar el documento para imprimir
-//   // window.webContents.on("dom-ready", () => {
-//   window.webContents.printToPDF({}, (error, data) => {
-//     console.log("Entro la orden de imprimir");
-//     if (error) throw error;
-
-//     const filePath = path.join(app.getPath("documents"), "documento.pdf");
-//     fs.writeFile(filePath, data, (err) => {
-//       if (err) throw err;
-//       console.log("Documento generado y guardado en: " + filePath);
-//     });
-//     // });
-//   });
-// });
-// ----------------------------------------------------------------
-// ipcMain.on('abrirUsuarios', () => {
-//     const newWindow = new BrowserWindow({
-//       width: 800,
-//       height: 600,
-//       webPreferences: {
-//         nodeIntegration: true,
-//         contextIsolation: false,
-//       }
-//     });
-
-//     newWindow.loadFile('src/ui/index.html');
-//   });
-let window;
 function createWindow() {
   app.commandLine.appendSwitch("allow-file-access-from-files");
 
@@ -261,46 +61,227 @@ function createWindow() {
       contextIsolation: false,
     },
   });
-  ipcMain.on("datos-a-servicios", async (event, servicio) => {
-    console.log("Datos a enviar: " + servicio.id);
-    servicioEnviar = servicio;
-    // pagina2Window = new BrowserWindow({ show: false });
-    await window.loadFile("src/ui/servicios.html");
-    // window.send("datos-a-pagina2", datos);
-    await window.show();
-    await window.webContents.send("datos-a-servicios");
-  });
-  ipcMain.on("datos-a-ocacionales", async (event, servicio) => {
-    console.log("Datos a enviar: " + servicio.id);
-    servicioEnviar = servicio;
-    // pagina2Window = new BrowserWindow({ show: false });
-    await window.loadFile("src/ui/cuotas.html");
-    // window.send("datos-a-pagina2", datos);
-    await window.show();
-    await window.webContents.send("datos-a-ocacionales");
-  });
-  // ipcMain.on("datos-a-servicios", async (event, servicio) => {
-  //   console.log("Datos a enviar: " + servicio.id);
 
-  //   // Cargar la página primero
-  //   window.loadFile("src/ui/servicios.html");
-
-  //   // Esperar a que la página se cargue completamente
-  //   window.webContents.once("did-finish-load", async () => {
-  //     // Enviar los datos a la página cargada
-  //     console.log(":) " + servicio.id);
-  //     window.webContents.send("datos-a-servicios", servicio);
-  //     window.show();
-
-  //     // Mostrar la ventana después de enviar los datos
-  //   });
-  // });
-  window.loadFile("src/ui/principal.html");
+  window.loadFile("src/ui/login.html");
 }
-ipcMain.on("abrirInterface", (event, interfaceName) => {
+app.on("ready", () => {
+  //Funciones de inicio de sesion
+  ipcMain.on("validarUsuarios", async (event, { usuario, clave }) => {
+    // const ses = session.defaultSession;
+    try {
+      const conn = await getConnection();
+      const user = await conn.query(
+        "SELECT usuario,rol FROM viewUsuarios WHERE usuario = ?",
+        usuario,
+        async (error, results) => {
+          if (error) {
+            event.reply("loginResponse", {
+              success: false,
+              message: "Error en la consulta a la base de datos",
+            });
+            return;
+          } else if (results.length > 0) {
+            console.log("usuario en peticion ");
+            const user = await conn.query(
+              "SELECT * from viewUsuarios where usuario=? and clave=?",
+              [usuario, clave],
+              async (error, results) => {
+                if (error) {
+                  event.sender.send("loginResponse", {
+                    success: false,
+                    message: "Error en la consulta a la base de datos",
+                  });
+                  const notification = new Notification({
+                    title: "No se ha podido iniciar session!",
+                    body: "Ocurrio un error al consultar en la base de datos, si el problema persiste solicite soporte tecnico",
+                    icon: "/path/to/icon.png",
+                  });
+
+                  notification.show();
+                  return;
+                } else if (results.length > 0) {
+                  console.log("Credenciales corerctas! ");
+                  event.sender.send("loginResponse", {
+                    success: true,
+                    message: "Credenciales correctas",
+                    data: results[0].rol,
+                  });
+                  const notification = new Notification({
+                    title: "Credenciales correctas!",
+                    body: "Bienvenido usuario: " + usuario,
+                    icon: "/path/to/icon.png",
+                  });
+
+                  notification.show();
+                } else {
+                  status: false;
+                  event.sender.send("loginResponse", {
+                    success: false,
+                    message: "Credenciales incorrectas",
+                  });
+
+                  const notification = new Notification({
+                    title: "Error de credenciales!",
+                    body: "La contraseña es incorrecta",
+                    icon: "/path/to/icon.png",
+                  });
+                  notification.show();
+                  return;
+                }
+              }
+            );
+          } else {
+            event.sender.send("loginResponse", {
+              success: false,
+              message: "No existe este usuario",
+            });
+            const notification = new Notification({
+              title: "Error de credenciales!",
+              body: "No hay un usuario registrado para " + usuario,
+              icon: "/path/to/icon.png",
+            });
+            notification.show();
+            return;
+          }
+        }
+      );
+      return user;
+    } catch (error) {
+      console.log("Error al iniciar session: ", error);
+    }
+  });
+});
+// ----------------------------------------------------------------
+// Funciones de comunicacion entre paginas
+// ----------------------------------------------------------------
+ipcMain.on("datos-a-servicios", async (event, servicio) => {
+  console.log("Datos a enviar: " + servicio.id);
+  servicioEnviar = servicio;
+  // pagina2Window = new BrowserWindow({ show: false });
+  await window.loadFile("src/ui/servicios.html");
+  // window.send("datos-a-pagina2", datos);
+  await window.show();
+  await window.webContents.send("datos-a-servicios");
+});
+ipcMain.on("datos-a-ocacionales", async (event, servicio) => {
+  console.log("Datos a enviar: " + servicio.id);
+  servicioEnviar = servicio;
+  // pagina2Window = new BrowserWindow({ show: false });
+  await window.loadFile("src/ui/cuotas.html");
+  // window.send("datos-a-pagina2", datos);
+  await window.show();
+  await window.webContents.send("datos-a-ocacionales");
+});
+// ----------------------------------------------------------------
+// Manejo de rutas
+// ----------------------------------------------------------------
+ipcMain.on("abrirInterface", (event, interfaceName, acceso) => {
+  console.log("Name: " + interfaceName);
+  let url = "";
+  if (interfaceName == "Inicio") {
+    url = "src/ui/principal.html";
+  }
+  if (interfaceName == "Login") {
+    url = "src/ui/login.html";
+  }
+  if (interfaceName == "Servicios fijos") {
+    console.log(acceso);
+    switch (acceso) {
+      case "Auditor":
+        console.log("Auditor");
+        url = "src/ui/servicios.html";
+        break;
+      case "Cajero":
+        break;
+      case "Digitador":
+        break;
+      default:
+    }
+  } else if (interfaceName == "Servicios ocacionales") {
+    switch (acceso) {
+      case "Auditor":
+        console.log("Auditor");
+        url = "src/ui/cuotas.html";
+        break;
+      case "Cajero":
+        break;
+      case "Digitador":
+        break;
+      default:
+    }
+  } else if (interfaceName == "Usuarios") {
+    switch (acceso) {
+      case "Auditor":
+        console.log("Auditor");
+        url = "src/ui/usuarios.html";
+        break;
+      case "Cajero":
+        break;
+      case "Digitador":
+        break;
+      default:
+    }
+  } else if (interfaceName == "Socios") {
+    switch (acceso) {
+      case "Auditor":
+        console.log("Auditor");
+        url = "src/ui/socios.html";
+        break;
+      case "Cajero":
+        url = "src/ui/socios.html";
+        break;
+      case "Digitador":
+        url = "src/ui/socios.html";
+        break;
+      default:
+    }
+  } else if (interfaceName == "Contratos") {
+    switch (acceso) {
+      case "Auditor":
+        console.log("Auditor");
+        url = "src/ui/contratos.html";
+        break;
+      case "Cajero":
+        break;
+      case "Digitador":
+        url = "src/ui/contratos.html";
+        break;
+      default:
+    }
+  } else if (interfaceName == "Planillas") {
+    switch (acceso) {
+      case "Auditor":
+        console.log("Auditor");
+        url = "src/ui/planillas.html";
+        break;
+      case "Cajero":
+        break;
+      case "Digitador":
+        url = "src/ui/planillas.html";
+        break;
+      default:
+    }
+  } else if (interfaceName == "Pagos") {
+    switch (acceso) {
+      case "Auditor":
+        console.log("Auditor");
+        url = "src/ui/cobros.html";
+        break;
+      case "Cajero":
+        url = "src/ui/cobros.html";
+        break;
+      case "Digitador":
+        url = "src/ui/cobros.html";
+        break;
+      default:
+    }
+  }
   try {
     console.log("interface name desde main", interfaceName);
-    window.loadFile(interfaceName);
+    console.log("url", url);
+    if (url !== "") {
+      window.loadFile(url);
+    }
   } catch (err) {
     console.log("Error de window" + err);
   }
@@ -308,12 +289,6 @@ ipcMain.on("abrirInterface", (event, interfaceName) => {
 // ----------------------------------------------------------------
 // Funciones de las facturas
 // ----------------------------------------------------------------
-// Define una función para abrir pagina2
-// ipcMain.on("abrir-pagina2", () => {
-//   // pagina2Window = new BrowserWindow({ show: false });
-//   window.loadFile("src/ui/factura.html");
-//   window.show();
-// });F
 
 // Define una función para enviar datos a pagina2
 ipcMain.on(
@@ -371,15 +346,7 @@ ipcMain.on("contrato-desde-socios", async (event, socioId, socioCedula) => {
   await window.show();
   await window.webContents.send("contrato-desde-socios", socioId, socioCedula);
 });
-// Recibe la peticion de la pagina de planillas para
-// enviar a la pagina de servicios.
-// ipcMain.on("datos-a-servicios", async (event, servicio) => {
-//   console.log("Datos a enviar: " + servicio.id);
-//   servicioEnviar = servicio;
-//   window.loadFile("src/ui/servicios.html");
-//   await window.webContents.send("datos-a-servicios", servicioEnviar);
-//   window.show();
-// });
+// ****************************************************************
 // ----------------------------------------------------------------
 // Funciones de los cargos
 // ----------------------------------------------------------------
@@ -1550,59 +1517,127 @@ ipcMain.handle("getContratosAnterioresByCedula", async (event, cedula) => {
   var sinMedidor;
   var conMedidor = 0;
   var contratos = 0;
+  let contratosTotal = [];
   const conn = await getConnection();
   try {
     const sinMedidores = await conn.query(
-      "select count(contratos.id)as sinMedidor,contratos.fecha,socios.cedulaPasaporte from contratos " +
-        "join socios on socios.id=contratos.sociosId where " +
-        "contratos.medidorSn='No' and socios.cedulaPasaporte='" +
+      // "select count(contratos.id)as sinMedidor,contratos.fecha,socios.cedulaPasaporte from contratos " +
+      //   "join socios on socios.id=contratos.sociosId where " +
+      //   "contratos.medidorSn='No' and socios.cedulaPasaporte='" +
+      //   cedula +
+      //   "' ; "
+      "select * from viewContratos " +
+        "where medidorSn='No' and cedulaPasaporte='" +
         cedula +
         "' ; "
     );
     const conMedidores = await conn.query(
-      "select count(contratos.id)as conMedidor,contratos.fecha,socios.cedulaPasaporte from contratos " +
-        "join socios on socios.id=contratos.sociosId  join medidores on contratos.id=medidores.contratosId where " +
-        " contratos.medidorSn='Si' and socios.cedulaPasaporte='" +
+      "select * from viewContratos " +
+        "where medidorSn='Si' and cedulaPasaporte='" +
         cedula +
-        "'; "
+        "' ; "
     );
-    sinMedidor = sinMedidores[0].sinMedidor;
-    conMedidor = conMedidores[0].conMedidor;
-    contratos = {
-      sinMedidor: sinMedidor,
-      conMedidor: conMedidor,
-    };
+    sinMedidor = sinMedidores.length;
+    conMedidor = conMedidores.length;
+
+    // sinMedidor: sinMedidor,
+    // conMedidor: conMedidor,
+
+    if (sinMedidor == 0 && conMedidor > 0) {
+      let listasectores = "";
+      conMedidores.forEach((contrato) => {
+        listasectores = listasectores + contrato.barrio + ", ";
+      });
+      event.sender.send(
+        "showAlertMedidoresExistentes",
+        "Este usuario ya registra " +
+          conMedidor +
+          " contrato(s) con Medidor\n" +
+          "Sector: " +
+          listasectores +
+          "\nVerifica el registro de contratos antes de crear uno nuevo!"
+      );
+      contratosTotal = conMedidores;
+    } else if (sinMedidor > 0 && conMedidor == 0) {
+      let listasectores = "";
+      sinMedidores.forEach((contrato) => {
+        listasectores = listasectores + contrato.barrio + ", ";
+      });
+      event.sender.send(
+        "showAlertMedidoresExistentes",
+        "Este usuario ya registra " +
+          sinMedidor +
+          " contrato(s) sin Medidor\n" +
+          "Sector: " +
+          listasectores +
+          "\nVerifica el registro de contratos antes de crear uno nuevo!"
+      );
+      contratosTotal = sinMedidores;
+    } else if (sinMedidor > 0 && conMedidor > 0) {
+      let listasectores = "";
+      sinMedidores.forEach((contrato) => {
+        listasectores = listasectores + contrato.barrio + ", ";
+      });
+      let listasectores2 = "";
+      conMedidores.forEach((contrato) => {
+        listasectores2 = listasectores2 + contrato.barrio + ", ";
+      });
+      event.sender.send(
+        "showAlertMedidoresExistentes",
+        "Este usuario ya registra " +
+          sinMedidor +
+          " contrato(s) sin Medidor\n" +
+          "Sector: " +
+          listasectores +
+          "\n" +
+          " y " +
+          conMedidor +
+          " contrato(s) con Medidor\n" +
+          "  " +
+          "Sector: " +
+          listasectores2 +
+          "\nVerifica el registro de contratos antes de crear uno nuevo!"
+      );
+      contratosTotal += conMedidores;
+      contratosTotal += sinMedidores;
+    }
+    console.log(contratos);
+    return contratosTotal;
   } catch (err) {
     console.log(err);
   }
-  if (sinMedidor == 0 && conMedidor > 0) {
-    event.sender.send(
-      "showAlertMedidoresExistentes",
-      "Este usuario ya registra " +
-        conMedidor +
-        " contratos con Medidor\nVerifica el registro de contratos antes de crear uno nuevo!"
-    );
-  } else if (sinMedidor > 0 && conMedidor == 0) {
-    event.sender.send(
-      "showAlertMedidoresExistentes",
-      "Este usuario ya registra " +
-        sinMedidor +
-        " contratos sin Medidor\nVerifica el registro de contratos antes de crear uno nuevo!"
-    );
-  } else if (sinMedidor > 0 && conMedidor > 0) {
-    event.sender.send(
-      "showAlertMedidoresExistentes",
-      "Este usuario ya registra " +
-        sinMedidor +
-        " contratos sin Medidor y " +
-        conMedidor +
-        " contratos con medidor\nVerifica el registro de contratos antes de crear uno nuevo!"
-    );
-  }
-  console.log(contratos);
-  return contratos;
 });
-
+ipcMain.handle("getContratosSimilares", async (event, socioId) => {
+  try {
+    const conn = await getConnection();
+    const contratosSimilares = await conn.query(
+      "SELECT * FROM contratos WHERE sociosId=?",
+      socioId
+    );
+    return contratosSimilares;
+  } catch (error) {
+    console.log("Error al cargar contratos similares: ", error);
+  }
+});
+ipcMain.handle(
+  "getCompartidosContratados",
+  async (event, servicioId, socioId) => {
+    try {
+      const conn = await getConnection();
+      const compartidosAnteriores = await conn.query(
+        "SELECT * FROM viewServiciosContratados where sociosId=" +
+          socioId +
+          " AND serviciosId=" +
+          servicioId +
+          " AND estado='Activo';"
+      );
+      console.log("Compartidos anteriores: ", compartidosAnteriores);
+      return compartidosAnteriores;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 ipcMain.handle("getContratosConMedidor", async () => {
   var contratosConMedidor;
   try {
@@ -1901,6 +1936,7 @@ ipcMain.handle(
 
         // }
       } else {
+        newContratado.fechaEmision = formatearFecha(new Date());
         newContratado.serviciosId = servicioId;
         newContratado.contratosId = contratoId;
         const resultServicioContratado = await conn.query(
@@ -1950,7 +1986,7 @@ ipcMain.handle(
 // ----------------------------------------------------------------
 // Funciones de las planillas
 // ----------------------------------------------------------------
-ipcMain.handle("createPlanilla", async (event) => {
+ipcMain.handle("createPlanilla", async (event, fechaCreacion) => {
   const conn = await getConnection();
   try {
     // Consultamos cuales son los medidores que se encuentran activos para crear el registro de lecturas
@@ -1965,8 +2001,17 @@ ipcMain.handle("createPlanilla", async (event) => {
         console.log("Contrato a buscar: " + contratoActivo.id);
         if (contratoActivo.medidorSn == "Si") {
           planillaExiste = await conn.query(
+            // "SELECT count(planillas.id) as existe from planillas where month" +
+            //   "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " +
+            //   "and  planillas.medidoresId=" +
+            //   contratoActivo.id +
+            //   ";"
             "SELECT count(planillas.id) as existe from planillas where month" +
-              "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " +
+              "(planillas.fechaEmision)=month('" +
+              fechaCreacion +
+              "') and year(planillas.fechaEmision)=year('" +
+              fechaCreacion +
+              "') " +
               "and  planillas.medidoresId=" +
               contratoActivo.id +
               ";"
@@ -1992,7 +2037,8 @@ ipcMain.handle("createPlanilla", async (event) => {
               "SELECT * FROM tarifas where tarifa='Familiar';"
             );
             const newPlanilla = {
-              //fechaEmision: "now()",
+              //Fecha emision va comentado
+              fechaEmision: fechaCreacion,
               valor: tarifaBase[0].valor,
               estado: "Por cobrar",
               lecturaActual: 0.0,
@@ -2011,8 +2057,17 @@ ipcMain.handle("createPlanilla", async (event) => {
           }
         } else {
           planillaExiste = await conn.query(
+            // "SELECT count(planillas.id) as existe from planillas where month" +
+            //   "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " +
+            //   "and  planillas.medidoresId=" +
+            //   contratoActivo.id +
+            //   ";"
             "SELECT count(planillas.id) as existe from planillas where month" +
-              "(planillas.fechaEmision)=month(now()) and year(planillas.fechaEmision)=year(now()) " +
+              "(planillas.fechaEmision)=month('" +
+              fechaCreacion +
+              "') and year(planillas.fechaEmision)=year('" +
+              fechaCreacion +
+              "') " +
               "and  planillas.medidoresId=" +
               contratoActivo.id +
               ";"
@@ -2038,7 +2093,8 @@ ipcMain.handle("createPlanilla", async (event) => {
             //   "SELECT * FROM tarifas where tarifa='Familiar';"
             // );
             const newPlanilla = {
-              //fechaEmision: "now()",
+              //Fecha emision va comentado
+              fechaEmision: fechaCreacion,
               valor: 0.0,
               estado: "Por cobrar",
               lecturaActual: 0.0,
@@ -2056,23 +2112,37 @@ ipcMain.handle("createPlanilla", async (event) => {
             // return resultadoPlanillas;
           }
         }
-        createCuentaServicios(contratoActivo.contratosId);
+        createCuentaServicios(contratoActivo.contratosId, fechaCreacion);
       });
     }
   } catch (error) {
     console.log("Error al crear planillas: " + error);
   }
 });
-async function createCuentaServicios(contratoId) {
+async function createCuentaServicios(contratoId, fechaCreacion) {
   console.log("Consultando encabezado para: " + contratoId);
   const conn = await getConnection();
   let encabezadoId;
   try {
     // Consultamos si existe un encabezado con los detalles de los servicios contratados segun el contrato
     const encabezadoExiste = await conn.query(
+      // Debe ir con now()
+      // "select count(id) as existe, id from viewEncabezados WHERE tipo='planilla' and   " +
+      // "month(fechaEmisionEncabezado)=month('" +
+      // fechaCreacion +
+      // "')" +
+      // " and year(fechaEmisionEncabezado)=year('" +
+      // fechaCreacion +
+      // "') and contratosId=" +
+      // contratoId +
+      // ";"
       "select count(id) as existe, id from viewEncabezados WHERE tipo='planilla' and   " +
-        "month(fechaEmisionEncabezado)=month(now())" +
-        " and year(fechaEmisionEncabezado)=year(now()) and contratosId=" +
+        "month(fechaEmisionEncabezado)=month('" +
+        fechaCreacion +
+        "')" +
+        " and year(fechaEmisionEncabezado)=year('" +
+        fechaCreacion +
+        "') and contratosId=" +
         contratoId +
         ";"
     );
@@ -2080,6 +2150,8 @@ async function createCuentaServicios(contratoId) {
       console.log("Existe encabezado: ", encabezadoExiste[0].existe);
       // Si no existe un encabezado para la fecha actual se procede a crear uno
       newEncabezado = {
+        // fechaEmision no va
+        fechaEmision: fechaCreacion,
         fechaPago: null,
         tipo: "planilla",
       };
@@ -2098,7 +2170,7 @@ async function createCuentaServicios(contratoId) {
         contratoId +
         " AND estado='Activo' AND tipo='Servicio fijo' AND aplazableSn='No';"
     );
-    createDetallesServicios(serviciosContratados, encabezadoId);
+    createDetallesServicios(serviciosContratados, encabezadoId, fechaCreacion);
     // Consultamos los servicios ocacionales, las cuotas y las multas que no son aplazables para
     // incluirlas en el detalle de servicios y relacionarlos con un encabezado correspondiente a la
     // cuenta de servicios de cada mes.
@@ -2131,27 +2203,45 @@ async function createCuentaServicios(contratoId) {
         " AND NOT tipo='Servicio fijo';"
     );
 
-    createDetallesServicios(otrosValores, encabezadoId);
+    createDetallesServicios(otrosValores, encabezadoId, fechaCreacion);
   } catch (error) {
     console.log("Error al crear cuentaservicios: " + error);
   }
 }
-async function createDetallesServicios(serviciosContratados, encabezadoId) {
+async function createDetallesServicios(
+  serviciosContratados,
+  encabezadoId,
+  fechaCreacion
+) {
   const conn = await getConnection();
   serviciosContratados.forEach(async (servicioContratado) => {
     console.log("Servicio contratado a buscar: " + servicioContratado.id);
     // Mediante la fecha consultamos si ya se ha creado un detalle para el servicio en determinado mes.
     // para evitar que el servicio se aplique dos veces.
     detalleServicioExiste = await conn.query(
+      // Debe ir con now()
+      // "SELECT count(detallesServicio.id) as existe from detallesServicio where month" +
+      // "(detallesServicio.fechaEmision)=month('" +
+      // fechaCreacion +
+      // "') and year(detallesServicio.fechaEmision)=year('" +
+      // fechaCreacion +
+      // "') " +
+      // "and  detallesServicio.serviciosContratadosId=" +
+      // servicioContratado.id +
+      // ";"
       "SELECT count(detallesServicio.id) as existe from detallesServicio where month" +
-        "(detallesServicio.fechaEmision)=month(now()) and year(detallesServicio.fechaEmision)=year(now()) " +
+        "(detallesServicio.fechaEmision)=month('" +
+        fechaCreacion +
+        "') and year(detallesServicio.fechaEmision)=year('" +
+        fechaCreacion +
+        "') " +
         "and  detallesServicio.serviciosContratadosId=" +
         servicioContratado.id +
         ";"
     );
     console.log("Detalle servicio existe: " + detalleServicioExiste[0].existe);
     // Si no existen los detalles de servicios correspondiente a la fecha se crean y se añaden al encabezado
-    if (detalleServicioExiste[0].existe === 0) {
+    if (detalleServicioExiste[0].existe == 0) {
       console.log(
         "Servicio a registrar: " + servicioContratado.valorIndividual,
         servicioContratado.valorPagosIndividual
@@ -2219,7 +2309,8 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
               abono: abono,
               encabezadosId: encabezadoId,
               estado: "Por cancelar",
-              //fechaEmision
+              // fechaEmision va comentado
+              fechaEmision: fechaCreacion,
             };
           } else {
             console.log("Entro a los aplazables que superan el abonado");
@@ -2241,65 +2332,110 @@ async function createDetallesServicios(serviciosContratados, encabezadoId) {
             abono: parseFloat(servicioContratado.valorPagosIndividual),
             encabezadosId: encabezadoId,
             estado: "Por cancelar",
-            //fechaEmision
+            // fechaEmision va comentado
+            fechaEmision: fechaCreacion,
           };
         }
         //total = servicioContratado.valorIndividual;
         // valorPagos = servicioContratado.valorIndividual;
       } else {
         console.log("Entro a los no aplazables");
-
-        //total = servicioContratado.valorIndividual;
-        // valorPagos = servicioContratado.valorPagosindividual;
+        // Errro No esta verificando correctamente si el servicio no ha sido aplicado dos veces.
         newDetalleServicios = {
           serviciosContratadosId: servicioContratado.id,
           descuento: servicioContratado.descuentoValor,
           subtotal: servicioContratado.valorIndividual,
           total: totalPagar,
           // El saldo debe ser calculado
-          saldo: total - servicioContratado.valorDescuento,
+          saldo: totalPagar - abono,
           // El abono debe ser calculado
-          abono: parseFloat(servicioContratado.valorPagosIndividual),
+          abono: abono,
           encabezadosId: encabezadoId,
           estado: "Por cancelar",
-          //fechaEmision
+          // fechaEmision va comentado
+          fechaEmision: fechaCreacion,
         };
-      }
-      // } else {
-      // if (servicioContratado.aplazableSn === "Si") {
-      //   total = servicioContratado.valor;
-      //   valorPagos =
-      //     servicioContratado.valorPagos - servicioContratado.valorDescuento;
-      // } else {
-      //   total = servicioContratado.valor;
-      //   valorPagos =
-      //     servicioContratado.valorPagos - servicioContratado.valorDescuento;
-      // }
-      // }
+        // Verificamos si este servicio ya ha sido detallado, al ser un no aplazable
+        // No se debe aplicar dos veces.
+        // if (servicioContratado.tipo !== "Servicio fijo") {
+        //   const noAplazableAplicado = conn.query(
+        //     "SELECT * from detallesServicio where serviciosContratadosId=" +
+        //       servicioContratado.id +
+        //       " ;"
+        //   );
+        //   console.log('Here')
 
-      const resultadoDetalleServicio = await conn.query(
-        "INSERT INTO detallesServicio set ?",
-        newDetalleServicios
-      );
-      console.log("servicioContratado.tipo: ", servicioContratado.tipo);
-      if (servicioContratado.tipo !== "Servicio fijo") {
-        console.log("entrando a cambiar estado");
-        const modificaEstado = await conn.query(
-          "UPDATE serviciosContratados SET estado='Aplicado' WHERE serviciosContratados.id=" +
-            servicioContratado.id +
-            ";"
-        );
-
-        console.log(
-          "Resultado de crear planillas: " + resultadoDetalleServicio
-        );
-        return resultadoDetalleServicio;
-      } else {
-        console.log(
-          "Resultado de crear planillas: " + resultadoDetalleServicio
-        );
-        return resultadoDetalleServicio;
+        //   // if (noAplazableAplicado.length <= 0) {
+        //     if (noAplazableAplicado[0]!== undefined) {
+        //     console.log('No se encontrarron aplicados')
+        //     abono = servicioContratado.valorPagosIndividual;
+        //     //total = servicioContratado.valorIndividual;
+        //     // valorPagos = servicioContratado.valorPagosindividual;
+        //     newDetalleServicios = {
+        //       serviciosContratadosId: servicioContratado.id,
+        //       descuento: servicioContratado.descuentoValor,
+        //       subtotal: servicioContratado.valorIndividual,
+        //       total: totalPagar,
+        //       // El saldo debe ser calculado
+        //       saldo: totalPagar - abono,
+        //       // El abono debe ser calculado
+        //       abono: abono,
+        //       encabezadosId: encabezadoId,
+        //       estado: "Por cancelar",
+        //       // fechaEmision va comentado
+        //       fechaEmision: fechaCreacion,
+        //     };
+        //   }
+        // } else {
+        //   console.log("Es no aplazable fijo");
+        //   abono = servicioContratado.valorPagosIndividual;
+        //   //total = servicioContratado.valorIndividual;
+        //   // valorPagos = servicioContratado.valorPagosindividual;
+        //   newDetalleServicios = {
+        //     serviciosContratadosId: servicioContratado.id,
+        //     descuento: servicioContratado.descuentoValor,
+        //     subtotal: servicioContratado.valorIndividual,
+        //     total: totalPagar,
+        //     // El saldo debe ser calculado
+        //     saldo: totalPagar - abono,
+        //     // El abono debe ser calculado
+        //     abono: abono,
+        //     encabezadosId: encabezadoId,
+        //     estado: "Por cancelar",
+        //     // fechaEmision va comentado
+        //     fechaEmision: fechaCreacion,
+        //   };
+        // }
       }
+      // Borrado 0001
+      if (newDetalleServicios !== null) {
+        const resultadoDetalleServicio = await conn.query(
+          "INSERT INTO detallesServicio set ?",
+          newDetalleServicios
+        );
+        console.log("servicioContratado.tipo: ", servicioContratado.tipo);
+        if (servicioContratado.tipo !== "Servicio fijo") {
+          console.log("entrando a cambiar estado");
+          const modificaEstado = await conn.query(
+            "UPDATE serviciosContratados SET estado='Aplicado' WHERE serviciosContratados.id=" +
+              servicioContratado.id +
+              ";"
+          );
+
+          console.log(
+            "Resultado de crear planillas: " + resultadoDetalleServicio
+          );
+          return resultadoDetalleServicio;
+        } else {
+          console.log(
+            "Resultado de crear planillas: " + resultadoDetalleServicio
+          );
+          return resultadoDetalleServicio;
+        }
+      }
+    } else {
+      console.log("Sin detalles por aplicar");
+      return;
     }
   });
 }
@@ -2317,8 +2453,8 @@ ipcMain.handle(
     );
     try {
       const conn = await getConnection();
-      if (estado == undefined) {
-        estado = "Por cobrar";
+      if (estado == undefined || estado == "all") {
+        estado = "";
       }
       if (criterio == undefined) {
         criterio = "all";
@@ -2334,9 +2470,9 @@ ipcMain.handle(
           console.log("anio all mes all");
           const results = await conn.query(
             "SELECT * FROM viewPlanillas WHERE " +
-              "estado='" +
+              "estado like'%" +
               estado +
-              "' order by fechaEmision desc"
+              "%' order by fechaEmision desc"
           );
           console.log(results);
           return results;
@@ -2344,9 +2480,9 @@ ipcMain.handle(
           console.log("anio all mes df", mes);
           const results = await conn.query(
             "SELECT * FROM viewPlanillas WHERE " +
-              "estado='" +
+              "estado like'%" +
               estado +
-              "' and month(fechaEmision) = '" +
+              "%' and month(fechaEmision) = '" +
               mes +
               "' order by fechaEmision desc ;"
           );
@@ -2356,9 +2492,9 @@ ipcMain.handle(
           console.log("mes all anio df", anio);
           const results = await conn.query(
             "SELECT * FROM viewPlanillas WHERE " +
-              "estado='" +
+              "estado like '%" +
               estado +
-              "' and " +
+              "%' and " +
               " year(fechaEmision) = '" +
               anio +
               "' order by fechaEmision desc ;"
@@ -2369,9 +2505,9 @@ ipcMain.handle(
           console.log("mes df anio df ", mes, anio);
           const results = await conn.query(
             "SELECT * FROM viewPlanillas WHERE " +
-              "estado='" +
+              "estado like'%" +
               estado +
-              "' and " +
+              "%' and " +
               " year(fechaEmision) = '" +
               anio +
               "' and month(fechaEmision) = '" +
@@ -2389,9 +2525,9 @@ ipcMain.handle(
               criterio +
               " like '%" +
               criterioContent +
-              "%' and estado='" +
+              "%' and estado like'%" +
               estado +
-              "' order by fechaEmision desc ;"
+              "%' order by fechaEmision desc ;"
           );
           console.log(results);
           return results;
@@ -2402,9 +2538,9 @@ ipcMain.handle(
               criterio +
               " like '%" +
               criterioContent +
-              "%' and estado='" +
+              "%' and estado like'%" +
               estado +
-              "' and month(fechaEmision) = '" +
+              "%' and month(fechaEmision) = '" +
               mes +
               "' order by fechaEmision desc ;"
           );
@@ -2417,9 +2553,9 @@ ipcMain.handle(
               criterio +
               " like '%" +
               criterioContent +
-              "%' and estado='" +
+              "%' and estado like'%" +
               estado +
-              "' and " +
+              "%' and " +
               " year(fechaEmision) = '" +
               anio +
               "' order by fechaEmision desc ;"
@@ -2433,9 +2569,9 @@ ipcMain.handle(
               criterio +
               " like '%" +
               criterioContent +
-              "%' and estado='" +
+              "%' and estado like'%" +
               estado +
-              "' and " +
+              "%' and " +
               " year(fechaEmision) = '" +
               anio +
               "' and month(fechaEmision) = '" +
@@ -2610,6 +2746,7 @@ ipcMain.handle("getDatosCuotasByCodigo", async (event, codigoMedidor) => {
 ipcMain.handle(
   "getDatosServiciosByContratoId",
   async (event, contratoId, fechaEmision, criterio) => {
+    console.log("Fecha emision: " + fechaEmision);
     const conn = await getConnection();
     if (criterio === "otros") {
       const result = await conn.query(
@@ -2701,12 +2838,18 @@ ipcMain.handle(
       );
       serviciosCancelar.forEach(async (servicioCancelar) => {
         let abono = 0;
+        let saldo = 0;
         if (servicioCancelar.abono !== null) {
           abono = parseFloat(servicioCancelar.abono).toFixed(2);
+        }
+        if (servicioCancelar.saldo !== null) {
+          saldo = parseFloat(servicioCancelar.saldo).toFixed(2);
         }
         await conn.query(
           "UPDATE detallesServicio set estado='Cancelado',abono=" +
             abono +
+            ", saldo=" +
+            saldo +
             " WHERE id = ? ;",
           servicioCancelar.id
         );

@@ -1,4 +1,6 @@
 const { ipcRenderer } = require("electron");
+// const SecureElectronStore = require('secure-electron-store');
+
 const validator = require("validator");
 const Swal = require("sweetalert2");
 // const abrirInterface = async()=> {
@@ -7,6 +9,7 @@ const Swal = require("sweetalert2");
 const usuarioUsuario = document.getElementById("usuario");
 const usuarioClave = document.getElementById("clave");
 const mensajeError = document.getElementById("mensajeError");
+// const store = SecureElectronStore().getInstance();
 // ----------------------------------------------------------------
 // Funcion de inicio de session
 // ----------------------------------------------------------------
@@ -41,10 +44,18 @@ loginForm.addEventListener("submit", async (e) => {
 // Funcion de recepcion de respuesta al intentar logearse
 // ----------------------------------------------------------------
 ipcRenderer.on("loginResponse", async (event, response) => {
+  let acceso=""
   if (response.success) {
     console.log("Incio de session correcto");
-    const url = "src/ui/principal.html";
-    await ipcRenderer.send("abrirInterface", url);
+    const url = "Inicio";
+    try {
+      acceso=response.data;
+      sessionStorage.setItem("acceso", acceso);
+      console.log(sessionStorage.getItem("acceso"));
+    } catch (error) {
+      console.log(error);
+    }
+    await ipcRenderer.send("abrirInterface", url,acceso);
   } else {
     if (response.message === "No existe este usuario") {
       console.log("Usuario incorrecto");

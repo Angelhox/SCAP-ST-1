@@ -176,7 +176,7 @@ ipcRenderer.on("datos-a-pagina3", function (event, datos, encabezado, recaudacio
       abonoRp = 0;
     }
 
-    recaudacionesList.innerHTML += "\n      <tr>\n      <td style=\"\n      text-align: left;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">".concat(recaudacion.contratosCodigo, "</td>\n      <td style=\"\n      text-align: left;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(recaudacion.nombres + " " + recaudacion.apellidos, "</td>\n      <td style=\"\n      text-align: left;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(recaudacion.detalleEstado, "</td>\n      <td style=\"\n      text-align: center;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(parseFloat(abonoRp).toFixed(2), "</td>\n      <td style=\"\n      text-align: center;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(parseFloat(recaudacion.total).toFixed(2), "</td>\n      <td style=\"\n      text-align: center;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(parseFloat(recaudacion.saldo - abonoRp).toFixed(2), "</td>        \n  </tr>\n      ");
+    recaudacionesList.innerHTML += "\n      <tr>\n      <td style=\"\n      text-align: left;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">".concat(recaudacion.contratosCodigo, "</td>\n      <td style=\"\n      text-align: left;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(recaudacion.nombres + " " + recaudacion.apellidos, "</td>\n      <td style=\"\n      text-align: left;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(recaudacion.detalleEstado, "</td>\n      <td style=\"\n      text-align: center;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(parseFloat(abonoRp).toFixed(2), "</td>\n      <td style=\"\n      text-align: center;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(parseFloat(recaudacion.total).toFixed(2), "</td>\n      <td style=\"\n      text-align: center;\n      padding: 5px;\n      \n      font-size: 15px;\n    \">").concat(parseFloat(recaudacion.total - abonoRp).toFixed(2), "</td>        \n  </tr>\n      ");
   });
   pendiente.textContent = datosTotales.pendiente;
   recaudado.textContent = datosTotales.recaudado;
@@ -365,16 +365,17 @@ function formatearFecha(fecha) {
 }
 
 var abrirPagos = function abrirPagos() {
-  var url;
+  var acceso, url;
   return regeneratorRuntime.async(function abrirPagos$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
-          url = "src/ui/servicios.html";
-          _context4.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Servicios ocacionales";
+          _context4.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context4.stop();
       }

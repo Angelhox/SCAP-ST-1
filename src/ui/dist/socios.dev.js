@@ -628,35 +628,41 @@ function imprimir() {
 } // funciones del navbar
 
 
-var abrirInicio = function abrirInicio() {
-  var url;
-  return regeneratorRuntime.async(function abrirInicio$(_context13) {
+function cerrarSesion() {
+  ipcRenderer.send("cerrarSesion");
+}
+
+ipcRenderer.on("sesionCerrada", function _callee7() {
+  var acceso, url;
+  return regeneratorRuntime.async(function _callee7$(_context13) {
     while (1) {
       switch (_context13.prev = _context13.next) {
         case 0:
-          url = "src/ui/principal.html";
-          _context13.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Login";
+          _context13.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context13.stop();
       }
     }
   });
-};
+});
 
-var abrirSocios = function abrirSocios() {
-  var url;
-  return regeneratorRuntime.async(function abrirSocios$(_context14) {
+var abrirInicio = function abrirInicio() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirInicio$(_context14) {
     while (1) {
       switch (_context14.prev = _context14.next) {
         case 0:
-          url = "src/ui/socios.html";
-          _context14.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Inicio";
+          _context14.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context14.stop();
       }
@@ -664,17 +670,18 @@ var abrirSocios = function abrirSocios() {
   });
 };
 
-var abrirUsuarios = function abrirUsuarios() {
-  var url;
-  return regeneratorRuntime.async(function abrirUsuarios$(_context15) {
+var abrirSocios = function abrirSocios() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirSocios$(_context15) {
     while (1) {
       switch (_context15.prev = _context15.next) {
         case 0:
-          url = "src/ui/usuarios.html";
-          _context15.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Socios";
+          _context15.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context15.stop();
       }
@@ -682,17 +689,18 @@ var abrirUsuarios = function abrirUsuarios() {
   });
 };
 
-var abrirPagos = function abrirPagos() {
-  var url;
-  return regeneratorRuntime.async(function abrirPagos$(_context16) {
+var abrirUsuarios = function abrirUsuarios() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirUsuarios$(_context16) {
     while (1) {
       switch (_context16.prev = _context16.next) {
         case 0:
-          url = "src/ui/planillas.html";
-          _context16.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Usuarios";
+          _context16.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context16.stop();
       }
@@ -700,17 +708,18 @@ var abrirPagos = function abrirPagos() {
   });
 };
 
-var abrirPlanillas = function abrirPlanillas() {
-  var url;
-  return regeneratorRuntime.async(function abrirPlanillas$(_context17) {
+var abrirPagos = function abrirPagos() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirPagos$(_context17) {
     while (1) {
       switch (_context17.prev = _context17.next) {
         case 0:
-          url = "src/ui/planillas-cuotas.html";
-          _context17.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Pagos";
+          _context17.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context17.stop();
       }
@@ -718,17 +727,18 @@ var abrirPlanillas = function abrirPlanillas() {
   });
 };
 
-var abrirParametros = function abrirParametros() {
-  var url;
-  return regeneratorRuntime.async(function abrirParametros$(_context18) {
+var abrirPlanillas = function abrirPlanillas() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirPlanillas$(_context18) {
     while (1) {
       switch (_context18.prev = _context18.next) {
         case 0:
-          url = "src/ui/parametros.html";
-          _context18.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Planillas";
+          _context18.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context18.stop();
       }
@@ -736,17 +746,18 @@ var abrirParametros = function abrirParametros() {
   });
 };
 
-var abrirImplementos = function abrirImplementos() {
-  var url;
-  return regeneratorRuntime.async(function abrirImplementos$(_context19) {
+var abrirContratos = function abrirContratos() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirContratos$(_context19) {
     while (1) {
       switch (_context19.prev = _context19.next) {
         case 0:
-          url = "src/ui/implementos.html";
-          _context19.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Contratos";
+          _context19.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context19.stop();
       }
@@ -754,17 +765,18 @@ var abrirImplementos = function abrirImplementos() {
   });
 };
 
-var abrirContratos = function abrirContratos() {
-  var url;
-  return regeneratorRuntime.async(function abrirContratos$(_context20) {
+var abrirServicios = function abrirServicios() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirServicios$(_context20) {
     while (1) {
       switch (_context20.prev = _context20.next) {
         case 0:
-          url = "src/ui/medidores.html";
-          _context20.next = 3;
-          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url));
+          acceso = sessionStorage.getItem("acceso");
+          url = "Servicios fijos";
+          _context20.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
 
-        case 3:
+        case 4:
         case "end":
           return _context20.stop();
       }
@@ -772,9 +784,23 @@ var abrirContratos = function abrirContratos() {
   });
 };
 
-function mostrarLogin() {
-  var dialog = document.getElementById("loginDialog");
-  dialog.showModal();
-}
+var abrirCuotas = function abrirCuotas() {
+  var acceso, url;
+  return regeneratorRuntime.async(function abrirCuotas$(_context21) {
+    while (1) {
+      switch (_context21.prev = _context21.next) {
+        case 0:
+          acceso = sessionStorage.getItem("acceso");
+          url = "Servicios ocacionales";
+          _context21.next = 4;
+          return regeneratorRuntime.awrap(ipcRenderer.send("abrirInterface", url, acceso));
+
+        case 4:
+        case "end":
+          return _context21.stop();
+      }
+    }
+  });
+};
 
 init();
